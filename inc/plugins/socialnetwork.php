@@ -36,7 +36,10 @@ function socialnetwork_info()
 function socialnetwork_is_installed()
 {
     global $db;
-    return $db->field_exists("sn_users", "sn_id_user");
+    if ($db->table_exists("sn_users")) {
+        return true;
+    }
+    return false;
 }
 
 function socialnetwork_install()
