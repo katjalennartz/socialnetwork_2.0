@@ -19,18 +19,28 @@ if (!defined("IN_MYBB")) {
 
 function socialnetwork_info()
 {
-    global $lang;
+    global $lang, $db, $plugins_cache;
     $lang->load("socialnetwork");
 
-    return array(
-        "name" => $lang->userpages_title,
-        "description" => $lang->userpages_desc,
+    $plugininfo = array(
+        "name" => $lang->socialnetwork_title,
+        "description" => $lang->socialnetwork_desc,
         "website" => "https://lslv.de/risu",
         "author" => "risuena",
         "authorsite" => "https://lslv.de/risu",
         "version" => "2.0",
         "compatability" => "18*"
     );
+    if (socialnetwork_is_installed() && is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active']['socialnetwork']) {
+        $result = $db->simple_select('settinggroups', 'gid', "name = 'weristwersettings'");
+        $set = $db->fetch_array($result);
+        if (!empty($set)) {
+            $desc = $plugininfo['description'];
+            $plugininfo['description'] = "" . $desc . "<div style=\"float:right;\"><img src=\"styles/default/images/icons/custom.png\" alt=\"\" style=\"margin-left: 10px;\" /><a href=\"index.php?module=config-settings&amp;action=change&amp;gid=" . (int)$set['gid'] . "\" style=\"margin: 10px;\">Verwaltung ACP Felder</a><hr style=\"margin-bottom: 5px;\">
+            <img src=\"styles/default/images/icons/custom.png\" alt=\"\" style=\"margin-left: 10px;\" /><a href=\"index.php?module=config-settings&amp;action=change&amp;gid=" . (int)$set['gid'] . "\" style=\"margin: 10px;\">Daten von 1.0 übertragen</a><hr style=\"margin-bottom: 5px;\"></div>";
+        }
+    }
+    return $plugininfo;
 }
 
 function socialnetwork_is_installed()
@@ -120,67 +130,67 @@ function socialnetwork_install()
     $setting_array = array(
         'socialnetwork_html' => array(
             'title' => 'HTML?',
-            'description' => 'Dürfen Mitglieder HTML verwenden?',
+            'description' => $lang->socialnetwork_settings_html,
             'optionscode' => 'yesno',
             'value' => '1', // Default
             'disporder' => 1
         ),
         'socialnetwork_mybbcode' => array(
             'title' => 'MyBB Code?',
-            'description' => 'Dürfen Mitglieder MyBB Code verwenden?',
+            'description' => $lang->socialnetwork_settings_mybbcode,
             'optionscode' => 'yesno',
             'value' => '1', // Default
             'disporder' => 2
         ),
         'socialnetwork_img' => array(
             'title' => 'Bilder?',
-            'description' => 'Dürfen Mitglieder Bilder verwenden?',
+            'description' => $lang->socialnetwork_settings_img,
             'optionscode' => 'yesno',
             'value' => '1', // Default
             'disporder' => 3
         ),
         'socialnetwork_badwords' => array(
             'title' => 'Bad Words?',
-            'description' => 'Sollen \'bad words\' gefiltert werden?',
+            'description' => $lang->socialnetwork_settings_badwords,
             'optionscode' => 'yesno',
             'value' => '0', // Default
             'disporder' => 4
         ),
         'socialnetwork_videos' => array(
             'title' => 'Videos?',
-            'description' => 'Dürfen Mitglieder Videos verwenden?',
+            'description' => $lang->socialnetwork_settings_video,
             'optionscode' => 'yesno',
             'value' => '1', // Default
             'disporder' => 5
         ),
         'socialnetwork_defaultavatar' => array(
             'title' => 'Defaultavatar?',
-            'description' => 'Adresse zu einem Defaultavatar, wenn der Nutzer keins ausgewählt hat oder gelöscht worden ist.',
+            'description' => $lang->socialnetwork_settings_defavatar,
             'optionscode' => 'text',
             'value' => 'https://', // Default
             'disporder' => 6
         ),
         'socialnetwork_alertpn' => array(
             'title' => 'Private Nachricht?',
-            'description' => 'Benachrichtigung der Mitglieder (bei Post, Antwort, Like, Freundanfrage etc) per PN?',
+            'description' => $lang->socialnetwork_settings_pn,
             'optionscode' => 'yesno',
             'value' => '1', // Default
             'disporder' => 7
         ),
         'socialnetwork_alertAlert' => array(
             'title' => 'MyAlert?',
-            'description' => 'Benachrichtigung der Mitglieder (bei Post, Antwort, Like, Freundanfrage etc) per MyAlert(Plugin muss installiert sein!)?',
+            'description' => $lang->socialnetwork_settings_alert,
             'optionscode' => 'yesno',
             'value' => '1', // Default
-            'disporder' => 7
+            'disporder' => 8
         ),
-        'socialnetwork_templates' => array(
-            'title' => 'Templates behalten?',
-            'description' => 'Beim Deaktivieren, die Templates behalten und nicht löschen? -> Praktisch bei großen Änderungen, aber vorsicht bei Updates vom Plugin!',
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 7
-        )
+        // 'socialnetwork_templates' => array(
+        //     'title' => 'Templates behalten?',
+        //     'description' => 'Beim Deaktivieren, die Templates behalten und nicht löschen? -> Praktisch bei großen Änderungen, aber vorsicht bei Updates vom Plugin!',
+        //     'optionscode' => 'yesno',
+        //     'value' => '1', // Default
+        //     'disporder' => 7
+        // )
     );
 
     foreach ($setting_array as $name => $setting) {
@@ -189,16 +199,61 @@ function socialnetwork_install()
         $db->insert_query('settings', $setting);
     }
     rebuild_settings();
+
+    //add templates and stylesheets
+    // Add templategroup
+    $templategrouparray = array(
+        'prefix' => 'socialnetwork',
+        'title'  => $db->escape_string($lang->socialnetwork_tplgroup),
+        'isdefault' => 1
+    );
+    $db->insert_query("templategroups", $templategrouparray);
+
+    socialnetwork_addtemplates();
+    socialnetwork_addstylesheets();
 }
 
 function socialnetwork_uninstall()
 {
+    global $db;
+    if ($db->table_exists("sn_users")) {
+        $db->drop_table("sn_users");
+    }
+    if ($db->table_exists("sn_post")) {
+        $db->drop_table("sn_post");
+    }
+    if ($db->table_exists("sn_answer")) {
+        $db->drop_table("sn_answer");
+    }
+    if ($db->table_exists("sn_friends")) {
+        $db->drop_table("sn_friends");
+    }
+    if ($db->table_exists("sn_likes")) {
+        $db->drop_table("sn_likes");
+    }
+
+    $db->delete_query("templates", "title LIKE 'socialnetwork_%'");
+    $db->delete_query("templategroups", "prefix = 'socialnetwork'");
+
+    //SETTINGS ENTFERNEN!
+    $db->delete_query('settings', "name LIKE 'socialnetwork%_'");
+    $db->delete_query('settinggroups', "name = 'socialnetwork'");
+    //CSS deinstallieren
+    require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
+    $db->delete_query("themestylesheets", "name = 'socialnetwork.css'");
+    $query = $db->simple_select("themes", "tid");
+    while ($theme = $db->fetch_array($query)) {
+        update_theme_stylesheet_list($theme['tid']);
+    }
 }
 
 function socialnetwork_activate()
 {
-    socialnetwork_addtemplates();
+    //Hier fügen wir nur die Variablen ein, die das Plugin sichtbar machen - so bleiben eigene Änderungen beim deaktivieren/aktivieren erhalten.
     //add variables
+    include MYBB_ROOT . "/inc/adminfunctions_templates.php";
+    find_replace_templatesets("member_profile", "#" . preg_quote('{$userstars}') . "#i", '{$userstars}{$social_link}');
+
 
     //finde replacement stuff
     // $keeptemplates = intval($mybb->settings['socialnetwork_templates']);
@@ -207,22 +262,20 @@ function socialnetwork_activate()
     // } else {
     //     //add all variables and templates 
     // }
+
 }
 
 function socialnetwork_deactivate()
 {
-    global $db, $mybb, $lang;
-    $keeptemplates = intval($mybb->settings['socialnetwork_templates']);
-    if ($keeptemplates == 1) {
-        //just delete the main variables
-    } else {
-        //delete all variables and templates 
-    }
+    //Template Variablen entfernen
+    include MYBB_ROOT . "/inc/adminfunctions_templates.php";
+    find_replace_templatesets("member_profile", "#" . preg_quote('{$social_link}') . "#i", '');
 }
 /** 
  * add templates
  * */
-function socialnetwork_addtemplates() {
+function socialnetwork_addtemplates()
+{
     global $db, $mybb;
     $template[0] = array(
         "title" => 'socialnetwork_member_main',
@@ -280,26 +333,65 @@ function socialnetwork_addtemplates() {
         "version" => "1.0",
         "dateline" => TIME_NOW
     );
+
+    foreach ($template as $row) {
+        $db->insert_query("templates", $row);
+    }
 }
+/**
+ * add stylesheet
+ */
+function socialnetwork_addstylesheets()
+{
+    global $db;
+    $css = array(
+        'name' => 'socialnetwork.css',
+        'tid' => 1,
+        'attachedto' => '',
+        "stylesheet" =>    '.socialmain {
+	display: flex;
+	display: -webkit-flex;
+	-moz-display: flex;
+	flex-wrap: wrap;
+	-moz-flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
+	justify-content: flex-start;
+	-moz-justify-content: flex-start;
+	-webkit-justify-content: flex-start;
+}',
+        'cachefile' => $db->escape_string(str_replace('/', '', socialnetwork.css)),
+        'lastmodified' => time()
+    );
+
+    require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
+
+    $sid = $db->insert_query("themestylesheets", $css);
+    $db->update_query("themestylesheets", array("cachefile" => "css.php?stylesheet=" . $sid), "sid = '" . $sid . "'", 1);
+
+    $tids = $db->simple_select("themes", "tid");
+    while ($theme = $db->fetch_array($tids)) {
+        update_theme_stylesheet_list($theme['tid']);
+    }
+}
+
 /**
  * Gruppenberechtigungen
  */
 $plugins->add_hook("admin_formcontainer_end", "socialnetwork_editgroup");
 function socialnetwork_editgroup()
 {
-	global $run_module, $form_container, $lang, $form, $mybb, $user;
-	
-	$lang->load("socialnetwork");
+    global $run_module, $form_container, $lang, $form, $mybb, $user;
 
-	if($run_module == 'user' && !empty($form_container->_title) && !empty($lang->users_permissions) && $form_container->_title == $lang->users_permissions)
-	{
-		$socialnetwork_options = array();
-		$socialnetwork_options[] = $form->generate_check_box('can_sn', 1, $lang->userpages_perm_base, array('checked' => $mybb->input['canuserpage']));
-		$socialnetwork_options[] = $form->generate_check_box('can_snedit', 1, $lang->userpages_perm_edit, array('checked' => $mybb->input['canuserpageedit']));	
-		$socialnetwork_options[] = $form->generate_check_box('can_snmod', 1, $lang->userpages_perm_mod, array('checked' => $mybb->input['canuserpagemod']));
+    $lang->load("socialnetwork");
 
-		$form_container->output_row($lang->userpages_perm, '', '<div class="group_settings_bit">'.implode('</div><div class="group_settings_bit">', $socialnetwork_options).'</div>');
-	}
+    if ($run_module == 'user' && !empty($form_container->_title) && !empty($lang->users_permissions) && $form_container->_title == $lang->users_permissions) {
+        $socialnetwork_options = array();
+        $socialnetwork_options[] = $form->generate_check_box('can_sn', 1, $lang->userpages_perm_base, array('checked' => $mybb->input['canuserpage']));
+        $socialnetwork_options[] = $form->generate_check_box('can_snedit', 1, $lang->userpages_perm_edit, array('checked' => $mybb->input['canuserpageedit']));
+        $socialnetwork_options[] = $form->generate_check_box('can_snmod', 1, $lang->userpages_perm_mod, array('checked' => $mybb->input['canuserpagemod']));
+
+        $form_container->output_row($lang->userpages_perm, '', '<div class="group_settings_bit">' . implode('</div><div class="group_settings_bit">', $socialnetwork_options) . '</div>');
+    }
 }
 
 /*
@@ -344,4 +436,27 @@ function socialnetwork_userdelete()
 {
     //posts umändern -> del_nickname etc
     //aus friends löschen
+}
+
+/*
+ *  Verwaltung der Defaults im Tool Menü des ACP hinzufügen
+ *  freien index finden
+ */
+$plugins->add_hook("admin_tools_menu", "socialnetwork_menu");
+function socialnetwork_menu($sub_menu)
+{
+    $key = count($sub_menu) * 10 + 10; /* We need a unique key here so this works well. */
+    $sub_menu[$key] = array(
+        'id'    => 'Soziales Netzwerk',
+        'title'    => 'Verwaltung',
+        'link'    => 'index.php?module=tools-socialnetwork'
+    );
+    return $sub_menu;
+}
+
+$plugins->add_hook("admin_tools_action_handler", "socialnetwork_action_handler");
+function socialnetwork_action_handler($actions)
+{
+    $actions['socialnetwork'] = array('active' => 'socialnetwork', 'file' => 'socialnetwork.php');
+    return $actions;
 }
