@@ -25,19 +25,20 @@ function socialnetwork_info()
     $plugininfo = array(
         "name" => $lang->socialnetwork_title,
         "description" => $lang->socialnetwork_desc,
-        "website" => "https://lslv.de/risu",
+        "website" => "https://github.com/katjalennartz/socialnetwork_2.0",
         "author" => "risuena",
         "authorsite" => "https://lslv.de/risu",
         "version" => "2.0",
         "compatability" => "18*"
     );
     if (socialnetwork_is_installed() && is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active']['socialnetwork']) {
-        $result = $db->simple_select('settinggroups', 'gid', "name = 'weristwersettings'");
+        $result = $db->simple_select('settinggroups', 'gid', "name = 'socialnetwork'");
         $set = $db->fetch_array($result);
         if (!empty($set)) {
             $desc = $plugininfo['description'];
-            $plugininfo['description'] = "" . $desc . "<div style=\"float:right;\"><img src=\"styles/default/images/icons/custom.png\" alt=\"\" style=\"margin-left: 10px;\" /><a href=\"index.php?module=config-settings&amp;action=change&amp;gid=" . (int)$set['gid'] . "\" style=\"margin: 10px;\">Verwaltung ACP Felder</a><hr style=\"margin-bottom: 5px;\">
-            <img src=\"styles/default/images/icons/custom.png\" alt=\"\" style=\"margin-left: 10px;\" /><a href=\"index.php?module=config-settings&amp;action=change&amp;gid=" . (int)$set['gid'] . "\" style=\"margin: 10px;\">Daten von 1.0 übertragen</a><hr style=\"margin-bottom: 5px;\"></div>";
+            $plugininfo['description'] = "" . $desc . "<div style=\"float:right;\"><img src=\"styles/default/images/icons/custom.png\" alt=\"\" style=\"margin-left: 10px;\" />
+                                                        <a href=\"index.php?module=tools-socialnetwork\" style=\"margin: 10px;\">".$lang->socialnetwork_infoacp."</a> | 
+                                                        <img src=\"styles/default/images/icons/custom.png\" alt=\"\" style=\"margin-left: 10px;\" /><a href=\"index.php?module=config-settings&amp;action=change&amp;gid=" . (int)$set['gid'] . "\" style=\"margin: 10px;\">".$lang->socialnetwork_infoolddata."</a><hr style=\"margin-bottom: 5px;\"></div>";
         }
     }
     return $plugininfo;
@@ -63,13 +64,13 @@ function socialnetwork_install()
         `sn_uid` int(20) NOT NULL,
         `sn_nickname` varchar(200) NOT NULL,
         `sn_avatar` varchar(200) NOT NULL,
-        `sn_lovestatus` varchar(200) NOT NULL,
-        `sn_job` varchar(200) NOT NULL,
-        `sn_living` varchar(200) NOT NULL,
         `sn_description` varchar(200) NOT NULL,    
     PRIMARY KEY (`sn_id_user`)
     ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
+    // `sn_lovestatus` varchar(200) NOT NULL,
+    // `sn_job` varchar(200) NOT NULL,
+    // `sn_living` varchar(200) NOT NULL,
     //Erstellt Tabelle für die Posts
     $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_post` (
 		`sn_post_id` int(20) NOT NULL AUTO_INCREMENT,
@@ -238,7 +239,7 @@ function socialnetwork_uninstall()
     //SETTINGS ENTFERNEN!
     $db->delete_query('settings', "name LIKE 'socialnetwork%_'");
     $db->delete_query('settinggroups', "name = 'socialnetwork'");
-    //CSS deinstallieren
+    //CSS löschen
     require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
     $db->delete_query("themestylesheets", "name = 'socialnetwork.css'");
     $query = $db->simple_select("themes", "tid");
@@ -359,7 +360,7 @@ function socialnetwork_addstylesheets()
 	-moz-justify-content: flex-start;
 	-webkit-justify-content: flex-start;
 }',
-        'cachefile' => $db->escape_string(str_replace('/', '', socialnetwork.css)),
+        'cachefile' => $db->escape_string(str_replace('/', '', 'socialnetwork.css')),
         'lastmodified' => time()
     );
 
@@ -386,11 +387,11 @@ function socialnetwork_editgroup()
 
     if ($run_module == 'user' && !empty($form_container->_title) && !empty($lang->users_permissions) && $form_container->_title == $lang->users_permissions) {
         $socialnetwork_options = array();
-        $socialnetwork_options[] = $form->generate_check_box('can_sn', 1, $lang->userpages_perm_base, array('checked' => $mybb->input['canuserpage']));
-        $socialnetwork_options[] = $form->generate_check_box('can_snedit', 1, $lang->userpages_perm_edit, array('checked' => $mybb->input['canuserpageedit']));
-        $socialnetwork_options[] = $form->generate_check_box('can_snmod', 1, $lang->userpages_perm_mod, array('checked' => $mybb->input['canuserpagemod']));
+        $socialnetwork_options[] = $form->generate_check_box('can_sn', 1, $lang->socialnetwork_perm_base, array('checked' => $mybb->input['can_sn']));
+        $socialnetwork_options[] = $form->generate_check_box('can_snedit', 1, $lang->socialnetwork_perm_edit, array('checked' => $mybb->input['can_snedit']));
+        $socialnetwork_options[] = $form->generate_check_box('can_snmod', 1, $lang->socialnetwork_perm_mod, array('checked' => $mybb->input['can_snmod']));
 
-        $form_container->output_row($lang->userpages_perm, '', '<div class="group_settings_bit">' . implode('</div><div class="group_settings_bit">', $socialnetwork_options) . '</div>');
+        $form_container->output_row($lang->socialnetwork_perm, '', '<div class="group_settings_bit">' . implode('</div><div class="group_settings_bit">', $socialnetwork_options) . '</div>');
     }
 }
 
@@ -447,8 +448,8 @@ function socialnetwork_menu($sub_menu)
 {
     $key = count($sub_menu) * 10 + 10; /* We need a unique key here so this works well. */
     $sub_menu[$key] = array(
-        'id'    => 'Soziales Netzwerk',
-        'title'    => 'Verwaltung',
+        'id'    => 'SozialesNetzwerk',
+        'title'    => 'Soziales Netzwerk Verwaltung',
         'link'    => 'index.php?module=tools-socialnetwork'
     );
     return $sub_menu;
