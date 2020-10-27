@@ -8,33 +8,39 @@ $page->add_breadcrumb_item("Soziales Netzwerk - Administration", "index.php?modu
 
 if (!$mybb->input['action']) {
 
+    //get alle existing columns in table sn_users
     $columns = $db->write_query("SHOW COLUMNS FROM " . TABLE_PREFIX . "sn_users WHERE field LIKE 'own_%'"); //
     $oldfields= array();
     $oldfieldsstring = ",";
+    //save them in an array and save a string - without the prefix own_
     while($column = $db->fetch_array($columns)) {
         array_push($oldfields, str_replace('own_', '',$column['Field']));
         $oldfieldsstring .= $column['Field'].",";
     }
     $oldfieldsstring = str_replace('own_', '',$oldfieldsstring);
 
+    //what we do after the button is clicked
     if ($mybb->request_method == "post") {
+        //we don't want it empty
         if (isset($mybb->input['do_setSNField'])) {
-            
+            //array for the input
             $fields = array();
-
+            //Get the input
             $get_fieldinput = $db->escape_string($mybb->get_input('socialnetworkfields'));
+            //and we want to get an array
             $fields = explode(',', $get_fieldinput);
-            //clean array
+            //clean array, means we delete the first and the last entry
             array_shift($fields);
             array_pop($fields);
- 
+            
+            //take our array and test if we had to add a column or not
             foreach ($fields as $field_own) {
-                echo $field_own." - in for each - <br>";
                 if (!$db->field_exists("own_".$field_own, "sn_users")) {   
                     $db->write_query("ALTER TABLE ".TABLE_PREFIX."sn_users
                     ADD `own_".$field_own."` varchar(255);");
                 }
             }
+            //take the old ones and compare it to the new ones, so we can test if we have to delete columns
             foreach($oldfields as $oldfield){
                 if(!in_array($oldfield,$fields)){
                     echo(" - !in_array".$oldfield);
@@ -54,6 +60,7 @@ if (!$mybb->input['action']) {
         'description' => $lang->socialnetwork_module_descr
     );
 
+    //make the containers, input and button
     $page->output_nav_tabs($sub_tabs, 'do_setSNField');
 
     $form = new Form("index.php?module=tools-socialnetwork", "post");
