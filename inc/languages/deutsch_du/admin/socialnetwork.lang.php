@@ -3,8 +3,10 @@
  * Social Network - Administrator Language File
  */
 
-$l['socialnetwork_title'] = "Social Network 2.0 for MyBB";
+$l['socialnetwork_title'] = "Soziales Netzwerk 2.0 for MyBB";
 $l['socialnetwork_desc'] = "Soziales Netzwerk für die Charaktere.";
+$l['socialnetwork_infoolddata'] = "Daten von 1.0 übertragen.";
+$l['socialnetwork_infoacp'] = "Verwaltung der Felder";
 
 $l['socialnetwork_settings_title'] = "Soziales Netzwerk Einstellungen";
 $l['socialnetwork_settings_desc'] = "Einstellungen für das soziale Netzwerk";
@@ -20,11 +22,21 @@ $l['socialnetwork_settings_alert']='Benachrichtigung der Mitglieder (bei Post, A
 
 
 
-
-$l['socialnetwork_perm'] = "Soziales Netzwerk Zugriff";
+$l['socialnetwork_perm'] = "Soziales Netzwerk";
 $l['socialnetwork_perm_base'] = "Darf die Seiten des sozialen Netzwerks sehen?";
-$l['socialnetwork_perm_edit'] = "Darf die Seite bearbeiten?";
+$l['socialnetwork_perm_edit'] = "Darf die eine Seite erstellen und sie bearbeiten?";
 $l['socialnetwork_perm_mod'] = "Darf das soziale Netzwerk moderieren?";
+
+$l['socialnetwork_module_title'] = "Soziales Netzwerk Felder Verwaltung";
+$l['socialnetwork_module_descr'] = "Hier kannst du weitere Felder hinzufügen.";
+$l['socialnetwork_module_contitle'] = "Soziales Netzwerk Verwaltung";
+$l['socialnetwork_module_explanation'] = "<label>Achtung</label> <div class=\"description\">Bitte mit Vorsicht benutzen. 
+Wenn du die Felder änderst und Felder rausnimmst wird der Inhalt bei allen Miglieder gelöscht! Die Standardfelder (Nickname, Avatar, Beschreibung) können nicht geändert werden.
+Anwendung: Felder mit , getrennt ins Textfeld schreiben. Achtung, vorne und hinten muss auch ein Komma stehen, keine Sonderzeichen.<br/>
+<b>Beispiel:</b> ,Status,Wohnohrt,Geburtstag,</div>";
+
+
+
 
 $l['socialnetwork_tplgroup'] = "socialnetwork";
 
