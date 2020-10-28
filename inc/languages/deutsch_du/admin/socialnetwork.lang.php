@@ -3,7 +3,7 @@
  * Social Network - Administrator Language File
  */
 
-$l['socialnetwork_title'] = "Soziales Netzwerk 2.0 for MyBB";
+$l['socialnetwork_title'] = "Soziales Netzwerk 2.0 für MyBB";
 $l['socialnetwork_desc'] = "Soziales Netzwerk für die Charaktere.";
 $l['socialnetwork_infoolddata'] = "Daten von 1.0 übertragen.";
 $l['socialnetwork_infoacp'] = "Verwaltung der Felder";
@@ -17,6 +17,9 @@ $l['socialnetwork_settings_img']='Dürfen Mitglieder Bilder verwenden?';
 $l['socialnetwork_settings_badwords']='Soll nach verbotenen Wörtern gefiltert werden?';
 $l['socialnetwork_settings_video']='Dürfen Mitglieder Videos verwenden?';
 $l['socialnetwork_settings_defavatar']='Adresse zu einem Defaultavatar, wenn der Nutzer keins ausgewählt hat oder gelöscht worden ist.?';
+$l['socialnetwork_settings_titlesize']='Größe des Avatars? Format: b,h (bsp: 150,150)';
+$l['socialnetwork_settings_titlesize']='Größe des Titelbilds? Format: b,h (bsp: 600,150)';
+
 $l['socialnetwork_settings_pn']='Benachrichtigung der Mitglieder (bei Post, Antwort, Like, Freundanfrage etc) per PN?';
 $l['socialnetwork_settings_alert']='Benachrichtigung der Mitglieder (bei Post, Antwort, Like, Freundanfrage etc) per MyAlert(Plugin muss installiert sein!)?';
 
