@@ -522,7 +522,6 @@ function socialnetwork_usercp_menu()
 }
 /*
 *	UserCP
-* //WIP Verwaltung UCP
 *	This function handles everything related to the user Cp
 */
 $plugins->add_hook("usercp_start", "socialnetwork_usercp");
@@ -531,7 +530,6 @@ function socialnetwork_usercp()
     global $db, $mybb, $lang, $cache, $templates, $page, $theme, $headerinclude, $header, $footer, $usercpnav;
     $lang->load('socialnetwork');
     $thisUser = $mybb->user['uid'];
-
     $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $mybb->user['uid'] . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
     $usergroups_cache = $cache->read("usergroups");
     if ($mybb->input['action'] == "socialnetwork") {
@@ -542,16 +540,26 @@ function socialnetwork_usercp()
         if (!$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_isallowed'] || !$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_canedit']) {
             error_no_permission();
         }
-
         //get the inputs and settings of user
-        $nickname = $db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = " . $mybb->user['uid']), "sn_nickanme");
-        $userheader = $db->fetch_field($db->simple_select("sn_users", "sn_userheader", "uid = " . $mybb->user['uid']), "sn_userheader");
-        $useravatar = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = " . $mybb->user['uid']), "sn_avatar");
+        $get_input = $db->query("SELECT * FROM " . TABLE_PREFIX . "sn_users WHERE uid = " . $thisUser . "");
+        while ($input = $db->fetch_array($get_input)) {
+            $nickname = $input['sn_nickname'];
+            $profilbild = $input['sn_avatar'];
+            $titelbild = $input['sn_userheader'];
+            $sn_alertPost = $input['sn_alertPost'];
+            $sn_alertFriend = $input['sn_alertFriend'];
+            $sn_alertLike = $input['sn_alertLike'];
+            $sn_alertMention = $input['sn_alertMention'];
+        }
 
-        $alertPost  = $db->fetch_field($db->simple_select("sn_users", "sn_alertPost", "uid = " . $mybb->user['uid']), "sn_alertPost");
-        $alertFriend  = $db->fetch_field($db->simple_select("sn_users", "sn_alertFriend", "uid = " . $mybb->user['uid']), "sn_alertFriend");
-        $alertLike  = $db->fetch_field($db->simple_select("sn_users", "sn_alertLike", "uid = " . $mybb->user['uid']), "sn_alertLike");
-        $alertMention  = $db->fetch_field($db->simple_select("sn_users", "sn_alertMention", "uid = " . $mybb->user['uid']), "sn_alertMention");
+        if ($sn_alertPost == 1) $sn_postcheck = "checked";
+        else $sn_postcheck = "";
+        if ($sn_alertFriend == 1) $sn_likecheck = "checked";
+        else $sn_likecheck = "";
+        if($sn_alertLike == 1) $sn_friendcheck = "checked";
+        else $sn_friendcheck ="";
+        if($sn_alertMention == 1) $sn_mentioncheck = "checked";
+        else $sn_sn_mentioncheck ="";
 
         $fields = getOwnFields();
         if (empty($fields)){
@@ -562,15 +570,12 @@ function socialnetwork_usercp()
             $get_input  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $mybb->user['uid']), "own_" . $field);
             eval("\$socialnetwork_ucp_ownFieldsBit .= \"" . $templates->get('socialnetwork_ucp_ownFieldsBit') . "\";");
         }
-
-
         eval("\$page = \"" . $templates->get('socialnetwork_ucp_main') . "\";");
         output_page($page);
     }
 
     if ($mybb->input['action'] == "editsn_do" && $mybb->request_method == "post") {
         verify_post_check($mybb->input['my_post_key']);
-
         //preparing for insert in table
         //handle of checkboxes
         if (isset($mybb->input['alertPost'])) $alertPost = "1";
@@ -605,6 +610,7 @@ function socialnetwork_usercp()
                 $inputvalue = $db->escape_string($mybb->input[$ownfield]);
                 $strUpdate.= "own_".$ownfield."='".$inputvalue."',"; 
             }
+            //we don't want the last , so cut it off
             $strOwnFields=substr($strOwnFields, 0, -1);
             $strownIns=substr($strownIns, 0, -1);
             $strUpdate=substr($strUpdate, 0, -1);
@@ -617,8 +623,8 @@ function socialnetwork_usercp()
         sn_nickname='$nickname', sn_avatar='$avatar', sn_userheader='$titelbild', 
         sn_alertPost = '$alertPost', sn_alertLike='$alertLike', sn_alertFriend='$alertFriend', sn_alertMention ='$alertMention'
         ".$strUpdate."");
-        
-        redirect('usercp.php?action=relas_usercp');
+
+        redirect('usercp.php?action=socialnetwork');
     }
 }
 
