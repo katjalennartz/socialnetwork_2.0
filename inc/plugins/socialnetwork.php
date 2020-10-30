@@ -178,14 +178,14 @@ function socialnetwork_install()
             'title' => 'Avatargröße?',
             'description' => $lang->socialnetwork_settings_avasize,
             'optionscode' => 'text',
-            'value' => 'https://', // Default
+            'value' => '150,150', // Default
             'disporder' => 7
         ),
         'socialnetwork_titlesize' => array(
             'title' => 'Titelbildgröße?',
             'description' => $lang->socialnetwork_settings_titlesize,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
+            'optionscode' => 'text',
+            'value' => '600,180', // Default
             'disporder' => 8
         ),
         'socialnetwork_alertpn' => array(
@@ -202,13 +202,6 @@ function socialnetwork_install()
             'value' => '1', // Default
             'disporder' => 10
         ),
-        // 'socialnetwork_templates' => array(
-        //     'title' => 'Templates behalten?',
-        //     'description' => 'Beim Deaktivieren, die Templates behalten und nicht löschen? -> Praktisch bei großen Änderungen, aber vorsicht bei Updates vom Plugin!',
-        //     'optionscode' => 'yesno',
-        //     'value' => '1', // Default
-        //     'disporder' => 7
-        // )
     );
 
     foreach ($setting_array as $name => $setting) {
@@ -249,21 +242,11 @@ function socialnetwork_deactivate()
 function socialnetwork_uninstall()
 {
     global $db, $cache;
-    if ($db->table_exists("sn_users")) {
-        $db->drop_table("sn_users");
-    }
-    if ($db->table_exists("sn_post")) {
-        $db->drop_table("sn_post");
-    }
-    if ($db->table_exists("sn_answer")) {
-        $db->drop_table("sn_answer");
-    }
-    if ($db->table_exists("sn_friends")) {
-        $db->drop_table("sn_friends");
-    }
-    if ($db->table_exists("sn_likes")) {
-        $db->drop_table("sn_likes");
-    }
+    if ($db->table_exists("sn_users")) $db->drop_table("sn_users");
+    if ($db->table_exists("sn_post"))  $db->drop_table("sn_post");
+    if ($db->table_exists("sn_answer")) $db->drop_table("sn_answer");
+    if ($db->table_exists("sn_friends")) $db->drop_table("sn_friends");
+    if ($db->table_exists("sn_likes")) $db->drop_table("sn_likes");
 
     $db->delete_query("templates", "title LIKE 'socialnetwork_%'");
     $db->delete_query("templategroups", "prefix = 'socialnetwork'");
@@ -298,7 +281,46 @@ function socialnetwork_addtemplates()
     global $db, $mybb;
     $template[0] = array(
         "title" => 'socialnetwork_member_main',
-        "template" => '<div class="socialmain">All the html stuff and other variables</html>',
+        "template" => '<html>
+        <head>
+        <title>{$mybb->settings[\\\'bbname\\\']} - {$lang->viewinguserpage}</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        {$headerinclude}
+        </head>
+        <body>
+        {$header}
+        <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder">
+            <tr>
+            <td class="trow1">
+                <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                         <div class="sn_titel" style="background:url({$tit_img});height:{$sn_titlesizeheight};"></div>
+                        <div class="sn_profil" style="width:{$sn_avasizewidth};height:{$sn_avasizeheight};">{$profil_img}</div>
+                        <div class="sn_username"><h1>{$sn_nickname}</h1></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3 sn_links">
+                        <div class="sn_logo"><img src="social/logo_150px.png" alt="social logo"/></div>
+                      {$socialnetwork_member_infobit}
+                    </div>
+                    <div class="col-8 sn_rechts">
+                      <fieldset>
+                         <legend>Beitrag erstellen</legend>
+                         <input type="date" value="2017-08-01" name="datum" /> <input type="time" name="sn_uhrzeit" /><br />
+                         <textarea id="sn_post" name="sn_post" rows="4" cols="50"> </textarea><br />
+                        <input type="submit" name="senden" value="senden">
+                    </fieldset>
+                    </div>
+                  </div>
+                </div>				
+        </td>
+        </tr>
+        </table>
+                {$footer}
+            </body>
+        </html>',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -339,47 +361,53 @@ function socialnetwork_addtemplates()
         <td valign="top">
         <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder">
         <tr>
-            <td class="thead" colspan="2"><strong>Verwaltung - Soziales Netzwerk</strong></td>
-        </tr>
-        <tr>
-        <td class="trow2">
-            <div class="ucp_social">
-			<form method="post" action="usercp.php">
-            <fieldset>
-            <legend>Benachrichtigungseinstellungen</legend>
-            <input type="checkbox" name="alertPost" {$sn_postcheck}> bei neuem Post oder Antwort.<br>
-            <input type="checkbox" name="alertLike" {$sn_likecheck}> wenn jemanden ein Post oder eine Antwort von dir gefällt.<br>
-            <input type="checkbox" name="alertFriend" {$sn_friendcheck}> wenn jeman dein Freund sein will.<br>
-            <input type="checkbox" name="alertMention" {$sn_mentioncheck}> wenn dich jemand erwähnt.</br>
-            </fieldset>
+        <td class="thead" colspan="2"><strong>Verwaltung - Soziales Netzwerk</strong></td>
+    </tr>
+    <tr>
+    <td class="trow2">
+        <div class="ucp_social">
+        <form method="post" action="usercp.php">
+        <fieldset>
+            <legend>Allgemein</legend>
+            {$linktosocial}
+        </fieldset>
+        <fieldset>
+        <legend>Benachrichtigungseinstellungen</legend>
+        <input type="checkbox" name="alertPost" {$sn_postcheck}> bei neuem Post oder Antwort.<br>
+        <input type="checkbox" name="alertLike" {$sn_likecheck}> wenn jemanden ein Post oder eine Antwort von dir gefällt.<br>
+        <input type="checkbox" name="alertFriend" {$sn_friendcheck}> wenn jeman dein Freund sein will.<br>
+        <input type="checkbox" name="alertMention" {$sn_mentioncheck}> wenn dich jemand erwähnt.</br>
+        </fieldset>
+    
+        <fieldset>
+            <legend>Charakterinformationen</legend>
+            <label>Nickname:</label> <input type="text" name="nickname" value="{$nickname}"/><br />
+            <label>Avatar:<div class="ucp_smallinfo">Avatargröße: {$sn_avasizewidth}x{$sn_avasizeheight}px</div></label> 
+            <input type="text" name="profilbild" value="{$profilbild}"/> <br />
+            <label>Titelbild:<div class="ucp_smallinfo">Titelbildgröße: {$sn_titlesizewidth}x{$sn_titlesizeheight}px</div></label>
+            <input type="text" name="titelbild" value="{$titelbild}"/><br />
+            
+        </fieldset>
         
-            <fieldset>
-                <legend>Charakterinformationen</legend>
-                <label>Nickname:</label> <input type="text" name="nickname" value="{$nutzername}"/><br />
-                <label>Avatar:</label> <input type="text" name="profilbild" value="{$profilbild}"/><br />
-                <label>Titelbild:</label> <input type="text" name="titelbild" value="{$titelbild}"/><br />
-                
-            </fieldset>
-            
-            <fieldset>
-                <legend>Weitere Felder:</legend>
-                {$socialnetwork_ucp_ownFieldsBit}
-            </fieldset>
-            
-            <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
-            <input type="hidden" name="action" value="editsn_do" />
-            <input type="submit" value="Speichern" name="Speichern" class="button" />
-			</form>
-            </div>
-        </td>
-        </tr>
-        </table>
-        </td>
-        </tr>
-        </table>
-        {$footer}
-        </body>
-        </html>',
+        <fieldset>
+            <legend>Weitere Felder:</legend>
+            {$socialnetwork_ucp_ownFieldsBit}
+        </fieldset>
+        
+        <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <input type="hidden" name="action" value="editsn_do" />
+        <input type="submit" value="Speichern" name="Speichern" class="button" />
+        </form>
+        </div>
+    </td>
+    </tr>
+    </table>
+    </td>
+    </tr>
+    </table>
+    {$footer}
+    </body>
+    </html>',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -412,6 +440,13 @@ function socialnetwork_addtemplates()
         "version" => "1.0",
         "dateline" => TIME_NOW
     );
+    $template[8] = array(
+        "title" => 'socialnetwork_member_infobit',
+        "template" => '{$own_title}: {$own_value}',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
 
     //socialnetwork_ucp_ownFieldsBit
     foreach ($template as $row) {
@@ -429,19 +464,57 @@ function socialnetwork_addstylesheets()
         'tid' => 1,
         'attachedto' => '',
         "stylesheet" =>    '.socialmain {
-            display: flex;
-            display: -webkit-flex;
-            -moz-display: flex;
-            flex-wrap: wrap;
-            -moz-flex-wrap: wrap;
-            -webkit-flex-wrap: wrap;
-            justify-content: flex-start;
-            -moz-justify-content: flex-start;
-            -webkit-justify-content: flex-start;
+            text-align:center;
         }
         
+        .sn_username {
+            padding-left: 10px;
+        }
+        
+        legend{
+        width: auto;
+        }
+        
+        .sn_titel{
+            width: 100%;
+            border: 0px #b1b1b1 solid;
+            background-repeat: no-repeat !important;
+            background-position: center 0px !important;
+        }
+        
+        .sn_profil{
+            background-color: #b1b1b1;
+            padding: 5px;
+            margin-left: 70px;
+            margin-top: -100px;
+            margin-right: 10px;
+            float: left;
+        }
+        
+        .sn_links{
+            background-color: #b1b1b1;
+            margin: 10px;
+            padding:10px;
+        }
+        
+        .sn_logo{
+            margin:auto;
+            text-align:center;
+        }
+        
+        .sn_rechts{
+            background-color: #b1b1b1;
+            margin: 10px;
+            padding: 10px
+        }
+                
         .ucp_social legend{
             font-weight: bold;
+        }
+        
+        sn_tit {
+        font-weight: bold;
+        
         }
         
         .ucp_social label{
@@ -450,10 +523,14 @@ function socialnetwork_addstylesheets()
             float: left; 
             clear: left;
         }
-        
+                
         .ucp_social input{
-            margin: 2px;
-        }                           ',
+            margin: 5px;
+        }
+            
+        .ucp_smallinfo {
+            font-size: 0.7em;
+        }',
         'cachefile' => $db->escape_string(str_replace('/', '', 'socialnetwork.css')),
         'lastmodified' => time()
     );
@@ -529,12 +606,19 @@ function socialnetwork_usercp()
 {
     global $db, $mybb, $lang, $cache, $templates, $page, $theme, $headerinclude, $header, $footer, $usercpnav;
     $lang->load('socialnetwork');
-    $thisUser = $mybb->user['uid'];
-    $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $mybb->user['uid'] . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
     $usergroups_cache = $cache->read("usergroups");
+    $thisUser = $mybb->user['uid'];
+
     if ($mybb->input['action'] == "socialnetwork") {
         add_breadcrumb($lang->nav_usercp, "usercp.php");
         add_breadcrumb($lang->changeuserpage, "usercp.php?action=socialnetwork");
+        $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $mybb->user['uid'] . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
+
+        $sizes = get_avatit_size();
+        $sn_avasizewidth = $sizes[0];
+        $sn_avasizeheight = $sizes[1];
+        $sn_titlesizewidth = $sizes[2];
+        $sn_titlesizeheight = $sizes[3];
 
         //user is not allowed to use social network
         if (!$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_isallowed'] || !$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_canedit']) {
@@ -556,15 +640,14 @@ function socialnetwork_usercp()
         else $sn_postcheck = "";
         if ($sn_alertFriend == 1) $sn_likecheck = "checked";
         else $sn_likecheck = "";
-        if($sn_alertLike == 1) $sn_friendcheck = "checked";
-        else $sn_friendcheck ="";
-        if($sn_alertMention == 1) $sn_mentioncheck = "checked";
-        else $sn_sn_mentioncheck ="";
+        if ($sn_alertLike == 1) $sn_friendcheck = "checked";
+        else $sn_friendcheck = "";
+        if ($sn_alertMention == 1) $sn_mentioncheck = "checked";
+        else $sn_sn_mentioncheck = "";
 
         $fields = getOwnFields();
-        if (empty($fields)){
-            $socialnetwork_ucp_ownFieldsBit ="Keine weiteren Felder.";
-        }
+        if (empty($fields)) $socialnetwork_ucp_ownFieldsBit = "Keine weiteren Felder.";
+
         foreach ($fields as $field) {
             $sn_fieldtitle = $field;
             $get_input  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $mybb->user['uid']), "own_" . $field);
@@ -586,6 +669,7 @@ function socialnetwork_usercp()
         else $alertFriend = "0";
         if (isset($mybb->input['alertMention'])) $alertMention = "1";
         else $alertMention = "0";
+
         //handle of the default values
         $nickname = $db->escape_string($mybb->input['nickname']);
         $avatar = $db->escape_string($mybb->input['profilbild']);
@@ -594,41 +678,94 @@ function socialnetwork_usercp()
         //get them
         $ownfields = getOwnFields();
         //some intial stuff
-        $strOwnFields =""; 
-        $strownIns=""; 
+        $strOwnFields = "";
+        $strownIns = "";
         $strUpdate = "";
         //are there own fields? 
         if (!empty($ownfields)) {
             //we need some strings to make our query work
             $strownIns = ",";
-            $strOwnFields =",";
-            $strUpdate =",";
+            $strOwnFields = ",";
+            $strUpdate = ",";
             //and now we have to puzzle
-            foreach ($ownfields as $ownfield) {                
-                $strOwnFields .= "own_".$ownfield.",";
-                $strownIns .= "'".$db->escape_string($mybb->input[$ownfield])."',";
+            foreach ($ownfields as $ownfield) {
+                $strOwnFields .= "own_" . $ownfield . ",";
+                $strownIns .= "'" . $db->escape_string($mybb->input[$ownfield]) . "',";
                 $inputvalue = $db->escape_string($mybb->input[$ownfield]);
-                $strUpdate.= "own_".$ownfield."='".$inputvalue."',"; 
+                $strUpdate .= "own_" . $ownfield . "='" . $inputvalue . "',";
             }
             //we don't want the last , so cut it off
-            $strOwnFields=substr($strOwnFields, 0, -1);
-            $strownIns=substr($strownIns, 0, -1);
-            $strUpdate=substr($strUpdate, 0, -1);
+            $strOwnFields = substr($strOwnFields, 0, -1);
+            $strownIns = substr($strownIns, 0, -1);
+            $strUpdate = substr($strUpdate, 0, -1);
         }
 
-        $db->write_query("INSERT INTO " . TABLE_PREFIX . "sn_users(uid, sn_nickname, sn_avatar, sn_userheader, sn_alertPost, sn_alertFriend,sn_alertLike,sn_alertMention".$strOwnFields.") 
+        $db->write_query("INSERT INTO " . TABLE_PREFIX . "sn_users(uid, sn_nickname, sn_avatar, sn_userheader, sn_alertPost, sn_alertFriend,sn_alertLike,sn_alertMention" . $strOwnFields . ") 
         VALUES 
         ('$thisUser', '$nickname','$avatar','$titelbild','$alertPost','$alertFriend','$alertLike','$alertMention'" . $strownIns . ") 
         ON DUPLICATE KEY UPDATE 
         sn_nickname='$nickname', sn_avatar='$avatar', sn_userheader='$titelbild', 
         sn_alertPost = '$alertPost', sn_alertLike='$alertLike', sn_alertFriend='$alertFriend', sn_alertMention ='$alertMention'
-        ".$strUpdate."");
+        " . $strUpdate . "");
 
         redirect('usercp.php?action=socialnetwork');
     }
 }
 
-//TODO Anzeige Profil
+//WIP Anzeige Profil
+/***
+ * The Mainpage of Network, bundle all the work
+ */
+$plugins->add_hook("member_profile_start", "socialnetwork_mainpage");
+function socialnetwork_mainpage()
+{
+    global $db, $mybb, $lang, $templates, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme;
+    $lang->load('socialnetwork');
+    $usergroups_cache = $cache->read("usergroups");
+
+    if ($mybb->input['area'] == "socialnetwork") {
+        //not allowed to use social network
+        if (!$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_isallowed']) {
+            error_no_permission();
+        }
+        //getsettings
+        $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
+        //get sizes
+        $sizes = get_avatit_size();
+        $sn_avasizewidth = $sizes[0] + 10; // +10 for nice view with padding
+        $sn_avasizeheight = $sizes[1] + 10; // +10 for nice view with padding
+        $sn_titlesizewidth = $sizes[2];
+        $sn_titlesizeheight = $sizes[3];
+
+        //Get the data of the page, we are looking at
+        $pagedata = $db->simple_select("sn_users", "*", "uid = " . intval($mybb->input['uid']));
+        //user habe no page
+        if ($db->num_rows($pagedata) == 0) error_no_permission();
+        $sn_activepage = $db->fetch_array($pagedata);
+        //catch data
+        if ($sn_activepage['sn_userheader'] == "") $tit_img = "";
+        else $tit_img = $sn_activepage['sn_userheader'];
+        if ($sn_activepage['sn_avatar'] == "") $profil_img = "<img src=\"" . $defaultava . "\"/>";
+        else $profil_img = "<img src=\"" . $sn_activepage['sn_avatar'] . "\"/>";
+        if ($sn_activepage['sn_nickname'] == "") $sn_nickname = $db->fetch_field($db->simple_select("users", "username", "uid = " . $sn_activepage['uid'], "limit 1"), "username");
+        else $sn_nickname = $sn_activepage['sn_nickname'];
+        //Now we want the individual fields
+        $fields = getOwnFields();
+        // $socialnetwork_ucp_ownFieldsBit
+        foreach ($fields as $field) {
+            $sn_fieldtitle = $field;
+            $get_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_activepage['uid']), "own_" . $field);
+            $own_title = $field;
+            if ($get_value == "") $own_value = "keine Angabe";
+            else $own_value = $get_value;
+            eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
+        }
+        eval("\$page = \"" . $templates->get('socialnetwork_member_main') . "\";");
+        output_page($page);
+        die();
+    }
+}
+
 
 //TODO POSTEN + edit + delete
 
@@ -647,6 +784,7 @@ function socialnetwork_usercp()
 
 //TODO Verwaltung MOD CP
 //
+
 
 
 /**
@@ -683,6 +821,21 @@ function socialnetwork_action_handler($actions)
     $actions['socialnetwork'] = array('active' => 'socialnetwork', 'file' => 'socialnetwork.php');
     return $actions;
 }
+/*** Other functions 
+ * put it in extra functions for better handling
+ * ***/
+
+/****
+ * Upload of images
+ *****/
+function uploadImg()
+{
+    global $db;
+    $allowedFormats = array("image/png", "image/jpeg", "image/gif");
+    if (!in_array($_FILES['uploaddatei']['type'], $allowedFormats)) {
+        echo "<p>Dateitype ist NICHT zugelassen</p>";
+    }
+}
 
 /**** Helper Functions  ******/
 function getOwnFields()
@@ -696,4 +849,17 @@ function getOwnFields()
         array_push($fields, str_replace('own_', '', $column['Field']));
     }
     return $fields;
+}
+//get sizes of Avatar and Title from settings of admin, return Array with sizes
+function get_avatit_size()
+{
+    global $mybb;
+    $sizearray = array();
+    $avasizearr = explode(',', $mybb->settings['socialnetwork_avasize']);
+    $titlesizearr = explode(',', $mybb->settings['socialnetwork_titlesize']);
+    array_push($sizearray, $avasizearr[0]); //index 0 = avabreite
+    array_push($sizearray, $avasizearr[1]); //index 1 = avahöhe
+    array_push($sizearray, $titlesizearr[0]); //index2 = titelbilbbreite
+    array_push($sizearray, $titlesizearr[1]); //index3 = titelbildhöhe
+    return $sizearray;
 }
