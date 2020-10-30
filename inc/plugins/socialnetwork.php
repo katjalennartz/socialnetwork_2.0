@@ -58,7 +58,7 @@ function socialnetwork_install()
     global $db, $lang;
     $lang->load("socialnetwork");
     socialnetwork_uninstall();
-    //Erstellt Tabelle für die userdaten
+    //create tables for userdata
     $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_users` (
         `uid` int(20) NOT NULL AUTO_INCREMENT,
         `sn_nickname` varchar(200) NOT NULL,
@@ -71,7 +71,7 @@ function socialnetwork_install()
     PRIMARY KEY (`uid`)
     ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
-    //Erstellt Tabelle für die Posts
+    //create table for posts
     $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_post` (
 		`sn_post_id` int(20) NOT NULL AUTO_INCREMENT,
         `sn_pageid` int(20) NOT NULL,
@@ -83,7 +83,7 @@ function socialnetwork_install()
 	PRIMARY KEY (`sn_post_id`)
     ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
-    //Erstellt Tabelle für die Antworten
+    //create table for answers
     $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_answer` (
 		`sn_aid` int(20) NOT NULL AUTO_INCREMENT,
 		`sn_post_id` int(20) NOT NULL,
@@ -96,7 +96,7 @@ function socialnetwork_install()
   	PRIMARY KEY (`sn_aid`)
 	) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
-    //Erstellt Tabelle für die Freunde
+    //create table for friends
     $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_friends` (
         `sn_friendsid` int(20) NOT NULL AUTO_INCREMENT,
   	    `sn_uid` int(20) NOT NULL,
@@ -105,13 +105,26 @@ function socialnetwork_install()
   	PRIMARY KEY (`sn_friendsid`)
 	) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
-    //Erstellt Tabelle für Likes.
+    //create tables for likes.
     $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_likes` (
         `sn_like_id` int(11) NOT NULL AUTO_INCREMENT,
         `sn_postid` int(11) NOT NULL,
         `sn_answerid` int(11) NOT NULL,
-        `sn_uid` varchar(200) NOT NULL,
+        `sn_uid` int(11) NOT NULL,
         PRIMARY KEY (`sn_like_id`)
+      ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
+
+
+    //create table for uploaded images.
+    $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_imgs` (
+        `sn_imgId` int(11) NOT NULL AUTO_INCREMENT,
+        `sn_filesize` int(11) NOT NULL,
+        `sn_filename` varchar(200) NOT NULL,
+        `sn_width` int(200) NOT NULL,
+        `sn_height` int(11) NOT NULL,
+        `sn_uid` int(11) NOT NULL,
+        `sn_postId` int(11) NOT NULL,
+        PRIMARY KEY (`sn_imgId`)
       ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
     //einstellungen:
@@ -201,6 +214,34 @@ function socialnetwork_install()
             'optionscode' => 'yesno',
             'value' => '1', // Default
             'disporder' => 10
+        ),
+        'socialnetwork_uploadImg' => array(
+            'title' => 'Bilder in Posts?',
+            'description' => 'Dürfen Mitglieder Bilder für Posts hochladen?',
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 11
+        ),
+        'socialnetwork_uploadImgSize' => array(
+            'title' => 'Dateigröße?',
+            'description' => 'Wie groß dürfen Bilder sein (Dateigröße)?',
+            'optionscode' => 'text',
+            'value' => '200000', // Default
+            'disporder' => 12
+        ),
+        'socialnetwork_uploadImgWidth' => array(
+            'title' => 'erlaubte Breite?',
+            'description' => 'Wie breit dürfen Bilder höchstens sein?',
+            'optionscode' => 'text',
+            'value' => '400', // Default
+            'disporder' => 13
+        ),
+        'socialnetwork_uploadImgHeight' => array(
+            'title' => 'erlaubte Höhe?',
+            'description' => 'Wie hoch dürfen Bilder höchstens sein?',
+            'optionscode' => 'text',
+            'value' => '200', // Default
+            'disporder' => 14
         ),
     );
 
@@ -760,6 +801,16 @@ function socialnetwork_mainpage()
             else $own_value = $get_value;
             eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
         }
+
+        if (isset($mybb->input['sendPost'])) {
+            //check if theres an upload
+            if (isset($_FILES['uploadImg']['name']) && $_FILES['uploadImg']['name'] != '') {
+                uploadImg();
+            }
+             //TODO save Post
+            savePost($sn_activepage['uid']);
+            // redirect('member.php?action=profile&uid='.$sn_activepage['uid'].'&area=socialnetwork');
+        }
         eval("\$page = \"" . $templates->get('socialnetwork_member_main') . "\";");
         output_page($page);
         die();
@@ -830,11 +881,80 @@ function socialnetwork_action_handler($actions)
  *****/
 function uploadImg()
 {
-    global $db;
-    $allowedFormats = array("image/png", "image/jpeg", "image/gif");
-    if (!in_array($_FILES['uploaddatei']['type'], $allowedFormats)) {
-        echo "<p>Dateitype ist NICHT zugelassen</p>";
+    global $db, $mybb;
+    // require_once MYBB_ROOT . "inc/functions_image.php";
+    echo ("im uploadimg");
+    //TODO Setting größe anlegen
+    $uploadImgWidth = $mybb->settings['socialnetwork_uploadImgWidth'];
+    $uploadImgHeight = $mybb->settings['socialnetwork_uploadImgHeight'];
+    $maxfilesize = $mybb->settings['socialnetwork_uploadImgSize'];
+   // sn_post_id
+    $post = $db->fetch_field($db->simple_select("Select max(sn_post_id) as maxID FROM ".TABLE_PREFIX."sn_post LIMIT 1"), "sn_post_id");
+    //$post = 1 + 1; //TODO letzte post id bekommen
+    $imgpath = "social/userimages/";
+    echo ("<br />test:" . $_FILES['uploadImg']['tmp_name']);
+    // Check if gallery path is writable
+    if (!is_writable('social/userimages/')) echo ("nicht beschreibar");
+
+    $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
+    echo ("<br> Sizes -" . $sizes[0] . "<br>");
+    $failed = false;
+    if ($sizes === false) {
+        @unlink($imgpath);
+        echo ("File? tmp name" . $_FILES['uploadImg']['tmp_name']) . "<br>";
+        move_uploaded_file($_FILES['uploadImg']['tmp_name'], 'upload/' . $_FILES['uploadImg']['name']);
+        $_FILES['uploadImg']['tmp_name'] = $imgpath;
+        $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
+        $failed = true;
     }
+    // No size, then it's probably not a valid pic.
+    if ($sizes === false) echo ("Size falsch");
+    elseif ((!empty($uploadImgWidth) && $sizes[0] >  $uploadImgWidth) || (!empty($uploadImgHeight) && $sizes[1] > $uploadImgHeight)) {
+        //Delete the temp file
+        @unlink($_FILES['uploadImg']['tmp_name']);
+        echo ("Fehler Größe");
+    } else {
+        echo ("im else <br>");
+        $filesize = $_FILES['uploadImg']['size'];
+        if (!empty($maxfilesize) && $filesize > $maxfilesize) {
+            //Delete the temp file
+            @unlink($_FILES['uploadImg']['tmp_name']);
+            echo ("Fehler mit Filegröße");
+        }
+
+        $extensions = array(
+            1 => 'gif',
+            2 => 'jpeg',
+            3 => 'png',
+            5 => 'psd',
+            6 => 'bmp',
+            7 => 'tiff',
+            8 => 'tiff',
+            9 => 'jpeg',
+            14 => 'iff',
+        );
+        $extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : '.bmp';
+
+        $filename = $mybb->user['uid'] . '_' . date('d_m_y_g_i_s') . '.' . $extension;
+
+        if ($failed == false)
+            move_uploaded_file($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
+        else
+            rename($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
+
+        @chmod($imgpath . $filename, 0644);
+
+        $db->query("INSERT INTO " . TABLE_PREFIX . "sn_imgs
+						(sn_filesize, filename, width, height, uid, postId)
+						VALUES ( $filesize,'$filename', $sizes[0], $sizes[1], " . $mybb->user['uid'] . ", $post)");
+    }
+}
+
+/**
+ * Save a Post
+ */
+function savePost($activePage)
+{
 }
 
 /**** Helper Functions  ******/
