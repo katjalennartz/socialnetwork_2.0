@@ -882,46 +882,41 @@ function socialnetwork_action_handler($actions)
 function uploadImg()
 {
     global $db, $mybb;
-    // require_once MYBB_ROOT . "inc/functions_image.php";
-    echo ("im uploadimg");
-    //TODO Setting größe anlegen
+    
     $uploadImgWidth = $mybb->settings['socialnetwork_uploadImgWidth'];
     $uploadImgHeight = $mybb->settings['socialnetwork_uploadImgHeight'];
     $maxfilesize = $mybb->settings['socialnetwork_uploadImgSize'];
-   // sn_post_id
-    $post = $db->fetch_field($db->simple_select("Select max(sn_post_id) as maxID FROM ".TABLE_PREFIX."sn_post LIMIT 1"), "sn_post_id");
-    //$post = 1 + 1; //TODO letzte post id bekommen
+
+    $post = $db->fetch_field($db->write_query("Select max(sn_post_id) as max FROM ".TABLE_PREFIX."sn_post LIMIT 1"), "max");
+    //echo($post);
+    if ($post == "") $post = 1;
     $imgpath = "social/userimages/";
-    echo ("<br />test:" . $_FILES['uploadImg']['tmp_name']);
     // Check if gallery path is writable
-    if (!is_writable('social/userimages/')) echo ("nicht beschreibar");
+    if (!is_writable('social/userimages/')) echo ("Der Pfad ist nicht beschreibar. Bitte sag dem Admin bescheid.");
 
     $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
-    echo ("<br> Sizes -" . $sizes[0] . "<br>");
     $failed = false;
     if ($sizes === false) {
         @unlink($imgpath);
-        echo ("File? tmp name" . $_FILES['uploadImg']['tmp_name']) . "<br>";
         move_uploaded_file($_FILES['uploadImg']['tmp_name'], 'upload/' . $_FILES['uploadImg']['name']);
         $_FILES['uploadImg']['tmp_name'] = $imgpath;
         $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
         $failed = true;
     }
     // No size, then it's probably not a valid pic.
-    if ($sizes === false) echo ("Size falsch");
+    if ($sizes === false) echo ("Mit den Größen des Bildes stimmt etwas nicht.");
     elseif ((!empty($uploadImgWidth) && $sizes[0] >  $uploadImgWidth) || (!empty($uploadImgHeight) && $sizes[1] > $uploadImgHeight)) {
         //Delete the temp file
         @unlink($_FILES['uploadImg']['tmp_name']);
         echo ("Fehler Größe");
     } else {
-        echo ("im else <br>");
         $filesize = $_FILES['uploadImg']['size'];
+        
         if (!empty($maxfilesize) && $filesize > $maxfilesize) {
             //Delete the temp file
             @unlink($_FILES['uploadImg']['tmp_name']);
-            echo ("Fehler mit Filegröße");
+            echo ("Fehler mit Dateigröße.");
         }
-
         $extensions = array(
             1 => 'gif',
             2 => 'jpeg',
@@ -945,19 +940,22 @@ function uploadImg()
         @chmod($imgpath . $filename, 0644);
 
         $db->query("INSERT INTO " . TABLE_PREFIX . "sn_imgs
-						(sn_filesize, filename, width, height, uid, postId)
+						(sn_filesize, sn_filename, sn_width, sn_height, sn_uid, sn_postId)
 						VALUES ( $filesize,'$filename', $sizes[0], $sizes[1], " . $mybb->user['uid'] . ", $post)");
     }
 }
 
 /**
- * Save a Post
+ * Save a Post to database
  */
 function savePost($activePage)
 {
+    //get the infos
+    
 }
 
 /**** Helper Functions  ******/
+/** get own fields and return an array with cleaned names */
 function getOwnFields()
 {
     global $db;
