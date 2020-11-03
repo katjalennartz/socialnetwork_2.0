@@ -9,8 +9,8 @@
  * 
  */
 // enable for Debugging:
-//   error_reporting ( -1 );
-//   ini_set ( 'display_errors', true );
+//    error_reporting ( -1 );
+//    ini_set ( 'display_errors', true );
 
 // Disallow direct access to this file for security reasons
 if (!defined("IN_MYBB")) {
@@ -72,7 +72,7 @@ function socialnetwork_install()
     ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
     //create table for posts
-    $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_post` (
+    $db->write_query("CREATE TABLE `" . TABLE_PREFIX . "sn_posts` (
 		`sn_post_id` int(20) NOT NULL AUTO_INCREMENT,
         `sn_pageid` int(20) NOT NULL,
 		`sn_uid` int(20) NOT NULL,
@@ -284,7 +284,7 @@ function socialnetwork_uninstall()
 {
     global $db, $cache;
     if ($db->table_exists("sn_users")) $db->drop_table("sn_users");
-    if ($db->table_exists("sn_post"))  $db->drop_table("sn_post");
+    if ($db->table_exists("sn_posts"))  $db->drop_table("sn_posts");
     if ($db->table_exists("sn_answer")) $db->drop_table("sn_answer");
     if ($db->table_exists("sn_friends")) $db->drop_table("sn_friends");
     if ($db->table_exists("sn_likes")) $db->drop_table("sn_likes");
@@ -374,7 +374,7 @@ function socialnetwork_addtemplates()
         "dateline" => TIME_NOW
     );
     $template[2] = array(
-        "title" => 'socialnetwork_member_answer',
+        "title" => 'socialnetwork_member_answerbit',
         "template" => 'the answers ',
         "sid" => "-2",
         "version" => "1.0",
@@ -391,64 +391,56 @@ function socialnetwork_addtemplates()
         "title" => 'socialnetwork_ucp_main',
         "template" => '<html>
         <head>
-        <title>{$lang->user_cp} - {$lang->socialnetwork_usercp}</title>
+        <title>{$mybb->settings[\\\'bbname\\\']} - {$lang->viewinguserpage}</title>
+        <link rel="stylesheet" href="social/css/bootstrap.min.css">
         {$headerinclude}
         </head>
         <body>
         {$header}
-        <table width="100%" border="0" align="center">
-        <tr>
-        {$usercpnav}
-        <td valign="top">
+        <div class="socialmain">
         <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder">
-        <tr>
-        <td class="thead" colspan="2"><strong>Verwaltung - Soziales Netzwerk</strong></td>
-    </tr>
-    <tr>
-    <td class="trow2">
-        <div class="ucp_social">
-        <form method="post" action="usercp.php">
-        <fieldset>
-            <legend>Allgemein</legend>
-            {$linktosocial}
-        </fieldset>
-        <fieldset>
-        <legend>Benachrichtigungseinstellungen</legend>
-        <input type="checkbox" name="alertPost" {$sn_postcheck}> bei neuem Post oder Antwort.<br>
-        <input type="checkbox" name="alertLike" {$sn_likecheck}> wenn jemanden ein Post oder eine Antwort von dir gefällt.<br>
-        <input type="checkbox" name="alertFriend" {$sn_friendcheck}> wenn jeman dein Freund sein will.<br>
-        <input type="checkbox" name="alertMention" {$sn_mentioncheck}> wenn dich jemand erwähnt.</br>
-        </fieldset>
-    
-        <fieldset>
-            <legend>Charakterinformationen</legend>
-            <label>Nickname:</label> <input type="text" name="nickname" value="{$nickname}"/><br />
-            <label>Avatar:<div class="ucp_smallinfo">Avatargröße: {$sn_avasizewidth}x{$sn_avasizeheight}px</div></label> 
-            <input type="text" name="profilbild" value="{$profilbild}"/> <br />
-            <label>Titelbild:<div class="ucp_smallinfo">Titelbildgröße: {$sn_titlesizewidth}x{$sn_titlesizeheight}px</div></label>
-            <input type="text" name="titelbild" value="{$titelbild}"/><br />
-            
-        </fieldset>
+            <tr>
+            <td class="trow1">
+                <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                         <div class="sn_titel" style="background:url({$tit_img});height:{$sn_titlesizeheight};"></div>
+                        <div class="sn_profil" style="width:{$sn_avasizewidth};height:{$sn_avasizeheight};">{$profil_img}</div>
+                        <div class="sn_username"><h1>{$sn_nickname}</h1></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3 sn_links">
+                        <div class="sn_logo"><img src="social/logo_150px.png" alt="social logo"/></div>
+                      {$socialnetwork_member_infobit}
+                    </div>
+                    <div class="col-8">
+                    <div class="sn_rechts">
+                      <fieldset>
+                         <legend>Beitrag erstellen</legend>
+                        <!--action=profile&uid=7&area=socialnetwork-->
+                         <form method="post" enctype="multipart/form-data" name="picform" id="picform" method="post"> <!--ohne action?-->
+                        <!--<form name="uploadformular" enctype="multipart/form-data" action="dateiupload.php" method="post">-->	 
+                         <input type="date" value="2017-08-01" name="datum" /> <input type="time" name="sn_uhrzeit" value="12:00" /><br />
+                         <textarea id="sn_post" name="sn_post" rows="4" cols="50"> </textarea><br />
+                        <input type="file" name="uploadImg" size="60" maxlength="255"><br />
+                        <input class="sn_send" type="submit" name="sendPost" value="senden">
+                         </form>
+                        </fieldset>
+                        </div>
+                        {$socialnetwork_member_postbit}
+                    </div>
+                    
         
-        <fieldset>
-            <legend>Weitere Felder:</legend>
-            {$socialnetwork_ucp_ownFieldsBit}
-        </fieldset>
-        
-        <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
-        <input type="hidden" name="action" value="editsn_do" />
-        <input type="submit" value="Speichern" name="Speichern" class="button" />
-        </form>
-        </div>
-    </td>
-    </tr>
-    </table>
-    </td>
-    </tr>
-    </table>
-    {$footer}
-    </body>
-    </html>',
+                  </div>
+                </div>				
+        </td>
+        </tr>
+        </table>
+            </div>
+                {$footer}
+            </body>
+        </html>',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -484,6 +476,32 @@ function socialnetwork_addtemplates()
     $template[8] = array(
         "title" => 'socialnetwork_member_infobit',
         "template" => '{$own_title}: {$own_value}',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[9] = array(
+        "title" => 'socialnetwork_member_postbit',
+        "template" => '<div class="sn_rechts">
+        <fieldset>
+            <img class="sn_postProfilbild" src="{$sn_postimg}" alt="" />
+            <span class="sn_postName">{$sn_postname}</span>
+            <span class="sn_postDate">{$sn_date}</span>
+            <span class="sn_edit">{$edit} {$delete}</span>
+            <div class="sn_socialPost">{$sn_showPost}</div>
+            {$socialnetwork_member_answerbit}
+            <hr>
+            <div class="sn_answer_form">
+                <form action="" method="post">
+                <input type="hidden"  value="{$sn_postid}" name="postid" />
+                <img class="sn_answerFormProfilbild" src="{$sn_ansFormImg}" alt="" />
+                <input type="date" value="2017-08-01" name="sn_ansDatum" /> <input type="time" name="sn_ansWhrzeit" value="12:00" /><br />
+                <textarea id="sn_answer" name="sn_answer" rows="1" cols="60"></textarea><br />
+                <input class="sn_send" type="submit" name="sendAnswer" value="senden">
+                </form>
+            </div>
+        </fieldset>
+    </div>',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -536,6 +554,7 @@ function socialnetwork_addstylesheets()
             background-color: #b1b1b1;
             margin: 10px;
             padding:10px;
+            height: min-content;
         }
         
         .sn_logo{
@@ -648,12 +667,12 @@ function socialnetwork_usercp()
     global $db, $mybb, $lang, $cache, $templates, $page, $theme, $headerinclude, $header, $footer, $usercpnav;
     $lang->load('socialnetwork');
     $usergroups_cache = $cache->read("usergroups");
-    $thisUser = $mybb->user['uid'];
+    $thisUser = intval($mybb->user['uid']);
 
     if ($mybb->input['action'] == "socialnetwork") {
         add_breadcrumb($lang->nav_usercp, "usercp.php");
         add_breadcrumb($lang->changeuserpage, "usercp.php?action=socialnetwork");
-        $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $mybb->user['uid'] . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
+        $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $thisUser . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
 
         $sizes = get_avatit_size();
         $sn_avasizewidth = $sizes[0];
@@ -760,10 +779,11 @@ function socialnetwork_usercp()
 $plugins->add_hook("member_profile_start", "socialnetwork_mainpage");
 function socialnetwork_mainpage()
 {
-    global $db, $mybb, $lang, $templates, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme;
+    global $db, $mybb, $lang, $templates, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme, $socialnetwork_member_postbit;
     $lang->load('socialnetwork');
     $usergroups_cache = $cache->read("usergroups");
 
+    echo ("this page:" . $mybb->input['uid']);
     if ($mybb->input['area'] == "socialnetwork") {
         //not allowed to use social network
         if (!$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_isallowed']) {
@@ -807,10 +827,13 @@ function socialnetwork_mainpage()
             if (isset($_FILES['uploadImg']['name']) && $_FILES['uploadImg']['name'] != '') {
                 uploadImg();
             }
-             //TODO save Post
-            savePost($sn_activepage['uid']);
+            savePost();
             // redirect('member.php?action=profile&uid='.$sn_activepage['uid'].'&area=socialnetwork');
         }
+        if (isset($mybb->input['sendAnswer'])) {
+            saveAnswer();
+        }
+        showPosts();
         eval("\$page = \"" . $templates->get('socialnetwork_member_main') . "\";");
         output_page($page);
         die();
@@ -882,12 +905,12 @@ function socialnetwork_action_handler($actions)
 function uploadImg()
 {
     global $db, $mybb;
-    
+
     $uploadImgWidth = $mybb->settings['socialnetwork_uploadImgWidth'];
     $uploadImgHeight = $mybb->settings['socialnetwork_uploadImgHeight'];
     $maxfilesize = $mybb->settings['socialnetwork_uploadImgSize'];
 
-    $post = $db->fetch_field($db->write_query("Select max(sn_post_id) as max FROM ".TABLE_PREFIX."sn_post LIMIT 1"), "max");
+    $post = $db->fetch_field($db->write_query("Select max(sn_post_id) as max FROM " . TABLE_PREFIX . "sn_posts LIMIT 1"), "max");
     //echo($post);
     if ($post == "") $post = 1;
     $imgpath = "social/userimages/";
@@ -911,7 +934,7 @@ function uploadImg()
         echo ("Fehler Größe");
     } else {
         $filesize = $_FILES['uploadImg']['size'];
-        
+
         if (!empty($maxfilesize) && $filesize > $maxfilesize) {
             //Delete the temp file
             @unlink($_FILES['uploadImg']['tmp_name']);
@@ -932,27 +955,107 @@ function uploadImg()
 
         $filename = $mybb->user['uid'] . '_' . date('d_m_y_g_i_s') . '.' . $extension;
 
-        if ($failed == false)
-            move_uploaded_file($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
-        else
-            rename($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
+        if ($failed == false) move_uploaded_file($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
+        else 
+        rename($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
 
         @chmod($imgpath . $filename, 0644);
 
-        $db->query("INSERT INTO " . TABLE_PREFIX . "sn_imgs
+        $db->write_query("INSERT INTO " . TABLE_PREFIX . "sn_imgs
 						(sn_filesize, sn_filename, sn_width, sn_height, sn_uid, sn_postId)
 						VALUES ( $filesize,'$filename', $sizes[0], $sizes[1], " . $mybb->user['uid'] . ", $post)");
+    }
+}
+/**
+ * Show Posts and Answers
+ */
+function showPosts()
+{
+    global $db, $mybb, $templates, $socialnetwork_member_postbit, $socialnetwork_member_answerbit;
+    $activepage = intval($mybb->input['uid']);
+    $thisUser = intval($mybb->user['uid']);
+    $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $activepage");
+    while ($get_post = $db->fetch_array($queryPosts)) {
+        $postuser = intval($get_post['sn_uid']);
+        $name = $db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname"); 
+        if ($name == "") $name = $db->fetch_field($db->simple_select("users", "username", "uid = '$postuser'"), "username");
+        $sn_postname = '<a href="member.php?action=profile&uid=' . $postuser . '&area=socialnetwork">' . $name . '</a>';
+        $sn_postimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$postuser'"), "sn_avatar");
+        $sn_date = date('d.m.y - H:i', strtotime($get_post['sn_date']));
+        $sn_showPost = $get_post['sn_social_post'];
+        $sn_postid = intval($get_post['sn_post_id']);
+
+        $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisUser'"), "sn_avatar");
+        $socialnetwork_member_answerbit="";
+        $queryAnswer = $db->simple_select("sn_answer", "*", "sn_post_id = $sn_postid");
+            while($get_answer = $db->fetch_array($queryAnswer)){
+                
+                $sn_ansUser = intval($get_answer['sn_uid']);
+                echo("bla".$sn_postid);
+                $sn_anspostimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$sn_ansUser'"), "sn_avatar");
+                $ansname = $db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$sn_ansUser'"), "sn_nickname"); 
+                
+                if ($ansname == "") $ansname = $db->fetch_field($db->simple_select("users", "username", "uid = '$sn_ansUser'"), "username");
+                $sn_ansname = '<a href="member.php?action=profile&uid=' . $sn_ansUser . '&area=socialnetwork">' . $ansname . '</a>';
+                $sn_ansdate = date('d.m.y - H:i', strtotime($get_answer['sn_date']));
+                $sn_showAnswer = $get_answer['sn_answer'];  
+
+            //     <div class="sn_answer">
+            //     <fieldset>
+            //         <img class="sn_ansProfilbild" src="{$sn_anspostimg}" alt="" />
+            //         <span class="sn_ansName">{$sn_ansname}</span>
+            //         <span class="sn_ansDate">{$sn_ansdate}</span>
+            //         <span class="sn_edit">{$edit} {$delete}</span>
+            //         <div class="sn_socialAnswer">{$sn_showAnswer}</div>
+            //         <hr>
+            //     </fieldset>
+            // </div>
+
+                eval("\$socialnetwork_member_answerbit .= \"" . $templates->get('socialnetwork_member_answerbit') . "\";");
+            }
+        eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
     }
 }
 
 /**
  * Save a Post to database
  */
-function savePost($activePage)
+function savePost()
 {
+    global $db, $mybb;
     //get the infos
-    
+    $datetime = $db->escape_string($mybb->input['datum'] . " " . $mybb->input['sn_uhrzeit']);
+    $post = $db->escape_string($mybb->input['sn_post']);
+    $activepage = intval($mybb->input['uid']);
+    $thisUser = intval($mybb->user['uid']);
+    $insert_array = array(
+        "sn_pageid" =>  $activepage,
+        "sn_uid" => $thisUser,
+        "sn_date" => $datetime,
+        "sn_social_post" => $post,
+    );
+    $db->insert_query("sn_post", $insert_array);
 }
+
+/**
+ * Save Answer to database
+ */
+function saveAnswer(){
+    global $db, $mybb;
+    //get the infos
+    $datetime = $db->escape_string($mybb->input['sn_ansDatum'] . " " . $mybb->input['sn_ansWhrzeit']);
+    $answer = $db->escape_string($mybb->input['sn_answer']);
+    $postId = intval($mybb->input['postid']);
+    $thisUser = intval($mybb->user['uid']);
+    $insert_array = array(
+        "sn_post_id" =>  $postId,
+        "sn_uid" => $thisUser,
+        "sn_date" => $datetime,
+        "sn_answer" => $answer,
+    );
+    $db->insert_query("sn_answer", $insert_array);
+}
+
 
 /**** Helper Functions  ******/
 /** get own fields and return an array with cleaned names */
