@@ -9,8 +9,8 @@
  * 
  */
 // enable for Debugging:
-//    error_reporting ( -1 );
-//    ini_set ( 'display_errors', true );
+// error_reporting ( -1 );
+// ini_set ( 'display_errors', true );
 
 // Disallow direct access to this file for security reasons
 if (!defined("IN_MYBB")) {
@@ -78,7 +78,7 @@ function socialnetwork_install()
 		`sn_uid` int(20) NOT NULL,
   		`sn_social_post` varchar(300) NOT NULL,
   		`sn_del_username` varchar(300) DEFAULT NUll,
-  		`sn_del_nutzername` varchar(300) DEFAULT NUll,
+  		`sn_del_nickname` varchar(300) DEFAULT NUll,
   		`sn_del_avatar` varchar(30) DEFAULT NUll,
 	PRIMARY KEY (`sn_post_id`)
     ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
@@ -675,10 +675,10 @@ function socialnetwork_usercp()
         $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $thisUser . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
 
         $sizes = get_avatit_size();
-        $sn_avasizewidth = $sizes[0];
-        $sn_avasizeheight = $sizes[1];
-        $sn_titlesizewidth = $sizes[2];
-        $sn_titlesizeheight = $sizes[3];
+        $sn_avasizewidth = $sizes[0] . "px";
+        $sn_avasizeheight = $sizes[1] . "px";
+        $sn_titlesizewidth = $sizes[2] . "px";
+        $sn_titlesizeheight = $sizes[3] . "px";
 
         //user is not allowed to use social network
         if (!$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_isallowed'] || !$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_canedit']) {
@@ -779,11 +779,11 @@ function socialnetwork_usercp()
 $plugins->add_hook("member_profile_start", "socialnetwork_mainpage");
 function socialnetwork_mainpage()
 {
-    global $db, $mybb, $lang, $templates, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme, $socialnetwork_member_postbit;
+    global $db, $mybb, $lang, $templates, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme, $socialnetwork_member_postbit, $socialnetwork_member_postimg;
     $lang->load('socialnetwork');
     $usergroups_cache = $cache->read("usergroups");
 
-    echo ("this page:" . $mybb->input['uid']);
+    // echo ("this page:" . $mybb->input['uid']);
     if ($mybb->input['area'] == "socialnetwork") {
         //not allowed to use social network
         if (!$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_isallowed']) {
@@ -793,10 +793,10 @@ function socialnetwork_mainpage()
         $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
         //get sizes
         $sizes = get_avatit_size();
-        $sn_avasizewidth = $sizes[0] + 10; // +10 for nice view with padding
-        $sn_avasizeheight = $sizes[1] + 10; // +10 for nice view with padding
-        $sn_titlesizewidth = $sizes[2];
-        $sn_titlesizeheight = $sizes[3];
+        $sn_avasizewidth = $sizes[0] + 10 . "px"; // +10 for nice view with padding
+        $sn_avasizeheight = $sizes[1] + 10 . "px"; // +10 for nice view with padding
+        $sn_titlesizewidth = $sizes[2] . "px";
+        $sn_titlesizeheight = $sizes[3] . "px";
 
         //Get the data of the page, we are looking at
         $pagedata = $db->simple_select("sn_users", "*", "uid = " . intval($mybb->input['uid']));
@@ -804,6 +804,7 @@ function socialnetwork_mainpage()
         if ($db->num_rows($pagedata) == 0) error_no_permission();
         $sn_activepage = $db->fetch_array($pagedata);
         //catch data
+
         if ($sn_activepage['sn_userheader'] == "") $tit_img = "";
         else $tit_img = $sn_activepage['sn_userheader'];
         if ($sn_activepage['sn_avatar'] == "") $profil_img = "<img src=\"" . $defaultava . "\"/>";
@@ -833,6 +834,13 @@ function socialnetwork_mainpage()
         if (isset($mybb->input['sendAnswer'])) {
             saveAnswer();
         }
+
+        if ($mybb->input['like'] == 'like') {
+            like($sn_activepage['uid']);
+        }
+        if ($mybb->input['like'] == 'dislike') {
+            dislike($sn_activepage['uid']);
+        }
         showPosts();
         eval("\$page = \"" . $templates->get('socialnetwork_member_main') . "\";");
         output_page($page);
@@ -845,7 +853,7 @@ function socialnetwork_mainpage()
 
 //TODO ANTWORTEN +edit + delete
 
-//TODO LIKE
+//WIP LIKE
 
 //TODO FREUNDE 
 //TODO ADD
@@ -858,8 +866,6 @@ function socialnetwork_mainpage()
 
 //TODO Verwaltung MOD CP
 //
-
-
 
 /**
  * //TODO handle when user is deleted -> nickname empty? save username, else keep nickname
@@ -956,8 +962,8 @@ function uploadImg()
         $filename = $mybb->user['uid'] . '_' . date('d_m_y_g_i_s') . '.' . $extension;
 
         if ($failed == false) move_uploaded_file($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
-        else 
-        rename($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
+        else
+            rename($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
 
         @chmod($imgpath . $filename, 0644);
 
@@ -971,48 +977,117 @@ function uploadImg()
  */
 function showPosts()
 {
-    global $db, $mybb, $templates, $socialnetwork_member_postbit, $socialnetwork_member_answerbit;
+    global $db, $mybb, $templates, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
     $activepage = intval($mybb->input['uid']);
     $thisUser = intval($mybb->user['uid']);
-    $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $activepage");
+    $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $activepage", array(
+        "order_by" => 'sn_date',
+        "order_dir" => 'DESC'
+    ));
+    $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
+
+    $cnt_likes_post = "";
+    //get all the data of the posts
     while ($get_post = $db->fetch_array($queryPosts)) {
+        //inital stuff for likes
+        $likevar = "like";
+        $sn_like = '<i class="far fa-heart"></i>';
+        $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisUser'"), "sn_avatar");
+        if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
+        //poster uid
         $postuser = intval($get_post['sn_uid']);
-        $name = $db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname"); 
-        if ($name == "") $name = $db->fetch_field($db->simple_select("users", "username", "uid = '$postuser'"), "username");
+
+        //did the poster have a nickname if not take the username
+        $name = $db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname");
+        if ($name == "") {
+            $name = $db->fetch_field($db->simple_select("users", "username", "uid = '$postuser'"), "username");
+        }
+        //we want to link to the social page
         $sn_postname = '<a href="member.php?action=profile&uid=' . $postuser . '&area=socialnetwork">' . $name . '</a>';
+        //the avatar
         $sn_postimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$postuser'"), "sn_avatar");
+        if ($sn_postimg == "") $sn_postimg = $defaultava;
+        //handle of deleted users
+        if ($get_post['sn_del_username'] != "") {
+            $sn_postname = $get_post['sn_del_username'];
+            if ($get_post['sn_del_nickname'] != "") {
+                $sn_postname = $get_post['sn_del_nickname'];
+            }
+            $sn_postimg = $defaultava;
+        }
+
+        //the other informations of post
         $sn_date = date('d.m.y - H:i', strtotime($get_post['sn_date']));
         $sn_showPost = $get_post['sn_social_post'];
         $sn_postid = intval($get_post['sn_post_id']);
 
-        $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisUser'"), "sn_avatar");
-        $socialnetwork_member_answerbit="";
-        $queryAnswer = $db->simple_select("sn_answer", "*", "sn_post_id = $sn_postid");
-            while($get_answer = $db->fetch_array($queryAnswer)){
-                
-                $sn_ansUser = intval($get_answer['sn_uid']);
-                echo("bla".$sn_postid);
-                $sn_anspostimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$sn_ansUser'"), "sn_avatar");
-                $ansname = $db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$sn_ansUser'"), "sn_nickname"); 
-                
-                if ($ansname == "") $ansname = $db->fetch_field($db->simple_select("users", "username", "uid = '$sn_ansUser'"), "username");
-                $sn_ansname = '<a href="member.php?action=profile&uid=' . $sn_ansUser . '&area=socialnetwork">' . $ansname . '</a>';
-                $sn_ansdate = date('d.m.y - H:i', strtotime($get_answer['sn_date']));
-                $sn_showAnswer = $get_answer['sn_answer'];  
-
-            //     <div class="sn_answer">
-            //     <fieldset>
-            //         <img class="sn_ansProfilbild" src="{$sn_anspostimg}" alt="" />
-            //         <span class="sn_ansName">{$sn_ansname}</span>
-            //         <span class="sn_ansDate">{$sn_ansdate}</span>
-            //         <span class="sn_edit">{$edit} {$delete}</span>
-            //         <div class="sn_socialAnswer">{$sn_showAnswer}</div>
-            //         <hr>
-            //     </fieldset>
-            // </div>
-
-                eval("\$socialnetwork_member_answerbit .= \"" . $templates->get('socialnetwork_member_answerbit') . "\";");
+        //we have to clear the variables first
+        $socialnetwork_member_answerbit = "";
+        $socialnetwork_member_postimg = "";
+        //Get all likes
+        $likeQuery = $db->simple_select("sn_likes", "*", "sn_postid = $sn_postid");
+        while ($likesarray = $db->fetch_array($likeQuery)) {
+            //do the user already like the post? -> then we want to show the dislike stuff
+            if ($likesarray['sn_uid'] == $thisUser) {
+                $likevar = "dislike";
+                $sn_like = '<i class="fas fa-heart"></i>';
             }
+        }
+        //count likes
+        $cnt_likes_post = $db->fetch_field($db->simple_select("sn_likes", "count(*) as cnt", "sn_postid = $sn_postid"), "cnt");
+
+        //Do the user upload an image to the post?
+        $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $sn_postid"));
+        if (!empty($postImg)) {
+            eval("\$socialnetwork_member_postimg = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
+        }
+        //variale to count the likes of an answer
+        $cnt_likes_ans = "";
+        //and here we get the answers for the actual post
+        $queryAnswer = $db->simple_select("sn_answer", "*", "sn_post_id = $sn_postid", array(
+            "order_by" => 'sn_date',
+            "order_dir" => 'DESC'
+        ));
+        while ($get_answer = $db->fetch_array($queryAnswer)) {
+            //Initial like stuff for answers
+            $likevar_ans = "like";
+            $sn_like_ans = '<i class="far fa-heart"></i>';
+
+            $ansid = intval($get_answer['sn_aid']);
+            //count like of answers
+            $cnt_likes_ans = $db->fetch_field($db->simple_select("sn_likes", "count(sn_postid) as cnt", "sn_answerid = $ansid"), "cnt");
+            //all likes
+            $likeQuery = $db->simple_select("sn_likes", "*", "sn_answerid = $ansid");
+            while ($likesarray = $db->fetch_array($likeQuery)) {
+                if ($likesarray['sn_uid'] == $thisUser) {
+                    $likevar_ans = "dislike";
+                    $sn_like_ans = '<i class="fas fa-heart"></i>';
+                }
+            }
+            //uid of answer
+            $sn_ansUser = intval($get_answer['sn_uid']);
+            echo "bla" . $sn_ansUser;
+            //avatar 
+            $sn_anspostimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$sn_ansUser'"), "sn_avatar");
+
+            //name (nickname or username?)
+            $ansname = $db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$sn_ansUser'"), "sn_nickname");
+            if ($ansname == "") $ansname = $db->fetch_field($db->simple_select("users", "username", "uid = '$sn_ansUser'"), "username");
+            $sn_ansname = '<a href="member.php?action=profile&uid=' . $sn_ansUser . '&area=socialnetwork">' . $ansname . '</a>';
+
+            //handle of deleted user
+            if ($get_answer['sn_del_username'] != "") {
+                $sn_ansname = $get_answer['sn_del_username'];
+                if ($get_answer['sn_del_nickname'] != "") {
+                    $sn_ansname = $get_answer['sn_del_nickname'];
+                }
+                $sn_anspostimg = $defaultava;
+            }
+
+            $sn_ansdate = date('d.m.y - H:i', strtotime($get_answer['sn_date']));
+            $sn_showAnswer = $get_answer['sn_answer'];
+            eval("\$socialnetwork_member_answerbit .= \"" . $templates->get('socialnetwork_member_answerbit') . "\";");
+        }
         eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
     }
 }
@@ -1028,19 +1103,21 @@ function savePost()
     $post = $db->escape_string($mybb->input['sn_post']);
     $activepage = intval($mybb->input['uid']);
     $thisUser = intval($mybb->user['uid']);
+
     $insert_array = array(
         "sn_pageid" =>  $activepage,
         "sn_uid" => $thisUser,
         "sn_date" => $datetime,
         "sn_social_post" => $post,
     );
-    $db->insert_query("sn_post", $insert_array);
+    $db->insert_query("sn_posts", $insert_array);
 }
 
 /**
  * Save Answer to database
  */
-function saveAnswer(){
+function saveAnswer()
+{
     global $db, $mybb;
     //get the infos
     $datetime = $db->escape_string($mybb->input['sn_ansDatum'] . " " . $mybb->input['sn_ansWhrzeit']);
@@ -1056,6 +1133,58 @@ function saveAnswer(){
     $db->insert_query("sn_answer", $insert_array);
 }
 
+/**
+ * Like Post
+ */
+function like($activepage)
+{
+    global $db, $mybb;
+    $sn_postid = intval($mybb->input['postid']);
+    $sn_ansid = intval($mybb->input['ansid']);
+    $sn_uid = intval($mybb->user['uid']);
+    $isokay = true;
+    if ($sn_postid != 0) {
+        $queryCheck = $db->simple_select("sn_likes", "*", "sn_postid = $sn_postid AND sn_uid = $sn_uid ");
+        if (!empty($db->fetch_array($queryCheck))) {
+            $isokay = false;
+            redirect('member.php?action=profile&uid=' . $activepage . '&area=socialnetwork');
+        }
+    }
+    if ($sn_ansid != 0) {
+        $queryCheck = $db->simple_select("sn_likes", "*", "sn_answerid = $sn_ansid AND sn_uid = $sn_uid ");
+        if (!empty($db->fetch_array($queryCheck))) {
+            $isokay = false;
+            redirect('member.php?action=profile&uid=' . $activepage . '&area=socialnetwork');
+        }
+    }
+    //we don't want user to like a post more than once!
+    if ($isokay === true) {
+        $insert_array = array(
+            "sn_postid" => $sn_postid,
+            "sn_answerid" => $sn_ansid,
+            "sn_uid" => $sn_uid,
+        );
+        $db->insert_query("sn_likes", $insert_array);
+        redirect('member.php?action=profile&uid=' . $activepage . '&area=socialnetwork');
+    }
+}
+
+function dislike($activepage)
+{
+    global $db, $mybb;
+    $sn_postid = intval($mybb->input['postid']);
+    $sn_ansid = intval($mybb->input['ansid']);
+    $sn_uid = intval($mybb->user['uid']);
+
+    if ($sn_postid != 0) {
+        $db->delete_query("sn_likes", "sn_uid = $sn_uid AND sn_postid = $sn_postid");
+        redirect('member.php?action=profile&uid=' . $activepage . '&area=socialnetwork');
+    }
+    if ($sn_ansid != 0) {
+        $db->delete_query("sn_likes", "sn_uid = $sn_uid AND sn_answerid = $sn_ansid");
+        redirect('member.php?action=profile&uid=' . $activepage . '&area=socialnetwork');
+    }
+}
 
 /**** Helper Functions  ******/
 /** get own fields and return an array with cleaned names */
