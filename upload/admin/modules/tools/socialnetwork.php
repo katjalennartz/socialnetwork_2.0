@@ -75,11 +75,8 @@ if (!$mybb->input['action']) {
     $form_container->output_cell($form->generate_submit_button($lang->go, array("name" => "do_setSNField")));
     $form_container->construct_row();
 
-
     $form_container->end();
     $form->end();
-
-    
 
     $page->output_footer();
     
