@@ -8,7 +8,7 @@ define("IN_MYBB", 1);
 
 
 require("global.php");
-global $db, $mybb, $templates, $parser, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
+global $db, $mybb, $templates, $lang, $parser, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
 
 $options = array(
     "allow_html" => $mybb->settings['socialnetwork_html'],
@@ -41,7 +41,7 @@ $test_test ="";
 
 while ($get_post = $db->fetch_array($nextposts)) {
     $likevar = "like";
-    $sn_like = '<i class="far fa-heart"></i>';
+    $sn_like = $lang->socialnetwork_member_like;
     //show the image beside the anwser form
     $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisUser'"), "sn_avatar");
     if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
@@ -90,7 +90,7 @@ while ($get_post = $db->fetch_array($nextposts)) {
         //do the user already like the post? -> then we want to show the dislike stuff
         if ($likesarray['sn_uid'] == $thisUser) {
             $likevar = "dislike";
-            $sn_like = '<i class="fas fa-heart"></i>';
+            $sn_like = $lang->socialnetwork_member_dislike;
         }
     }
     //count likes
@@ -113,7 +113,7 @@ while ($get_post = $db->fetch_array($nextposts)) {
     while ($get_answer = $db->fetch_array($queryAnswer)) {
         //Initial like stuff for answers
         $likevar_ans = "like";
-        $sn_like_ans = '<i class="far fa-heart"></i>';
+        $sn_like_ans = $lang->socialnetwork_member_like;
 
         $ansid = intval($get_answer['sn_aid']);
         //count like of answers
@@ -123,7 +123,7 @@ while ($get_post = $db->fetch_array($nextposts)) {
         while ($likesarray = $db->fetch_array($likeQuery)) {
             if ($likesarray['sn_uid'] == $thisUser) {
                 $likevar_ans = "dislike";
-                $sn_like_ans = '<i class="fas fa-heart"></i>';
+                $sn_like_ans = $lang->socialnetwork_member_dislike;
             }
         }
         //uid of answer
