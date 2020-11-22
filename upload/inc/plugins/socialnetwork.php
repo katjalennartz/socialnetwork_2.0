@@ -733,12 +733,134 @@ function socialnetwork_addstylesheets()
         'name' => 'socialnetwork.css',
         'tid' => 1,
         'attachedto' => '',
-        "stylesheet" =>    '.socialmain {
-            text-align:center;
+        "stylesheet" =>    '/*be sure, that accountswitcher attached accounts are working*/
+        ul.trow1 {
+            z-index: 10;
+        }
+        
+        .socialmain .tborder {
+            border: 0px;
+            border-radius: 8px;
+        }
+        
+        .socialmain .trow1 {
+            background: #f5f5f5;
         }
         
         .sn_username {
             padding-left: 10px;
+        }
+        
+        .sn_friend {
+            padding: 8px;
+        }
+        
+        h1.friends {
+            margin: auto;
+            text-align: center;
+            font-size: 2.0em;
+        }
+        
+        span.allreadyAsked {
+            display: block;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        span#friendAddRemove {
+            display: block;
+            text-align: center;
+            font-size: 2em;
+            padding: 10px;
+        }
+        
+        /**Posts**/ 
+        .sn_postProfilbild {
+            border-radius: 8px;
+            width: 50px;
+            -webkit-border-radius: 100%;
+            -moz-border-radius: 100%;
+        }
+        
+        .editDelete {
+            font-size: 0.8em;
+        }
+        .sn_img {
+            margin-top: -20px;
+        }
+        /**attachment view**/ 
+        .infopop { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: hsla(0, 0%, 0%, 0.5); z-index: 1; opacity:0; -webkit-transition: .5s ease-in-out; -moz-transition: .5s ease-in-out; transition: .5s ease-in-out; pointer-events: none; } .infopop:target { opacity:1; pointer-events: auto; } .infopop > .pop {     background: #aaaaaa; margin: 10% auto; padding: 10px; width: fit-content; z-index: 3;} .closepop { position: absolute; right: -5px; top:-5px; width: 100%; height: 100%; z-index: 2; }
+        
+        .sn_postName{
+            display:block;
+            font-weight: bold;
+        }
+        
+        .sn_postDate{
+            font-size:0.8em;
+        }
+        
+        .sn_socialPost {
+            margin-bottom: 30px;
+        }
+        
+        .snpost {
+            padding: 0px;
+        }
+        
+        .sn_answer_form {
+            margin-top: 10px;
+        }
+        
+        .sn_likes {
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.8em;
+            margin-top: -20px;
+            padding-bottom: 6px;
+        }
+        
+        .sn_likes i.fas.fa-heart,.sn_likes i.far.fa-heart {
+            font-size: 1.5em;
+        }
+        
+        input.editDelete {
+            border: none;
+            background: none;
+            font-size: 0.8em;
+            padding: 0px;
+        }
+        
+        .sn_rechts hr{
+            background-color: #ddd;
+            color: #ddd;
+            height: 1px;
+            border: 0px;
+        }
+        
+        .sn_answerFormProfilbild, .sn_ansProfilbild{
+            float:left;
+            margin-right: 10px;
+            width: 35px;
+            -webkit-border-radius: 150%;
+            -moz-border-radius: 100%;
+        }
+        
+        .sn_answer {clear: both;margin: 11px 0px 10px 0px;padding-bottom: 5px;padding-left: 20px;}
+        
+        .sn_ansDate {
+            font-size: 0.8em;
+        }
+        
+        
+        input.sn_send {
+            margin-top: 3px;
+            padding: 4px;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-left: 5px;
+            border-radius: 9px;
+            border: 0;
         }
         
         legend{
@@ -758,6 +880,7 @@ function socialnetwork_addstylesheets()
             margin-left: 70px;
             margin-top: -100px;
             margin-right: 10px;
+            border-radius: 8px;
             float: left;
         }
         
@@ -766,6 +889,7 @@ function socialnetwork_addstylesheets()
             margin: 10px;
             padding:10px;
             height: min-content;
+            border-radius: 8px;
         }
         
         .sn_logo{
@@ -776,7 +900,8 @@ function socialnetwork_addstylesheets()
         .sn_rechts{
             background-color: #b1b1b1;
             margin: 10px;
-            padding: 10px
+            padding: 10px;
+            border-radius: 8px;
         }
                 
         .ucp_social legend{
@@ -801,7 +926,8 @@ function socialnetwork_addstylesheets()
             
         .ucp_smallinfo {
             font-size: 0.7em;
-        }',
+        }
+        ',
         'cachefile' => $db->escape_string(str_replace('/', '', 'socialnetwork.css')),
         'lastmodified' => time()
     );
