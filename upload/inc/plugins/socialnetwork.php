@@ -1223,6 +1223,7 @@ function socialnetwork_mainpage()
 
         if ($mybb->input['like'] == 'like') {
             checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
+            echo($sn_postid."   aid:.".$sn_ansid);
             like($thispage, $sn_postid, $sn_ansid, $sn_uid);
         }
         if ($mybb->input['like'] == 'dislike') {
@@ -1276,6 +1277,10 @@ function deleteAnswer($toDelete)
 }
 
 //WIP MYAlert Integration
+
+//TODO Bilder löschen/editieren
+//TODO Bilder bei antwort? 
+//TODO Nur posten wenn selber SN ! 
 
 //TODO Verwaltung MOD CP
 //
@@ -1417,6 +1422,165 @@ function showPosts()
         //poster uid
         $postuser = intval($get_post['sn_uid']);
 
+        //do the poster have a nickname if not take the username
+        $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname"));
+        if ($name == "") {
+            $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("users", "username", "uid = '$postuser'"), "username"));
+        }
+        //we want to link to the social page of the poster
+        $sn_postname = '<a href="member.php?action=profile&uid=' . $postuser . '&area=socialnetwork">' . $name . '</a>';
+        //the avatar
+        $sn_postimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$postuser'"), "sn_avatar");
+        if ($sn_postimg == "") $sn_postimg = $defaultava;
+        //handle of deleted users
+        if ($get_post['sn_del_username'] != "") {
+            $sn_postname =  htmlspecialchars_uni($get_post['sn_del_username']);
+            if ($get_post['sn_del_nickname'] != "") {
+                $sn_postname =  htmlspecialchars_uni($get_post['sn_del_nickname']);
+            }
+            $sn_postimg = $defaultava;
+        }
+
+        //the other informations of post
+        $sn_date = date('d.m.y - H:i', strtotime($get_post['sn_date']));
+
+        $sn_showPost = $parser->parse_message($get_post['sn_social_post'], $options);
+        $sn_postid = intval($get_post['sn_post_id']);
+
+        $sn_post_ed_del = "";
+        //edit and delete
+        if (($thisUser == $postuser) || ($mybb->usergroup['canmodcp'] == 1)) {
+            $sn_date_date = date('Y-m-d', strtotime($get_post['sn_date']));
+            $sn_date_time = date('H:i', strtotime($get_post['sn_date']));
+            eval("\$sn_post_ed_del = \"" . $templates->get("socialnetwork_member_postedit") . "\";");
+        }
+
+        //we have to clear the variables first
+        $socialnetwork_member_answerbit = "";
+        $socialnetwork_member_postimg = "";
+        //Get all likes
+        $likeQuery = $db->simple_select("sn_likes", "*", "sn_postid = $sn_postid");
+        while ($likesarray = $db->fetch_array($likeQuery)) {
+            //do the user already like the post? -> then we want to show the dislike stuff
+            if ($likesarray['sn_uid'] == $thisUser) {
+                $likevar = "dislike";
+                $sn_like = $lang->socialnetwork_member_dislike;
+            }
+        }
+        //count likes
+        $cnt_likes_post = $db->fetch_field($db->simple_select("sn_likes", "count(*) as cnt", "sn_postid = $sn_postid"), "cnt");
+
+        //Do the user upload an image to the post?
+        $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $sn_postid"));
+        if (!empty($postImg)) {
+            eval("\$socialnetwork_member_postimg = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
+        }
+        //variale to count the likes of an answer
+        $cnt_likes_ans = "";
+        //and here we get the answers for the actual post
+        $queryAnswer = $db->simple_select("sn_answers", "*", "sn_post_id = $sn_postid", array(
+            "order_by" => 'sn_date',
+            "order_dir" => 'DESC'
+        ));
+        $sn_ans_ed_del = "";
+        while ($get_answer = $db->fetch_array($queryAnswer)) {
+            //Initial like stuff for answers
+            $likevar_ans = "like";
+            $sn_like_ans = $lang->socialnetwork_member_like;
+
+            $ansid = intval($get_answer['sn_aid']);
+            //count like of answers
+            $cnt_likes_ans = $db->fetch_field($db->simple_select("sn_likes", "count(sn_postid) as cnt", "sn_answerid = $ansid"), "cnt");
+            //all likes
+            $likeQuery = $db->simple_select("sn_likes", "*", "sn_answerid = $ansid");
+            while ($likesarray = $db->fetch_array($likeQuery)) {
+                if ($likesarray['sn_uid'] == $thisUser) {
+                    $likevar_ans = "dislike";
+                    $sn_like_ans = $lang->socialnetwork_member_dislike;
+                }
+            }
+            //uid of answer
+            $sn_ansUser = intval($get_answer['sn_uid']);
+            //avatar 
+            $sn_anspostimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$sn_ansUser'"), "sn_avatar");
+            if ($sn_anspostimg == "") $sn_anspostimg = $defaultava;
+            //name (nickname or username?)
+            $ansname =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$sn_ansUser'"), "sn_nickname"));
+            if ($ansname == "") $ansname =  htmlspecialchars_uni($db->fetch_field($db->simple_select("users", "username", "uid = '$sn_ansUser'"), "username"));
+            $sn_ansname = '<a href="member.php?action=profile&uid=' . $sn_ansUser . '&area=socialnetwork">' . $ansname . '</a>';
+
+            //handle of deleted user
+            if ($get_answer['sn_del_username'] != "") {
+                $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_username']);
+                if ($get_answer['sn_del_nickname'] != "") {
+                    $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_nickname']);
+                }
+                $sn_anspostimg = $defaultava;
+            }
+            $sn_ansdate = date('d.m.y - H:i', strtotime($get_answer['sn_date']));
+            $sn_ans_ed_del = "";
+            //edit and delete
+            if (($thisUser == $sn_ansUser) || ($mybb->usergroup['canmodcp'] == 1)) {
+                // eval("\$sn_post_ed_del = \"".$templates->get("socialnetwork_member_postedit")."\";");
+                $ansdate = date('Y-m-d', strtotime($get_answer['sn_date']));
+                $anstime = date('H:i', strtotime($get_answer['sn_date']));
+                eval("\$sn_ans_ed_del = \"" . $templates->get("socialnetwork_member_answeredit") . "\";");
+            }
+            $sn_showAnswer = $parser->parse_message($get_answer['sn_answer'], $options);
+            eval("\$socialnetwork_member_answerbit .= \"" . $templates->get('socialnetwork_member_answerbit') . "\";");
+        }
+        eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
+    }
+}
+
+/** *****
+ * INFINITE SCROLLING
+ * This function could handle infinite scrolling(like facebook), you can use this instead of 'showPosts()' 
+ * but beware, direct links from notifications may not be working, when post/answer isn't already loaded
+ *
+ ***** */
+function showPostAjax()
+{
+    global  $activepage, $db, $lang, $mybb, $templates, $parser, $infinitescrolling, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
+    //Parser options
+    $options = array(
+        "allow_html" => $mybb->settings['socialnetwork_html'],
+        "allow_mycode" => $mybb->settings['socialnetwork_mybbcode'],
+        "allow_imgcode" => $mybb->settings['socialnetwork_img'],
+        "filter_badwords" => $mybb->settings['socialnetwork_badwords'],
+        "nl2br" => 1,
+        "allow_videocode" => $mybb->settings['socialnetwork_videos'],
+    );
+
+    $offset = 0;
+    $no_of_records_per_page = 10;
+
+    $activepage = intval($mybb->input['uid']);
+    $thisUser = intval($mybb->user['uid']);
+    $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
+    $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $activepage", array(
+        "order_by" => 'sn_date',
+        "order_dir" => 'DESC',
+        "limit start" => $offset,
+        "limit" => $no_of_records_per_page
+    ));
+    $cnt_likes_post = "";
+
+    $pageno = $_POST['pageno'];
+    $no_of_records_per_page = 10;
+    $offset = ($pageno - 1) * $no_of_records_per_page;
+
+    while ($get_post = $db->fetch_array($queryPosts)) {
+        $likevar = "like";
+        $sn_like = $lang->socialnetwork_member_like;
+        $infinitescrolling = '<span style="text-align:center; display:block;"><img id="loader" src="images/spinner.gif"></div>';
+
+        //show the image beside the anwser form
+        $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisUser'"), "sn_avatar");
+        if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
+        //poster uid
+        $postuser = intval($get_post['sn_uid']);
+
         //did the poster have a nickname if not take the username
         $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname"));
         if ($name == "") {
@@ -1527,6 +1691,7 @@ function showPosts()
         eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
     }
 }
+
 
 function showFriends()
 {
@@ -1663,15 +1828,12 @@ function showFriends()
 function addFriend($userid, $thisuser)
 {
     global $db, $mybb;
-
-
     $insert_array = array(
         "sn_uid" => $userid,
         "sn_friendwith" => $thisuser,
         "sn_accepted" => 0,
     );
     $db->insert_query("sn_friends", $insert_array);
-
     //we don't want the param stuff in URI after friend is added
     redirect('member.php?action=profile&uid=' . $userid . '&area=socialnetwork');
 }
@@ -1815,26 +1977,26 @@ function checkMentions($type, $pageid, $uid, $pid, $aid)
                 }
             }
             //we are using myAlert
-            if ($alert == 1) {
-                //is My Alert really installed? 
-                if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
-                    //we get the infos of the Alert Typa (sn_Post)
-                    $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('sn_Post');
-                    //Not null, the user wants an alert and the user is not on his own page.
-                    if ($alertType != NULL && $alertType->getEnabled() && $pageid != $uid) {
-                        //constructor for MyAlert gets first argument, $user (not sure), second: type  and third the objectId 
-                        $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$pageid, $alertType, (int)$id);
-                        //some extra details
-                        $alert->setExtraDetails([
-                            'postid' => $pid,
-                            'pageid' => $pageid,
-                            'fromuser' => $uid
-                        ]);
-                        //add the alert
-                        MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
-                    }
+
+            //is My Alert really installed? 
+            if ($alert == 1 && class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+                //we get the infos of the Alert Typa (sn_Post)
+                $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('sn_Post');
+                //Not null, the user wants an alert and the user is not on his own page.
+                if ($alertType != NULL && $alertType->getEnabled() && $pageid != $uid) {
+                    //constructor for MyAlert gets first argument, $user (not sure), second: type  and third the objectId 
+                    $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$pageid, $alertType, (int)$id);
+                    //some extra details
+                    $alert->setExtraDetails([
+                        'postid' => $pid,
+                        'pageid' => $pageid,
+                        'fromuser' => $uid
+                    ]);
+                    //add the alert
+                    MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
                 }
             }
+
 
             break;
         case "answer":
@@ -1862,49 +2024,95 @@ function checkMentions($type, $pageid, $uid, $pid, $aid)
                 }
             }
 
-            if ($alert == 1) {
-                //The owner of page = page id
-                echo "ansid ist" . $aid;
-                if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
-                    $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('sn_Answer');
-                    //Not null, the user wants an alert and the user is not on his own page.
-                    if ($alertType != NULL && $alertType->getEnabled() && $pageid != $uid) {
-                        //constructor for MyAlert gets first argument, $user (not sure), second: type  and third the objectId 
-                        $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$pageid, $alertType, (int)$aid);
-                        //some extra details
-                        $alert->setExtraDetails([
-                            'answerid' => $aid,
-                            'pageid' => $pageid,
-                            'fromuser' => $uid
-                        ]);
-                        //add the alert
-                        MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
-                    }
-                    //The Post is not from pageowner, someone has answer to it -> so we want the original poster to get an alert
-                    if ($posteruid != $pageid && $posteruid != $uid) {
-                        $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$posteruid, $alertType, (int)$aid);
-                        $alert->setExtraDetails([
-                            'answerid' => $aid,
-                            'pageid' => $pageid,
-                            'fromuser' => $uid,
-                            'postid' => $pid //$answertopostid?
-                        ]);
-                        MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
-                    }
+            //The owner of page = page id
+            if ($alert == 1 && class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+                $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('sn_Answer');
+                //Not null, the user wants an alert and the user is not on his own page.
+                if ($alertType != NULL && $alertType->getEnabled() && $pageid != $uid) {
+                    //constructor for MyAlert gets first argument, $user (not sure), second: type  and third the objectId 
+                    $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$pageid, $alertType, (int)$id);
+                    //some extra details
+                    $alert->setExtraDetails([
+                        'answerid' => $aid,
+                        'pageid' => $pageid,
+                        'fromuser' => $uid
+                    ]);
+                    //add the alert
+                    MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
                 }
-            }
-            break;
-        case "like":
-            // checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
-            if ($sn_postid != 0 && $sn_ansid == 0) {
-                //POST
-            } else {
-                //ANTWORT
+                //The Post is not from pageowner, someone has answer to it -> so we want the original poster to get an alert
+                if ($posteruid != $pageid && $posteruid != $uid) {
+                    $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$posteruid, $alertType, (int)$id);
+                    $alert->setExtraDetails([
+                        'answerid' => $aid,
+                        'pageid' => $pageid,
+                        'fromuser' => $uid,
+                        'postid' => $pid //$answertopostid?
+                    ]);
+                    MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+                }
             }
 
             break;
+        case "like":
+            
+            // checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
+            //function checkMentions($type, $pageid, $uid, $pid, $aid)
+            if ($pid != 0 && $aid == 0) {
+                //POST
+                //we need to get the author of post, to know if he want an alert
+                $authorpost = $db->fetch_field($db->simple_select("sn_posts", "sn_uid", "sn_post_id = " . $pid), "sn_uid");
+                $authorAlert = $db->fetch_field($db->simple_select("sn_users", "sn_alertLike", "uid =" . $authorpost), "sn_alertLike");
+                $pid = $pid;
+                
+            } else if ($aid != 0) {
+                $authorpost = $db->fetch_field($db->simple_select("sn_answers", "sn_uid", "sn_aid = " . $aid), "sn_uid");
+                $authorAlert = $db->fetch_field($db->simple_select("sn_users", "sn_alertLike", "uid =" . $authorpost), "sn_alertLike");
+                $pid = "ans" . $aid;
+                echo "autho".$authorpost;
+            }
+            if ($pm == 1 && $authorAlert == 1) {
+                
+                //ersteller soll informiert werden 
+                //should send PN
+                $socialnetwork_pm_like = $lang->socialnetwork_pm_like;
+                $lang->socialnetwork_pm_like = $lang->sprintf($socialnetwork_pm_like, $thisusername, $pageid, $pid);
+                echo "test".$lang->socialnetwork_pm_like;
+                $pm = array(
+                    "subject" => $lang->socialnetwork_pm_likeSubject,
+                    "message" => $lang->socialnetwork_pm_like,
+                    "fromid" => $uid,
+                    "toid" => $authorpost
+                );
+                $pmhandler->set_data($pm);
+                if (!$pmhandler->validate_pm()) {
+                    $pm_errors = $pmhandler->get_friendly_errors();
+                    return $pm_errors;
+                } else {
+                    $pminfo = $pmhandler->insert_pm();
+                }
+            }
+            
+            if ($alert == 1 && class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+                $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('sn_Like');
+                
+                //Not null, the user wants an alert and the user is not on his own page.
+                if ($alertType != NULL && $alertType->getEnabled()) {
+                    //constructor for MyAlert gets first argument, $user (not sure), second: type  and third the objectId 
+                    $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$authorpost, $alertType, (int)$id);
+                    //some extra details
+                    $alert->setExtraDetails([
+                        'pid' => $pid,
+                        'pageid' => $pageid,
+                        'fromuser' => $thisusername
+                    ]);
+                    //add the alert
+                    MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+                }
+            }
+            break;
         case "friend":
-            echo "i ist gleich 2";
+            
             break;
         case "mention":
             if ($aid != 0) {
@@ -2049,7 +2257,7 @@ function like($activepage, $sn_postid, $sn_ansid, $sn_uid)
         );
 
         $db->insert_query("sn_likes", $insert_array);
-        redirect('member.php?action=profile&uid=' . $activepage . '&area=socialnetwork');
+      //  redirect('member.php?action=profile&uid=' . $activepage . '&area=socialnetwork');
     }
 }
 /**
@@ -2227,7 +2435,7 @@ function socialnetwork_alert()
 
     /**
      * We need our MyAlert Formatter
-     * Alert Formater for sn_Like
+     * Alert Formater for sn_Mention
      */
     class MybbStuff_MyAlerts_Formatter_SocialnetworkMentionFormatter extends MybbStuff_MyAlerts_Formatter_AbstractFormatter
     {
@@ -2256,169 +2464,86 @@ function socialnetwork_alert()
     if (class_exists('MybbStuff_MyAlerts_AlertFormatterManager')) {
         $formatterManagerAns = MybbStuff_MyAlerts_AlertFormatterManager::getInstance();
         if (!$formatterManagerAns) {
-            echo "im alert";
             $formatterManagerAns = MybbStuff_MyAlerts_AlertFormatterManager::createInstance($mybb, $lang);
         }
         $formatterManagerAns->registerFormatter(
             new MybbStuff_MyAlerts_Formatter_SocialnetworkMentionFormatter($mybb, $lang, 'sn_Mention')
         );
     }
+
+     /**
+     * We need our MyAlert Formatter
+     * Alert Formater for sn_Like
+     */
+    class MybbStuff_MyAlerts_Formatter_SocialnetworkLikeFormatter extends MybbStuff_MyAlerts_Formatter_AbstractFormatter
+    {
+        public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert4, array $outputAlert4)
+        {
+            $alertContent4 = $alert4->getExtraDetails();
+            return $this->lang->sprintf(
+                $this->lang->socialnetwork_sn_Like,
+                $alertContent4['fromuser'],
+                $outputAlert4['dateline']
+            );
+        }
+        public function init()
+        {
+            if (!$this->lang->socialnetwork) {
+                $this->lang->load('socialnetwork');
+            }
+        }
+        public function buildShowLink(MybbStuff_MyAlerts_Entity_Alert $alert4)
+        {
+            $alertContent4 = $alert4->getExtraDetails();
+            return $this->mybb->settings['bburl'] . '/member.php?action=profile&uid=' . $alertContent4['pageid'] . '&area=socialnetwork#' . $alertContent4['pid'] . '';
+        }
+    }
+    if (class_exists('MybbStuff_MyAlerts_AlertFormatterManager')) {
+        $formatterManagerAns = MybbStuff_MyAlerts_AlertFormatterManager::getInstance();
+        if (!$formatterManagerAns) {
+            $formatterManagerAns = MybbStuff_MyAlerts_AlertFormatterManager::createInstance($mybb, $lang);
+        }
+        $formatterManagerAns->registerFormatter(
+            new MybbStuff_MyAlerts_Formatter_SocialnetworkLikeFormatter($mybb, $lang, 'sn_Like')
+        );
+    }
 }
-/** *****
- * INFINITE SCROLLING
- * This function could handle infinite scrolling(like facebook), you can use this instead of 'showPosts()' 
- * but beware, direct links from notifications may not be working, when post/answer isn't already loaded
- *
- ***** */
-function showPostAjax()
-{
-    global  $activepage, $db, $lang, $mybb, $templates, $parser, $infinitescrolling, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
-    //Parser options
-    $options = array(
-        "allow_html" => $mybb->settings['socialnetwork_html'],
-        "allow_mycode" => $mybb->settings['socialnetwork_mybbcode'],
-        "allow_imgcode" => $mybb->settings['socialnetwork_img'],
-        "filter_badwords" => $mybb->settings['socialnetwork_badwords'],
-        "nl2br" => 1,
-        "allow_videocode" => $mybb->settings['socialnetwork_videos'],
-    );
 
-    $offset = 0;
-    $no_of_records_per_page = 5;
 
-    $activepage = intval($mybb->input['uid']);
-    $thisUser = intval($mybb->user['uid']);
-    $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
-    $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $activepage", array(
-        "order_by" => 'sn_date',
-        "order_dir" => 'DESC',
-        "limit start" => $offset,
-        "limit" => $no_of_records_per_page
-    ));
-    $cnt_likes_post = "";
-
-    $pageno = $_POST['pageno'];
-    $no_of_records_per_page = 10;
-    $offset = ($pageno - 1) * $no_of_records_per_page;
-
-    while ($get_post = $db->fetch_array($queryPosts)) {
-        $likevar = "like";
-        $sn_like = $lang->socialnetwork_member_like;
-        $infinitescrolling = '<span style="text-align:center; display:block;"><img id="loader" src="images/spinner.gif"></div>';
-
-        //show the image beside the anwser form
-        $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisUser'"), "sn_avatar");
-        if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
-        //poster uid
-        $postuser = intval($get_post['sn_uid']);
-
-        //did the poster have a nickname if not take the username
-        $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname"));
-        if ($name == "") {
-            $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("users", "username", "uid = '$postuser'"), "username"));
+     /**
+     * We need our MyAlert Formatter
+     * Alert Formater for sn_
+     */
+    class MybbStuff_MyAlerts_Formatter_SocialnetworkFriendFormatter extends MybbStuff_MyAlerts_Formatter_AbstractFormatter
+    {
+        public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert5, array $outputAlert5)
+        {
+            $alertContent5 = $alert5->getExtraDetails();
+            return $this->lang->sprintf(
+                $this->lang->socialnetwork_sn_Friend,
+                $alertContent5['fromuser'],
+                $outputAlert5['dateline']
+            );
         }
-        //we want to link to the social page of the poster
-        $sn_postname = '<a href="member.php?action=profile&uid=' . $postuser . '&area=socialnetwork">' . $name . '</a>';
-        //the avatar
-        $sn_postimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$postuser'"), "sn_avatar");
-        if ($sn_postimg == "") $sn_postimg = $defaultava;
-        //handle of deleted users
-        if ($get_post['sn_del_username'] != "") {
-            $sn_postname =  htmlspecialchars_uni($get_post['sn_del_username']);
-            if ($get_post['sn_del_nickname'] != "") {
-                $sn_postname =  htmlspecialchars_uni($get_post['sn_del_nickname']);
-            }
-            $sn_postimg = $defaultava;
-        }
-
-        //the other informations of post
-        $sn_date = date('d.m.y - H:i', strtotime($get_post['sn_date']));
-
-        $sn_showPost = $parser->parse_message($get_post['sn_social_post'], $options);
-        $sn_postid = intval($get_post['sn_post_id']);
-
-        $sn_post_ed_del = "";
-        //edit and delete
-        if (($thisUser == $postuser) || ($mybb->usergroup['canmodcp'] == 1)) {
-            $sn_date_date = date('Y-m-d', strtotime($get_post['sn_date']));
-            $sn_date_time = date('H:i', strtotime($get_post['sn_date']));
-            eval("\$sn_post_ed_del = \"" . $templates->get("socialnetwork_member_postedit") . "\";");
-        }
-
-        //we have to clear the variables first
-        $socialnetwork_member_answerbit = "";
-        $socialnetwork_member_postimg = "";
-        //Get all likes
-        $likeQuery = $db->simple_select("sn_likes", "*", "sn_postid = $sn_postid");
-        while ($likesarray = $db->fetch_array($likeQuery)) {
-            //do the user already like the post? -> then we want to show the dislike stuff
-            if ($likesarray['sn_uid'] == $thisUser) {
-                $likevar = "dislike";
-                $sn_like = $lang->socialnetwork_member_dislike;
+        public function init()
+        {
+            if (!$this->lang->socialnetwork) {
+                $this->lang->load('socialnetwork');
             }
         }
-        //count likes
-        $cnt_likes_post = $db->fetch_field($db->simple_select("sn_likes", "count(*) as cnt", "sn_postid = $sn_postid"), "cnt");
-
-        //Do the user upload an image to the post?
-        $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $sn_postid"));
-        if (!empty($postImg)) {
-            eval("\$socialnetwork_member_postimg = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
+        public function buildShowLink(MybbStuff_MyAlerts_Entity_Alert $alert5)
+        {
+            $alertContent4 = $alert5->getExtraDetails();
+            return $this->mybb->settings['bburl'] . '/member.php?action=profile&uid=' . $alertContent5['pageid'] . '&area=socialnetwork#' . $alertContent5['pid'] . '';
         }
-        //variale to count the likes of an answer
-        $cnt_likes_ans = "";
-        //and here we get the answers for the actual post
-        $queryAnswer = $db->simple_select("sn_answers", "*", "sn_post_id = $sn_postid", array(
-            "order_by" => 'sn_date',
-            "order_dir" => 'DESC'
-        ));
-        $sn_ans_ed_del = "";
-        while ($get_answer = $db->fetch_array($queryAnswer)) {
-            //Initial like stuff for answers
-            $likevar_ans = "like";
-            $sn_like_ans = $lang->socialnetwork_member_like;
-
-            $ansid = intval($get_answer['sn_aid']);
-            //count like of answers
-            $cnt_likes_ans = $db->fetch_field($db->simple_select("sn_likes", "count(sn_postid) as cnt", "sn_answerid = $ansid"), "cnt");
-            //all likes
-            $likeQuery = $db->simple_select("sn_likes", "*", "sn_answerid = $ansid");
-            while ($likesarray = $db->fetch_array($likeQuery)) {
-                if ($likesarray['sn_uid'] == $thisUser) {
-                    $likevar_ans = "dislike";
-                    $sn_like_ans = $lang->socialnetwork_member_dislike;
-                }
-            }
-            //uid of answer
-            $sn_ansUser = intval($get_answer['sn_uid']);
-            //avatar 
-            $sn_anspostimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$sn_ansUser'"), "sn_avatar");
-            if ($sn_anspostimg == "") $sn_anspostimg = $defaultava;
-            //name (nickname or username?)
-            $ansname =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$sn_ansUser'"), "sn_nickname"));
-            if ($ansname == "") $ansname =  htmlspecialchars_uni($db->fetch_field($db->simple_select("users", "username", "uid = '$sn_ansUser'"), "username"));
-            $sn_ansname = '<a href="member.php?action=profile&uid=' . $sn_ansUser . '&area=socialnetwork">' . $ansname . '</a>';
-
-            //handle of deleted user
-            if ($get_answer['sn_del_username'] != "") {
-                $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_username']);
-                if ($get_answer['sn_del_nickname'] != "") {
-                    $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_nickname']);
-                }
-                $sn_anspostimg = $defaultava;
-            }
-            $sn_ansdate = date('d.m.y - H:i', strtotime($get_answer['sn_date']));
-            $sn_ans_ed_del = "";
-            //edit and delete
-            if (($thisUser == $sn_ansUser) || ($mybb->usergroup['canmodcp'] == 1)) {
-                // eval("\$sn_post_ed_del = \"".$templates->get("socialnetwork_member_postedit")."\";");
-                $ansdate = date('Y-m-d', strtotime($get_answer['sn_date']));
-                $anstime = date('H:i', strtotime($get_answer['sn_date']));
-                eval("\$sn_ans_ed_del = \"" . $templates->get("socialnetwork_member_answeredit") . "\";");
-            }
-            $sn_showAnswer = $parser->parse_message($get_answer['sn_answer'], $options);
-            eval("\$socialnetwork_member_answerbit .= \"" . $templates->get('socialnetwork_member_answerbit') . "\";");
+    }
+    if (class_exists('MybbStuff_MyAlerts_AlertFormatterManager')) {
+        $formatterManagerAns = MybbStuff_MyAlerts_AlertFormatterManager::getInstance();
+        if (!$formatterManagerAns) {
+            $formatterManagerAns = MybbStuff_MyAlerts_AlertFormatterManager::createInstance($mybb, $lang);
         }
-        eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
+        $formatterManagerAns->registerFormatter(
+            new MybbStuff_MyAlerts_Formatter_SocialnetworkFriendFormatter($mybb, $lang, 'sn_Friend')
+        );
     }
 }

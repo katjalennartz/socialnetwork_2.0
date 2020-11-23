@@ -35,15 +35,22 @@ $l['socialnetwork_upload_errorSizes'] = "Dein Bild entspricht nicht den erlaubte
 $l['socialnetwork_upload_errorFileSize'] = "Die Dateigröße des Bildes ist zu groß.";
 
 
-// Private Message
-$l['socialnetwork_pm_postSubject'] = 'Ein neuer Post auf deiner User Seite';
+// Private Message Alerts
+$l['socialnetwork_pm_postSubject'] = 'Social Network: Neuer Post.';
 $l['socialnetwork_pm_post']= '{1} hat einen <a href="member.php?action=profile&uid={2}&area=socialnetwork#{3}">Post</url> auf deiner Userpage geschrieben.';
 
-$l['socialnetwork_pm_answerSubject'] = 'Eine neue Antwort im Social Network';
+$l['socialnetwork_pm_answerSubject'] = 'Social Network: Neue Antwort';
 $l['socialnetwork_pm_answer']= '{1} hat eine neue <a href="member.php?action=profile&uid={2}&area=socialnetwork#ans{3}">Post</url> auf deiner Userpage geschrieben.';
 
-$l['socialnetwork_pm_mentionSubject'] = 'Du wurdest im Social Network erwähnt.';
+$l['socialnetwork_pm_likeSubject'] = 'Social Network: Like.';
+$l['socialnetwork_pm_like']= '{1} gefällt dein <a href="member.php?action=profile&uid={2}&area=socialnetwork#{3}">Beitrag</url>.';
+
+$l['socialnetwork_pm_mentionSubject'] = 'Social Network: Mention.';
 $l['socialnetwork_pm_mention']= '{1} hat dich in einem <a href="member.php?action=profile&uid={2}&area=socialnetwork#{3}">Beitrag</url> erwähnt.';
+
+$l['socialnetwork_pm_friendSubject'] = 'Social Network: Freundschaftsanfrage.';
+$l['socialnetwork_pm_friend']= '{1} möchte mit dir befreundet sein. Gehe auf deine <a href="member.php?action=profile&uid={2}&area=socialnetwork">Seite</url> um ihn zu bestätigen.';
+
 
 // ALERTS
 $l['socialnetwork_sn_Post'] = '{1} hat einen Post in deinem Social Network gepostet.';
@@ -55,7 +62,7 @@ $l['myalerts_setting_sn_Answer'] = 'Soziales Netzwerk: Benachrichtigung, bei neu
 $l['socialnetwork_sn_Like'] = '{1} gefällt ein Post oder eine Antwort von dir beim Social Network.';
 $l['myalerts_setting_sn_Like'] = 'Soziales Netzwerk: Benachrichtigung, wenn jemandem ein Post oder eine Antwort von dir gefällt.';
 
-$l['socialnetwork_sn_Friend'] = '{1} mit dir im Social Network befreundet sein.';
+$l['socialnetwork_sn_Friend'] = '{1} will mit dir im Social Network befreundet sein.';
 $l['myalerts_setting_sn_Friend'] = 'Soziales Netzwerk: Benachrichtigung, wenn jemand mit dir befreundet sein will.';
 
 $l['socialnetwork_sn_Mention'] = '{1} hat dich in einem Post oder einer Antwort erwähnt.';
