@@ -49,7 +49,12 @@ $l['socialnetwork_pm_mentionSubject'] = 'Social Network: Mention.';
 $l['socialnetwork_pm_mention']= '{1} hat dich in einem <a href="member.php?action=profile&uid={2}&area=socialnetwork#{3}">Beitrag</url> erwähnt.';
 
 $l['socialnetwork_pm_friendSubject'] = 'Social Network: Freundschaftsanfrage.';
-$l['socialnetwork_pm_friend']= '{1} möchte mit dir befreundet sein. Gehe auf deine <a href="member.php?action=profile&uid={2}&area=socialnetwork">Seite</url> um ihn zu bestätigen.';
+$l['socialnetwork_pm_friend']= '{1} möchte mit dir befreundet sein. Gehe auf deine <a href="member.php?action=profile&uid={2}&area=socialnetwork">Seite</a> um ihn zu bestätigen.';
+
+
+$l['socialnetwork_pm_friendReqSubject'] = 'Social Network: Reaktion auf Freundschaftsanfrage.';
+$l['socialnetwork_pm_friendReqAcpt']= '{1} hat deine Freundschaftsanfrage akzeptiert';
+$l['socialnetwork_pm_friendReqDeny']= '{1} hat deine Freundschaftsanfrage abgelehnt';
 
 
 // ALERTS
@@ -67,6 +72,9 @@ $l['myalerts_setting_sn_Friend'] = 'Soziales Netzwerk: Benachrichtigung, wenn je
 
 $l['socialnetwork_sn_Mention'] = '{1} hat dich in einem Post oder einer Antwort erwähnt.';
 $l['myalerts_setting_sn_Mention'] = 'Soziales Netzwerk: Benachrichtigung, wenn du in einem Post erwähnt wirst.';
+
+$l['socialnetwork_sn_FriendRequest'] = '{1} hat auf deine Freundschaftsanfrage reagiert.';
+$l['myalerts_setting_sn_FriendRequest'] = 'Soziales Netzwerk: Benachrichtigung, wenn jemand auf deine Freundschaftsanfrage reagiert hat.';
 
 
 ?>
