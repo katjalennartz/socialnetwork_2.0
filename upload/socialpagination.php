@@ -1,14 +1,11 @@
 <?php
 define("IN_MYBB", 1);
-//define('THIS_SCRIPT', 'reservierung.php');
-//require_once MYBB_ROOT."inc/plugins/socialnetwork.php";
- error_reporting ( -1 );
- ini_set ( 'display_errors', true ); 
-// include "inc/plugins/socialnetwork.php";
 
+//  error_reporting ( -1 );
+//  ini_set ( 'display_errors', true ); 
 
 require("global.php");
-global $db, $mybb, $templates, $lang, $parser, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
+global $db, $mybb, $templates, $lang, $parser, $socialnetwork_member_postbit,$socialnetwork_member_postimg_ans, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
 
 $options = array(
     "allow_html" => $mybb->settings['socialnetwork_html'],
@@ -19,31 +16,26 @@ $options = array(
     "allow_videocode" => $mybb->settings['socialnetwork_videos'],
 ); // "me_username" => $memprofile['username'],
 
-$thisUser = intval($mybb->user['uid']);
+$thisuser = intval($mybb->user['uid']);
 $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
 
 
-$pageno = $_POST['pageno'];
-$pageid = $_POST['pageid'];
-$activepage = $_POST['pageid'];
+$pageno = intval($_POST['pageno']);
+$pageid = intval($_POST['pageid']);
+$thispage = intval($_POST['pageid']);
+//TODO Variable machen settingfeld einfügen! 
 $no_of_records_per_page = 5;
 $offset = ($pageno - 1) * $no_of_records_per_page;
 
 $cnt_likes_post = "";
-// $sql = "SELECT * FROM ".TABLE_PREFIX."sn_posts WHERE sn_pageid = $activepage LIMIT $offset, $no_of_records_per_page";
-$nextposts = $db->query("SELECT * FROM mybb_sn_posts WHERE sn_pageid =  " . $pageid . " ORDER by sn_date DESC LIMIT $offset, $no_of_records_per_page");
-// $queryPosts = var_dump( $queryPosts);
 
-//  while ($get_post = $db->fetch_array($nextposts)) {
-//      echo("Test blub".$get_post['sn_uid']);
-//  }
-$test_test ="";
+$nextposts = $db->query("SELECT * FROM mybb_sn_posts WHERE sn_pageid =  " . $pageid . " ORDER by sn_date DESC LIMIT $offset, $no_of_records_per_page");
 
 while ($get_post = $db->fetch_array($nextposts)) {
     $likevar = "like";
     $sn_like = $lang->socialnetwork_member_like;
     //show the image beside the anwser form
-    $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisUser'"), "sn_avatar");
+    $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisuser'"), "sn_avatar");
     if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
     //poster uid
     $postuser = intval($get_post['sn_uid']);
@@ -75,7 +67,7 @@ while ($get_post = $db->fetch_array($nextposts)) {
 
     $sn_post_ed_del = "";
     //edit and delete
-    if (($thisUser == $postuser) || ($mybb->usergroup['canmodcp'] == 1)) {
+    if (($thisuser == $postuser) || ($mybb->usergroup['canmodcp'] == 1)) {
         $sn_date_date = date('Y-m-d', strtotime($get_post['sn_date']));
         $sn_date_time = date('H:i', strtotime($get_post['sn_date']));
         eval("\$sn_post_ed_del = \"" . $templates->get("socialnetwork_member_postedit") . "\";");
@@ -88,7 +80,7 @@ while ($get_post = $db->fetch_array($nextposts)) {
     $likeQuery = $db->simple_select("sn_likes", "*", "sn_postid = $sn_postid");
     while ($likesarray = $db->fetch_array($likeQuery)) {
         //do the user already like the post? -> then we want to show the dislike stuff
-        if ($likesarray['sn_uid'] == $thisUser) {
+        if ($likesarray['sn_uid'] == $thisuser) {
             $likevar = "dislike";
             $sn_like = $lang->socialnetwork_member_dislike;
         }
@@ -97,8 +89,10 @@ while ($get_post = $db->fetch_array($nextposts)) {
     $cnt_likes_post = $db->fetch_field($db->simple_select("sn_likes", "count(*) as cnt", "sn_postid = $sn_postid"), "cnt");
 
     //Do the user upload an image to the post?
-    $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $sn_postid"));
     if (!empty($postImg)) {
+        $postImgFilename = $postImg['sn_filename'];
+        $postImgId = $postImg['sn_imgId'];
+
         eval("\$socialnetwork_member_postimg = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
     }
 
@@ -121,7 +115,7 @@ while ($get_post = $db->fetch_array($nextposts)) {
         //all likes
         $likeQuery = $db->simple_select("sn_likes", "*", "sn_answerid = $ansid");
         while ($likesarray = $db->fetch_array($likeQuery)) {
-            if ($likesarray['sn_uid'] == $thisUser) {
+            if ($likesarray['sn_uid'] == $thisuser) {
                 $likevar_ans = "dislike";
                 $sn_like_ans = $lang->socialnetwork_member_dislike;
             }
@@ -144,10 +138,18 @@ while ($get_post = $db->fetch_array($nextposts)) {
             }
             $sn_anspostimg = $defaultava;
         }
+        $socialnetwork_member_postimg_ans = "";
+        $postImgAns = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $ansid and sn_type = 'answer'"));
+        if (!empty($postImgAns)) {
+            $postImgFilename = $postImgAns['sn_filename'];
+            $postImgId = $postImgAns['sn_imgId'];
+
+            eval("\$socialnetwork_member_postimg_ans = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
+        }
         $sn_ansdate = date('d.m.y - H:i', strtotime($get_answer['sn_date']));
         $sn_ans_ed_del = "";
         //edit and delete
-        if (($thisUser == $sn_ansUser) || ($mybb->usergroup['canmodcp'] == 1)) {
+        if (($thisuser == $sn_ansUser) || ($mybb->usergroup['canmodcp'] == 1)) {
             // eval("\$sn_post_ed_del = \"".$templates->get("socialnetwork_member_postedit")."\";");
             $ansdate = date('Y-m-d', strtotime($get_answer['sn_date']));
             $anstime = date('H:i', strtotime($get_answer['sn_date']));
