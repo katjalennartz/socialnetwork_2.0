@@ -43,6 +43,8 @@ $l['socialnetwork_settings_uploadHeight_tit']='Erlaubte Höhe?';
 $l['socialnetwork_settings_uploadHeight']='Wie hoch dürfen hochgeladene Bilder höchstens sein?';
 $l['socialnetwork_settings_scrolling_tit']='Unendliches Scrollen?';
 $l['socialnetwork_settings_scrolling']='Du kannst dadurch dynamisches Nachladen der Inhalte aktivieren (wie bei Facebook). Allerdings funktionieren dann die direktlinks zu den Posts bei Erwähnungen eventuell nicht mehr.';
+$l['socialnetwork_settings_recordsperpage_tit']='Anzahl der geladenen Posts?';
+$l['socialnetwork_settings_recordsperpage']='Wieviele Posts sollen zunächst angezeigt und dann nachgeladen werden?';
 
 
 

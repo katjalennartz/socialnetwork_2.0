@@ -1,11 +1,11 @@
 <?php
 define("IN_MYBB", 1);
 
-//  error_reporting ( -1 );
-//  ini_set ( 'display_errors', true ); 
+error_reporting(-1);
+ini_set('display_errors', true);
 
 require("global.php");
-global $db, $mybb, $templates, $lang, $parser, $socialnetwork_member_postbit,$socialnetwork_member_postimg_ans, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
+global $db, $mybb, $templates, $lang, $parser, $socialnetwork_member_postbit, $socialnetwork_member_postimg_ans, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
 
 $options = array(
     "allow_html" => $mybb->settings['socialnetwork_html'],
@@ -19,19 +19,20 @@ $options = array(
 $thisuser = intval($mybb->user['uid']);
 $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
 
-
 $pageno = intval($_POST['pageno']);
 $pageid = intval($_POST['pageid']);
-$thispage = intval($_POST['pageid']);
-//TODO Variable machen settingfeld einfügen! 
-$no_of_records_per_page = 5;
-$offset = ($pageno - 1) * $no_of_records_per_page;
+$thispage = intval($_POST['thispage']);
 
+$no_of_records_per_page = $mybb->settings['socialnetwork_recordsperpage'];
+if ($no_of_records_per_page == "") $no_of_records_per_page = 5;
+
+$offset = ($pageno - 1) * $no_of_records_per_page;
 $cnt_likes_post = "";
 
 $nextposts = $db->query("SELECT * FROM mybb_sn_posts WHERE sn_pageid =  " . $pageid . " ORDER by sn_date DESC LIMIT $offset, $no_of_records_per_page");
 
 while ($get_post = $db->fetch_array($nextposts)) {
+
     $likevar = "like";
     $sn_like = $lang->socialnetwork_member_like;
     //show the image beside the anwser form
@@ -51,11 +52,9 @@ while ($get_post = $db->fetch_array($nextposts)) {
     $sn_postimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$postuser'"), "sn_avatar");
     if ($sn_postimg == "") $sn_postimg = $defaultava;
     //handle of deleted users
-    if ($get_post['sn_del_username'] != "") {
-        $sn_postname =  htmlspecialchars_uni($get_post['sn_del_username']);
-        if ($get_post['sn_del_nickname'] != "") {
-            $sn_postname =  htmlspecialchars_uni($get_post['sn_del_nickname']);
-        }
+
+    if ($get_post['sn_del_name'] != "") {
+        $sn_postname =  htmlspecialchars_uni($get_post['sn_del_name']);
         $sn_postimg = $defaultava;
     }
 
@@ -89,10 +88,19 @@ while ($get_post = $db->fetch_array($nextposts)) {
     $cnt_likes_post = $db->fetch_field($db->simple_select("sn_likes", "count(*) as cnt", "sn_postid = $sn_postid"), "cnt");
 
     //Do the user upload an image to the post?
+    $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $sn_postid and sn_type = 'post'"));
+    //echo  $sn_postid;
+    if ($thisuser == $postuser || $mybb->usergroup['canmodcp'] == 1) {
+        $socialnetwork_member_postimg = "<span id=\"post".$sn_postid."\"><button onClick=\"addImg('post','" . $sn_postid . "')\"  class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
+    } else {
+        $socialnetwork_member_postimg = "";
+    }
     if (!empty($postImg)) {
         $postImgFilename = $postImg['sn_filename'];
         $postImgId = $postImg['sn_imgId'];
-
+        if ($thisuser == $postImg['sn_uid'] || $mybb->usergroup['canmodcp'] == 1) {
+            $manage_img = "<a href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&deleteImgPid=" . $sn_postid . "&type=post\" class=\"editDelete\" ><i class=\"fas fa-trash\"></i></a>";
+        }
         eval("\$socialnetwork_member_postimg = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
     }
 
@@ -100,11 +108,12 @@ while ($get_post = $db->fetch_array($nextposts)) {
     $cnt_likes_ans = "";
     //and here we get the answers for the actual post
     $queryAnswer = $db->simple_select("sn_answers", "*", "sn_post_id = $sn_postid", array(
-        "order_by" => 'sn_date',
+        "order_by" => 'sn_date, sn_aid',
         "order_dir" => 'DESC'
     ));
     $sn_ans_ed_del = "";
     while ($get_answer = $db->fetch_array($queryAnswer)) {
+
         //Initial like stuff for answers
         $likevar_ans = "like";
         $sn_like_ans = $lang->socialnetwork_member_like;
@@ -131,19 +140,23 @@ while ($get_post = $db->fetch_array($nextposts)) {
         $sn_ansname = '<a href="member.php?action=profile&uid=' . $sn_ansUser . '&area=socialnetwork">' . $ansname . '</a>';
 
         //handle of deleted user
-        if ($get_answer['sn_del_username'] != "") {
-            $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_username']);
-            if ($get_answer['sn_del_nickname'] != "") {
-                $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_nickname']);
-            }
+        if ($get_answer['sn_del_name'] != "") {
+            $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_name']);
             $sn_anspostimg = $defaultava;
         }
-        $socialnetwork_member_postimg_ans = "";
+
+        if ($thisuser == $sn_ansUser || $mybb->usergroup['canmodcp'] == 1) {
+            $socialnetwork_member_postimg_ans = "<button onClick=\"addImg('ans','" . $ansid . "')\" id=\"sn_addimg\" class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button>";
+        } else {
+            $socialnetwork_member_postimg_ans = "";
+        }
         $postImgAns = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $ansid and sn_type = 'answer'"));
         if (!empty($postImgAns)) {
             $postImgFilename = $postImgAns['sn_filename'];
             $postImgId = $postImgAns['sn_imgId'];
-
+            if ($thisuser == $postImg['sn_uid'] || $mybb->usergroup['canmodcp'] == 1) {
+                $manage_img = "<a href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&deleteImgPid=" . $ansid . "&type=answer\" class=\"editDelete\" ><i class=\"fas fa-trash\"></i></a>";
+            }
             eval("\$socialnetwork_member_postimg_ans = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
         }
         $sn_ansdate = date('d.m.y - H:i', strtotime($get_answer['sn_date']));
@@ -161,5 +174,5 @@ while ($get_post = $db->fetch_array($nextposts)) {
 
     eval("\$showMorePosts .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
 }
-echo $showMorePosts;
 
+echo $showMorePosts;

@@ -12,9 +12,16 @@ $l['socialnetwork_notupdated'] = "Entschuldige, irgendwas ist beim Speichern dei
 
 $l['socialnetwork_ucp_link'] = "Soziales Netzwerk ansehen";
 
+$l['socialnetwork_ucp_alertPost'] = "bei neuem Post oder Antwort.";
+$l['socialnetwork_ucp_alertLike'] = "wenn jemanden ein Post oder eine Antwort von dir gefällt.";
+$l['socialnetwork_ucp_alertFriend'] = "wenn jemand dein Freund sein will.";
+$l['socialnetwork_ucp_alertMention'] = "wenn dich jemand in einem Post erwähnt.";
+$l['socialnetwork_ucp_alertFriendReq'] = "wenn jemand auf deine Freundschaftsanfrage reagiert hat.";
+
 //Memberpage
 $l['socialnetwork_member_ownNotFilled'] = "keine Angabe";
 $l['socialnetwork_member_errorMessageEmpty'] = "Du kannst keinen leeren Beitrag setzen";
+$l['socialnetwork_member_errorNoOwnPage'] = "Du kannst nur Posten, wenn du selbst eine Social Network Seite hast.";
 $l['socialnetwork_member_errorMessageDelete'] = "Löschen nicht möglich.";
 
 //Like/Dislike fontawesome! 
