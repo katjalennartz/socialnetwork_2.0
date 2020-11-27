@@ -31,15 +31,34 @@ function abortAns($id,$ans){
     document.getElementById($aid).innerHTML = $ans;
 }
 
-var nextPage = parseInt($('#pageno').val())+1;
-
+function addImg($type, $postid){
+    $pid = $type + $postid;
+    console.log("pidaddimg" + $pid)
+    $saveInnerhtml = document.getElementById($pid).innerHTML; 
+    document.getElementById($pid).innerHTML = '<form enctype="multipart/form-data" name="picform" id="picform" method="post">'
+    + '<input type="file" name="uploadImg" size="60" maxlength="255">' 
+    + '<input type="hidden" name="'+$type+'id" value="'+$postid+'">'
+    + '<input class="sn_send" type="submit" name="saveImg'+$type+'" value="speichern">'
+    +'</form>'
+    + '<input type="button" value="abbrechen" onclick="abortImg(\''+$pid+'\',\''+$postid+'\',\''+$type+'\')\"/>';
+}   
+function abortImg($pid,$postid,$type){
+    console.log($pid)
+    document.getElementById($pid).innerHTML = ' '
+    + '<button onClick="addImg(\''+$type+'\',\''+$postid+'\')" class="editDelete">'
+    + '<i class="fas fa-camera-retro"></i>'
+    + '</button>'
+}
 
 /*handle of infinite scrolling - load data when reach end of page*/
 $(document).ready(function(){
+
     $('#loader').on('inview', function(event, isInView) {
+      
         if (isInView) {
             var nextPage = parseInt($('#pageno').val())+1;
-            var pageId = parseInt($('#activepage').val());
+            var pageId = parseInt($('#thispage').val());
+            
             $.ajax({
                 type: 'POST',
                 url: 'socialpagination.php',
@@ -53,7 +72,6 @@ $(document).ready(function(){
                         $("#loader").hide();
                     }
                 }
-                
             });
         }
     });
