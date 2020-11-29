@@ -2539,6 +2539,7 @@ $plugins->add_hook("fetch_wol_activity_end", "socialnetwork_online_activity");
 function socialnetwork_online_activity($user_activity)
 {
     global $parameters, $user;
+      // print_r($user_activity);
     $split_loc = explode(".php", $user_activity['location']);
     if ($split_loc[0] == $user['location']) {
         $filename = '';
@@ -2561,6 +2562,32 @@ function socialnetwork_online_activity($user_activity)
     return $user_activity;
 }
 
+
+$plugins->add_hook("build_friendly_wol_location_end", "socialnetwork_online_location");
+/**
+ * Build text and link for online locations
+ * @param array the information we need
+ */
+function socialnetwork_online_location($plugin_array)
+{
+    global $lang;
+  // print_r($plugin_array);
+    $pagedata = get_user($plugin_array['user_activity']['uid']);
+    $pagelink = '<a href="' . get_profile_link($pagedata['uid']) . '&amp;area=socialnetwork" >' . $pagedata['username']  . '</a>';
+
+    if ($plugin_array['user_activity']['activity'] == "socialnetwork") {
+        $socialnetwork_wol_page =  $lang->socialnetwork_wol_page;
+        $lang->socialnetwork_wol_page = $lang->sprintf($socialnetwork_wol_page, $pagelink);
+        $plugin_array['location_name'] = $lang->socialnetwork_wol_page;
+    }
+    if ($plugin_array['user_activity']['activity'] == "edit_socialnetwork") {
+        $plugin_array['location_name'] = $lang->socialnetwork_wol_edit;
+    }
+
+    return $plugin_array;
+}
+
+$plugins->add_hook("modcp_start", "socialnetwork_modcp");
 function socialnetwork_modcp_nav() {
     global $db, $cache, $mybb, $lang, $templates, $theme, $header, $headerinclude, $footer, $modcp_nav, $nav_rumors;
    // $lang->load('rumors');
@@ -2585,30 +2612,6 @@ function socialnetwork_modcp()
 
     }
 }
-$plugins->add_hook("modcp_start", "socialnetwork_modcp");
-$plugins->add_hook("build_friendly_wol_location_end", "socialnetwork_online_location");
-/**
- * Build text and link for online locations
- * @param array the information we need
- */
-function socialnetwork_online_location($plugin_array)
-{
-    global $lang;
-    $pagedata = get_user($plugin_array['user_activity']['uid']);
-    $pagelink = '<a href="' . get_profile_link($pagedata['uid']) . '&amp;area=socialnetwork" >' . $pagedata['username']  . '</a>';
-
-    if ($plugin_array['user_activity']['activity'] == "socialnetwork") {
-        $socialnetwork_wol_page =  $lang->socialnetwork_wol_page;
-        $lang->socialnetwork_wol_page = $lang->sprintf($socialnetwork_wol_page, $pagelink);
-        $plugin_array['location_name'] = $lang->socialnetwork_wol_page;
-    }
-    if ($plugin_array['user_activity']['activity'] == "edit_socialnetwork") {
-        $plugin_array['location_name'] = $lang->socialnetwork_wol_edit;
-    }
-
-    return $plugin_array;
-}
-
 
 /**
  * integrate MyAlerts
