@@ -289,6 +289,7 @@ function socialnetwork_activate()
     include MYBB_ROOT . "/inc/adminfunctions_templates.php";
     //add variables to member_profile to show link to social network
     find_replace_templatesets("member_profile", "#" . preg_quote('{$userstars}') . "#i", '{$userstars}{$social_link}');
+    find_replace_templatesets('modcp_nav_users', '#'.preg_quote('{$nav_ipsearch}').'#', '{$nav_ipsearch} {$nav_socialnetwork}');
 
     // add Alerts
     if (function_exists('myalerts_is_activated') && myalerts_is_activated()) {
@@ -751,6 +752,23 @@ function socialnetwork_addtemplates()
         <input type="checkbox" name="alertMention" {$sn_mentioncheck}> {$lang->socialnetwork_ucp_alertMention}</br>
         <input type="checkbox" name="alertFriendReq" {$sn_friendReqcheck}> {$lang->socialnetwork_ucp_alertFriendReq}</br>
         </fieldset>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[17] = array(
+        "title" => 'socialnetwork_modcp_nav',
+        "template" => '
+        <tr>
+		<td class="tcat">
+			<div class="float_right"><img src="{$theme[\\\'imgdir\\\']}/collapse{$collapsedimg[\\\'modcpsocialnetwork\\\']}.gif" id="socialnetwork_img" class="expander" alt="[-]" title="[-]" /></div>
+			<div><span class="smalltext"><strong>{$lang->socialnetwork_modcp}</strong></span></div>
+		</td>
+	</tr>
+	<tbody style="{$collapsed[\\\'modcpsocialnetwork_e\\\']}" id="modcpsocialnetwork_e">
+		<tr><td class="trow1 smalltext"><a href="modcp.php?action=socialnetwork" class="modcp_nav_item modcp_nav_editprofile">{$lang->moderate_userpages}</a></td></tr>
+	</tbody>
         ',
         "sid" => "-2",
         "version" => "1.0",
@@ -2543,7 +2561,31 @@ function socialnetwork_online_activity($user_activity)
     return $user_activity;
 }
 
+function socialnetwork_modcp_nav() {
+    global $db, $cache, $mybb, $lang, $templates, $theme, $header, $headerinclude, $footer, $modcp_nav, $nav_rumors;
+   // $lang->load('rumors');
+//TODO NAVIGATION preg replace
+    eval("\$socialnetwork_modcp_nav= \"".$templates->get("socialnetwork_modcp_nav")."\";");
+}
 
+
+$plugins->add_hook('modcp_nav', 'socialnetwork_modcp_nav');
+function socialnetwork_modcp()
+{
+    global $mybb, $db, $cache, $lang, $templates, $theme, $headerinclude, $header, $footer, $modcp_nav;
+    $lang->load("socialnetwork");
+    $usergroups_cache = $cache->read("usergroups");
+
+	if ($mybb->input['action'] == "socialnetwork") {
+        if (!$usergroups_cache[$mybb->user['usergroup']]['canuserpagemod']) {
+            error_no_permission();
+            add_breadcrumb($lang->socialnetwork_modcp_nav, "modcp.php");
+            add_breadcrumb($lang->userpages_modcp, "modcp.php?action=socialnetwork");
+		}
+
+    }
+}
+$plugins->add_hook("modcp_start", "socialnetwork_modcp");
 $plugins->add_hook("build_friendly_wol_location_end", "socialnetwork_online_location");
 /**
  * Build text and link for online locations
