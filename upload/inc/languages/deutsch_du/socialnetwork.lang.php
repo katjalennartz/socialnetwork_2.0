@@ -5,8 +5,8 @@
 
 $l['socialnetwork_view'] = "{1}'s soziales Netzwerk";
 $l['socialnetwork_usercp'] = "soziales Netzwerk";
-$l['socialnetwork_change'] = "bearbeite dein soziales Netzwerk Profil";
-$l['socialnetwork_save'] = "speicher dein soziales Netzwerk Profil";
+$l['socialnetwork_change'] = "bearbeite dein Profil vom Sozialen Netzwerk";
+$l['socialnetwork_save'] = "speicher dein Soziales Netzwerk Profil";
 $l['socialnetwork_updated'] = "dein soziales Netzwerk Profil wurde erfolgreich gespeichert";
 $l['socialnetwork_notupdated'] = "Entschuldige, irgendwas ist beim Speichern deines Profils schief gegangen.";
 
@@ -63,6 +63,9 @@ $l['socialnetwork_pm_friendReqSubject'] = 'Social Network: Reaktion auf Freundsc
 $l['socialnetwork_pm_friendReqAcpt']= '{1} hat deine Freundschaftsanfrage akzeptiert';
 $l['socialnetwork_pm_friendReqDeny']= '{1} hat deine Freundschaftsanfrage abgelehnt';
 
+// WHO IS ONLINE
+$l['socialnetwork_wol_page'] = 'Sieht sich das Social Network von {1} an.';
+$l['socialnetwork_wol_edit'] = 'Bearbeitet die eigene Social Network Seite.';
 
 // ALERTS
 $l['socialnetwork_sn_Post'] = '{1} hat einen Post in deinem Social Network gepostet.';

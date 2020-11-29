@@ -824,12 +824,59 @@ function socialnetwork_addstylesheets()
         
         .editDelete {
             font-size: 0.8em;
+            background: none;
+            border: 0;
+            padding: 0;
         }
+
+	a.editDelete {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+	}
+
         .sn_img {
-            margin-top: -20px;
+            display: flex;
         }
         /**attachment view**/ 
-        .infopop { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: hsla(0, 0%, 0%, 0.5); z-index: 1; opacity:0; -webkit-transition: .5s ease-in-out; -moz-transition: .5s ease-in-out; transition: .5s ease-in-out; pointer-events: none; } .infopop:target { opacity:1; pointer-events: auto; } .infopop > .pop {     background: #aaaaaa; margin: 10% auto; padding: 10px; width: fit-content; z-index: 3;} .closepop { position: absolute; right: -5px; top:-5px; width: 100%; height: 100%; z-index: 2; }
+        .infopop { 
+			position: fixed; 
+			top: 0; right: 0; 
+			bottom: 0; 
+			left: 0; 
+			background: hsla(0, 0%, 0%, 0.5); 
+			z-index: 1; 
+			opacity:0; 
+			-webkit-transition: .5s ease-in-out; 
+			-moz-transition: .5s ease-in-out; 
+			transition: .5s ease-in-out; 
+			pointer-events: none; 
+		} 
+
+		.infopop:target { 
+			opacity:1; 
+			pointer-events: auto; 
+		} 
+		
+		.infopop > .pop {     
+			background: #aaaaaa; 
+			margin: 10% auto; 
+			padding: 10px; 
+			width: fit-content; 
+			z-index: 3;
+			} 
+
+		.closepop { 
+			position: absolute; 
+			right: -5px; 
+			top:-5px; 
+			width: 100%; 
+			height: 100%; 
+			z-index: 2; 
+		}
         
         .sn_postName{
             display:block;
@@ -841,7 +888,7 @@ function socialnetwork_addstylesheets()
         }
         
         .sn_socialPost {
-            margin-bottom: 30px;
+            /* margin-bottom: 30px; */
         }
         
         .snpost {
@@ -967,6 +1014,7 @@ function socialnetwork_addstylesheets()
         .ucp_smallinfo {
             font-size: 0.7em;
         }
+        
         ',
         'cachefile' => $db->escape_string(str_replace('/', '', 'socialnetwork.css')),
         'lastmodified' => time()
@@ -1049,7 +1097,7 @@ function socialnetwork_usercp()
 
     if ($mybb->input['action'] == "socialnetwork") {
         add_breadcrumb($lang->nav_usercp, "usercp.php");
-        add_breadcrumb($lang->changeuserpage, "usercp.php?action=socialnetwork");
+        add_breadcrumb($lang->socialnetwork_change, "usercp.php?action=socialnetwork");
         $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $thisuser . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
 
         if ($pm == 1) {
@@ -1272,16 +1320,16 @@ function socialnetwork_mainpage()
                 updatePostOrAnswer($idAns, $datetimeAns, $messageAns, "sn_answers");
             }
         }
-        if (isset($mybb->input['saveImgpost'])){
+        if (isset($mybb->input['saveImgpost'])) {
             uploadImg(intval($mybb->input['postid']), "post");
         }
-        if (isset($mybb->input['saveImgans'])){
+        if (isset($mybb->input['saveImgans'])) {
             uploadImg(intval($mybb->input['ansid']), "answer");
         }
         if ($mybb->input['deleteImgPid'] != "" && is_numeric($mybb->input['deleteImgPid'])) {
-            $todelete = intval($mybb->input['deleteImgPid']); 
-            $typeis = $db->escape_string($mybb->input['type']); 
-            deleteImgs($todelete,$typeis);
+            $todelete = intval($mybb->input['deleteImgPid']);
+            $typeis = $db->escape_string($mybb->input['type']);
+            deleteImgs($todelete, $typeis);
         }
 
         $sn_postid = intval($mybb->input['postid']);
@@ -1369,7 +1417,6 @@ function deleteAnswer($toDelete, $thispage)
 
 //TODO NEWSFEED FRIENDS & ALL
 //TODO Verwaltung MOD CP
-
 
 /**
  * handle when user is deleted -> nickname empty? save username, else keep nickname
@@ -1502,12 +1549,12 @@ function showPostsNormal()
     //Parser options
 
     $thispage = intval($mybb->input['uid']);
-   
+
     $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $thispage", array(
         "order_by" => 'sn_date, sn_post_id',
         "order_dir" => 'DESC',
     ));
-    showPosts($queryPosts, "normal");   
+    showPosts($queryPosts, "normal");
 }
 
 /** *****
@@ -1521,10 +1568,10 @@ function showPostsNormal()
 function showPostsAjax()
 {
     global  $thispage, $db, $lang, $mybb, $templates, $parser, $infinitescrolling, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
-    
+
     $offset = 0;
     $no_of_records_per_page = $mybb->settings['socialnetwork_recordsperpage'];
-    if ($no_of_records_per_page == "" ) $no_of_records_per_page= 5;
+    if ($no_of_records_per_page == "") $no_of_records_per_page = 5;
     $thispage = intval($mybb->input['uid']);
 
     $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $thispage", array(
@@ -1534,13 +1581,14 @@ function showPostsAjax()
         "limit" => $no_of_records_per_page
     ));
 
-   showPosts($queryPosts, "infinite");
+    showPosts($queryPosts, "infinite");
 }
 
 /***
  * showPosts()
  */
-function showPosts($query, $type){
+function showPosts($query, $type)
+{
     global  $thispage, $db, $lang, $mybb, $templates, $parser, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg, $infinitescrolling;
     $options = array(
         "allow_html" => $mybb->settings['socialnetwork_html'],
@@ -1562,7 +1610,7 @@ function showPosts($query, $type){
             //echo $infinitescrolling;
             $infinitescrolling = '<span style="text-align:center; display:block;"><img id="loader" src="images/spinner.gif"></div>';
         } else {
-            $infinitescrolling="";   
+            $infinitescrolling = "";
         }
         //show the image beside the anwser form
         $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisuser'"), "sn_avatar");
@@ -1620,9 +1668,9 @@ function showPosts($query, $type){
         $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $sn_postid and sn_type = 'post'"));
         //echo  $sn_postid;
         if ($thisuser == $postuser || $mybb->usergroup['canmodcp'] == 1) {
-            $socialnetwork_member_postimg = "<span id=\"post".$sn_postid."\"><button onClick=\"addImg('post','" . $sn_postid . "')\"  class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
+            $socialnetwork_member_postimg = "<span id=\"post" . $sn_postid . "\"><button onClick=\"addImg('post','" . $sn_postid . "')\"  class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
         } else {
-            $socialnetwork_member_postimg ="";
+            $socialnetwork_member_postimg = "";
         }
         if (!empty($postImg)) {
             $postImgFilename = $postImg['sn_filename'];
@@ -1672,7 +1720,7 @@ function showPosts($query, $type){
                 $sn_anspostimg = $defaultava;
             }
             if ($thisuser == $sn_ansUser || $mybb->usergroup['canmodcp'] == 1) {
-                $socialnetwork_member_postimg_ans = "<span id=\"ans".$ansid."\"><button onClick=\"addImg('ans','" . $ansid . "')\" id=\"sn_addimg\" class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
+                $socialnetwork_member_postimg_ans = "<span id=\"ans" . $ansid . "\"><button onClick=\"addImg('ans','" . $ansid . "')\" id=\"sn_addimg\" class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
             } else {
                 $socialnetwork_member_postimg_ans = "";
             }
@@ -1700,7 +1748,6 @@ function showPosts($query, $type){
         }
         eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
     }
-
 }
 /**
  * Handle everything to show and add friends
@@ -2463,6 +2510,64 @@ function deleteLikes($postid, $type)
 if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
     $plugins->add_hook("global_start", "socialnetwork_alert");
 }
+
+
+$plugins->add_hook("fetch_wol_activity_end", "socialnetwork_online_activity");
+/**
+ * Show user in Who is Online
+ * @param array info of activity of user
+ * @return array acticity + info where is the user
+ */
+function socialnetwork_online_activity($user_activity)
+{
+    global $parameters, $user;
+    $split_loc = explode(".php", $user_activity['location']);
+    if ($split_loc[0] == $user['location']) {
+        $filename = '';
+    } else {
+        $filename = my_substr($split_loc[0], -my_strpos(strrev($split_loc[0]), "/"));
+    }
+
+    switch ($filename) {
+        case 'member':
+            if ($parameters['area'] == "socialnetwork" && empty($parameters['site'])) {
+                $user_activity['activity'] = "socialnetwork";
+            }
+            break;
+        case 'usercp':
+            if ($parameters['action'] == "socialnetwork" && empty($parameters['site'])) {
+                $user_activity['activity'] = "edit_socialnetwork";
+            }
+            break;
+    }
+    return $user_activity;
+}
+
+
+$plugins->add_hook("build_friendly_wol_location_end", "socialnetwork_online_location");
+/**
+ * Build text and link for online locations
+ * @param array the information we need
+ */
+function socialnetwork_online_location($plugin_array)
+{
+    global $lang;
+    $pagedata = get_user($plugin_array['user_activity']['uid']);
+    $pagelink = '<a href="' . get_profile_link($pagedata['uid']) . '&amp;area=socialnetwork" >' . $pagedata['username']  . '</a>';
+
+    if ($plugin_array['user_activity']['activity'] == "socialnetwork") {
+        $socialnetwork_wol_page =  $lang->socialnetwork_wol_page;
+        $lang->socialnetwork_wol_page = $lang->sprintf($socialnetwork_wol_page, $pagelink);
+        $plugin_array['location_name'] = $lang->socialnetwork_wol_page;
+    }
+    if ($plugin_array['user_activity']['activity'] == "edit_socialnetwork") {
+        $plugin_array['location_name'] = $lang->socialnetwork_wol_edit;
+    }
+
+    return $plugin_array;
+}
+
+
 /**
  * integrate MyAlerts
  */
