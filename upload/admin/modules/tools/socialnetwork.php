@@ -11,12 +11,13 @@ if (!$mybb->input['action']) {
     //get alle existing columns in table sn_users
     $columns = $db->write_query("SHOW COLUMNS FROM " . TABLE_PREFIX . "sn_users WHERE field LIKE 'own_%'"); //
     $oldfields= array();
-    $oldfieldsstring = ",";
+    $oldfieldsstring = "";
     //save them in an array and save a string - without the prefix own_
     while($column = $db->fetch_array($columns)) {
         array_push($oldfields, str_replace('own_', '',$column['Field']));
         $oldfieldsstring .= $column['Field'].",";
     }
+    $oldfieldsstring = substr($oldfieldsstring, 0, -1);
     $oldfieldsstring = str_replace('own_', '',$oldfieldsstring);
 
     //what we do after the button is clicked
@@ -29,9 +30,6 @@ if (!$mybb->input['action']) {
             $get_fieldinput = $db->escape_string($mybb->get_input('socialnetworkfields'));
             //and we want to get an array
             $fields = explode(',', $get_fieldinput);
-            //clean array, means we delete the first and the last entry
-            array_shift($fields);
-            array_pop($fields);
             
             //take our array and test if we had to add a column or not
             foreach ($fields as $field_own) {
@@ -43,7 +41,6 @@ if (!$mybb->input['action']) {
             //take the old ones and compare it to the new ones, so we can test if we have to delete columns
             foreach($oldfields as $oldfield){
                 if(!in_array($oldfield,$fields)){
-                    echo(" - !in_array".$oldfield);
                      $db->write_query("ALTER TABLE ".TABLE_PREFIX."sn_users
                      DROP COLUMN `own_".$oldfield."`");
                 }

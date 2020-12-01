@@ -6,7 +6,7 @@
 $l['socialnetwork_view'] = "{1}'s soziales Netzwerk";
 $l['socialnetwork_usercp'] = "soziales Netzwerk";
 $l['socialnetwork_change'] = "bearbeite dein Profil vom Sozialen Netzwerk";
-$l['socialnetwork_save'] = "speicher dein Soziales Netzwerk Profil";
+$l['socialnetwork_save'] = "speichern";
 $l['socialnetwork_updated'] = "dein soziales Netzwerk Profil wurde erfolgreich gespeichert";
 $l['socialnetwork_notupdated'] = "Entschuldige, irgendwas ist beim Speichern deines Profils schief gegangen.";
 
@@ -85,6 +85,15 @@ $l['myalerts_setting_sn_Mention'] = 'Soziales Netzwerk: Benachrichtigung, wenn d
 
 $l['socialnetwork_sn_FriendRequest'] = '{1} hat auf deine Freundschaftsanfrage reagiert.';
 $l['myalerts_setting_sn_FriendRequest'] = 'Soziales Netzwerk: Benachrichtigung, wenn jemand auf deine Freundschaftsanfrage reagiert hat.';
+
+//MODERATION
+$l['socialnetwork_modcp_edittit'] = 'Soziales Netzwerk von {1} bearbeiten';
+$l['socialnetwork_modcp_nav'] = 'Soziales Netzwerk';
+$l['socialnetwork_modcp'] = 'Soziales Netzwerk';
+$l['socialnetwork_modcp_tit'] = 'Soziales Netzwerk ModCP';
+$l['socialnetwork_modcp_edit'] = 'bearbeiten';
+$l['socialnetwork_modcp_view'] = 'Soziales Netzwerk von {1} ansehen';
+
 
 
 ?>

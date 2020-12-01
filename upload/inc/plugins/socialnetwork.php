@@ -200,7 +200,7 @@ function socialnetwork_install()
             'disporder' => 8
         ),
         'socialnetwork_titlesize' => array(
-            'title' => 'Titelbildgröße?',
+            'title' => $lang->socialnetwork_settings_titlesize_tit,
             'description' => $lang->socialnetwork_settings_titlesize,
             'optionscode' => 'text',
             'value' => '600,180', // Default
@@ -248,19 +248,26 @@ function socialnetwork_install()
             'value' => '200', // Default
             'disporder' => 15
         ),
+        'socialnetwork_orderOffFields' => array(
+            'title' => $lang->socialnetwork_settings_orderOffFields_tit,
+            'description' => $lang->socialnetwork_settings_orderOffFields,
+            'optionscode' => 'text',
+            'value' => '', // Default
+            'disporder' => 16
+        ),
         'socialnetwork_scrolling' => array(
             'title' => $lang->socialnetwork_settings_scrolling_tit,
             'description' => $lang->socialnetwork_scrolling,
             'optionscode' => 'yesno',
             'value' => '0', // Default
-            'disporder' => 16
+            'disporder' => 17
         ),
         'socialnetwork_recordsperpage' => array(
             'title' => $lang->socialnetwork_settings_recordsperpage_tit,
             'description' => $lang->socialnetwork_settings_recordsperpage,
             'optionscode' => 'text',
             'value' => '5', // Default
-            'disporder' => 17
+            'disporder' => 18
         ),
     );
 
@@ -289,7 +296,7 @@ function socialnetwork_activate()
     include MYBB_ROOT . "/inc/adminfunctions_templates.php";
     //add variables to member_profile to show link to social network
     find_replace_templatesets("member_profile", "#" . preg_quote('{$userstars}') . "#i", '{$userstars}{$social_link}');
-    find_replace_templatesets('modcp_nav_users', '#'.preg_quote('{$nav_ipsearch}').'#', '{$nav_ipsearch} {$nav_socialnetwork}');
+    find_replace_templatesets('modcp_nav_users', '#' . preg_quote('{$nav_ipsearch}') . '#', '{$nav_ipsearch} {$socialnetwork_modcp_nav}');
 
     // add Alerts
     if (function_exists('myalerts_is_activated') && myalerts_is_activated()) {
@@ -377,7 +384,7 @@ function socialnetwork_uninstall()
     $db->delete_query('settings', "name LIKE 'socialnetwork%_'");
     $db->delete_query('settinggroups', "name = 'socialnetwork'");
 
-    //remove stylesheet löschen
+    //remove stylesheet
     require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
     $db->delete_query("themestylesheets", "name = 'socialnetwork.css'");
     $query = $db->simple_select("themes", "tid");
@@ -385,7 +392,7 @@ function socialnetwork_uninstall()
         update_theme_stylesheet_list($theme['tid']);
     }
 
-    //remove settings
+    //remove settings usergroups
     if ($db->field_exists("socialnetwork_isallowed", "usergroups")) {
         $db->write_query("ALTER TABLE `" . TABLE_PREFIX . "usergroups` DROP `socialnetwork_isallowed`;");
     }
@@ -430,7 +437,7 @@ function socialnetwork_addtemplates()
                 <div class="row">
                     <div class="col-12">
                          <div class="sn_titel" style="background:url({$tit_img});height:{$sn_titlesizeheight};"></div>
-                        <div class="sn_profil" style="width:{$sn_avasizewidth};height:{$sn_avasizeheight};">{$profil_img}</div>
+                        <div class="sn_profil" style="width:{$sn_avasizewidth};height:{$sn_avasizeheight};">{$sn_thispage[\\\'sn_avatar\\\']}</div>
                         <div class="sn_username"><h1>{$sn_nickname}</h1></div>
                     </div>
                 </div>
@@ -1083,6 +1090,23 @@ function socialnetwork_editgroupdo()
 }
 
 /*
+ *  Verwaltung der Defaults im Tool Menü des ACP hinzufügen
+ *  freien index finden
+ */
+$plugins->add_hook("admin_tools_menu", "socialnetwork_menu");
+function socialnetwork_menu($sub_menu)
+{
+    $key = count($sub_menu) * 10 + 10; /* We need a unique key here so this works well. */
+    $sub_menu[$key] = array(
+        'id'    => 'SozialesNetzwerk',
+        'title'    => 'Soziales Netzwerk Verwaltung',
+        'link'    => 'index.php?module=tools-socialnetwork'
+    );
+    return $sub_menu;
+}
+
+//TODO add positionfield -> feld reihenfolge
+/*
  * Fügt die Verwaltung des Social Networks ins UCP Menü ein 
  */
 $plugins->add_hook("usercp_menu", "socialnetwork_usercp_menu");
@@ -1118,12 +1142,6 @@ function socialnetwork_usercp()
         add_breadcrumb($lang->socialnetwork_change, "usercp.php?action=socialnetwork");
         $linktosocial = '<span class="smalltext"><a href="member.php?action=profile&uid=' . $thisuser . '&area=socialnetwork">' . $lang->socialnetwork_ucp_link . '</a></span>';
 
-        if ($pm == 1) {
-            eval("\$socialnetwork_ucp_pmAlert .= \"" . $templates->get('socialnetwork_ucp_pmAlert') . "\";");
-        } else {
-            $socialnetwork_ucp_pmAlert = "";
-        }
-
         $sizes = get_avatit_size();
         $sn_avasizewidth = $sizes[0] . "px";
         $sn_avasizeheight = $sizes[1] . "px";
@@ -1144,6 +1162,7 @@ function socialnetwork_usercp()
             $sn_alertFriend = $input['sn_alertFriend'];
             $sn_alertLike = $input['sn_alertLike'];
             $sn_alertMention = $input['sn_alertMention'];
+            $sn_alertfriendReqcheck = $input['sn_alertFriendReq'];
         }
 
         if ($sn_alertPost == 1) $sn_postcheck = "checked";
@@ -1153,8 +1172,15 @@ function socialnetwork_usercp()
         if ($sn_alertLike == 1) $sn_friendcheck = "checked";
         else $sn_friendcheck = "";
         if ($sn_alertMention == 1) $sn_mentioncheck = "checked";
-        else $sn_sn_mentioncheck = "";
+        else $sn_mentioncheck = "";
+        if ($sn_alertfriendReqcheck == 1) $sn_friendReqcheck = "checked";
+        else $sn_friendReqcheck = "";
 
+        if ($pm == 1) {
+            eval("\$socialnetwork_ucp_pmAlert .= \"" . $templates->get('socialnetwork_ucp_pmAlert') . "\";");
+        } else {
+            $socialnetwork_ucp_pmAlert = "";
+        }
         $fields = getOwnFields();
         if (empty($fields)) $socialnetwork_ucp_ownFieldsBit = "Keine weiteren Felder.";
 
@@ -1254,33 +1280,34 @@ function socialnetwork_mainpage()
         $sn_titlesizeheight = $sizes[3] . "px";
 
         //Get the data of the page, we are looking at
-        $pagedata = $db->simple_select("sn_users", "*", "uid = " . intval($mybb->input['uid']));
-        //user habe no page
-        if ($db->num_rows($pagedata) == 0) error_no_permission();
-        $sn_thispage = $db->fetch_array($pagedata);
+        $sn_thispage = getSnUserInfo(intval($mybb->input['uid']));
 
-        //catch data
-        if ($sn_thispage['sn_userheader'] == "") $tit_img = "";
-        else $tit_img = $sn_thispage['sn_userheader'];
-        if ($sn_thispage['sn_avatar'] == "") $profil_img = "<img src=\"" . $defaultava . "\"/>";
-        else $profil_img = "<img src=\"" . $sn_thispage['sn_avatar'] . "\"/>";
-        if ($sn_thispage['sn_nickname'] == "") $sn_nickname = $db->fetch_field($db->simple_select("users", "username", "uid = " . $sn_thispage['uid'], "limit 1"), "username");
-        else $sn_nickname = $sn_thispage['sn_nickname'];
+        //user have no page
+        if ($sn_thispage == 0) error_no_permission();
 
         $socialnetwork_view = $lang->socialnetwork_view;
-        $lang->socialnetwork_view = $lang->sprintf($socialnetwork_view, $sn_nickname);
+        $lang->socialnetwork_view = $lang->sprintf($socialnetwork_view, $sn_thispage['sn_nickname']);
 
         //Now we want the individual fields
         $fields = getOwnFields();
         // $socialnetwork_ucp_ownFieldsBit
-        foreach ($fields as $field) {
-            $sn_fieldtitle = $field;
-            $get_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_thispage['uid']), "own_" . $field);
-            $own_title = $field;
-            if ($get_value == "") $own_value = $lang->socialnetwork_member_ownNotFilled;
-            else $own_value = $get_value;
-            eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
+        $getOrder = $db->escape_string($mybb->settings['socialnetwork_orderOffFields']);
+        // echo($getOrder);
+        $orderArray = explode(',',  $getOrder);
+
+        foreach ($orderArray as $order) {
+            foreach ($fields as $field) {
+                if($order == $field) {
+                $sn_fieldtitle = $field;
+                $get_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_thispage['uid']), "own_" . $field);
+                $own_title = $field;
+                if ($get_value == "") $own_value = $lang->socialnetwork_member_ownNotFilled;
+                else $own_value = $get_value;
+                eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
+            }
+            }
         }
+
         $thispage = intval($sn_thispage['uid']);
 
         if (isset($mybb->input['sendPost']) && $userUseSN == 1) {
@@ -1434,7 +1461,7 @@ function deleteAnswer($toDelete, $thispage)
 
 
 //TODO NEWSFEED FRIENDS & ALL
-//TODO Verwaltung MOD CP
+//TODO Komma hinzufügen wenn fehlt
 
 /**
  * handle when user is deleted -> nickname empty? save username, else keep nickname
@@ -1447,34 +1474,15 @@ function socialnetwork_userdelete()
     global $db, $cache, $mybb, $user;
     $todelete = (int)$user['uid'];
     $snData = getSnUserInfo($todelete);
-    if ($snData['sn_nickname'] != "") {
-        $name = $snData['sn_nickname'];
-    } else {
-        $name = $user['username'];
-    }
+    $name = $snData['sn_nickname'];
+
     $updateArr = array(
         'sn_del_name' => $name
     );
-    $db->update_query("sn_posts", $updateArr, "sn_uid ='" . $user['uid'] . "'");
-    $db->update_query("sn_answers", $updateArr, "sn_uid ='" . $user['uid'] . "'");
+    $db->update_query("sn_posts", $updateArr, "sn_uid ='" . $todelete . "'");
+    $db->update_query("sn_answers", $updateArr, "sn_uid ='" . $todelete . "'");
     $db->delete_query("sn_friends", "sn_uid = $todelete OR sn_friendith = $todelete");
     $db->delete_query("sn_likes", "sn_uid= $todelete");
-}
-
-/*
- *  Verwaltung der Defaults im Tool Menü des ACP hinzufügen
- *  freien index finden
- */
-$plugins->add_hook("admin_tools_menu", "socialnetwork_menu");
-function socialnetwork_menu($sub_menu)
-{
-    $key = count($sub_menu) * 10 + 10; /* We need a unique key here so this works well. */
-    $sub_menu[$key] = array(
-        'id'    => 'SozialesNetzwerk',
-        'title'    => 'Soziales Netzwerk Verwaltung',
-        'link'    => 'index.php?module=tools-socialnetwork'
-    );
-    return $sub_menu;
 }
 
 $plugins->add_hook("admin_tools_action_handler", "socialnetwork_action_handler");
@@ -1598,7 +1606,7 @@ function showPostsAjax()
         "limit start" => $offset,
         "limit" => $no_of_records_per_page
     ));
-
+    //TODO Testen ob socialpagination noch variablen richtig ausliest!
     showPosts($queryPosts, "infinite");
 }
 
@@ -1617,9 +1625,12 @@ function showPosts($query, $type)
         "allow_videocode" => $mybb->settings['socialnetwork_videos'],
     );
     $thispage = intval($mybb->input['uid']);
+    $thispagedata = getSnUserInfo($thispage);
     $thisuser = intval($mybb->user['uid']);
+    $thisusersndata = getSnUserInfo($thisuser);
     $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
     $cnt_likes_post = "";
+
 
     while ($get_post = $db->fetch_array($query)) {
         $likevar = "like";
@@ -1631,22 +1642,18 @@ function showPosts($query, $type)
             $infinitescrolling = "";
         }
         //show the image beside the anwser form
-        $sn_ansFormImg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$thisuser'"), "sn_avatar");
+        $sn_ansFormImg = $thisusersndata['sn_avatar'];
         if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
         //poster uid
         $postuser = intval($get_post['sn_uid']);
+        $postuserdata = getSnUserInfo($postuser);
+        $name = $postuserdata['sn_nickname'];
 
-        //do the poster have a nickname if not take the username
-        $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname"));
-        if ($name == "") {
-            $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("users", "username", "uid = '$postuser'"), "username"));
-        }
         //we want to link to the social page of the poster
         $sn_postname = '<a href="member.php?action=profile&uid=' . $postuser . '&area=socialnetwork">' . $name . '</a>';
         //the avatar
-        $sn_postimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$postuser'"), "sn_avatar");
-        if ($sn_postimg == "") $sn_postimg = $defaultava;
-        //handle of deleted users
+        $sn_postimg =  $postuserdata['sn_avatar'];
+
 
         if ($get_post['sn_del_name'] != "") {
             $sn_postname =  htmlspecialchars_uni($get_post['sn_del_name']);
@@ -1724,12 +1731,11 @@ function showPosts($query, $type)
             }
             //uid of answer
             $sn_ansUser = intval($get_answer['sn_uid']);
+            $sn_ansUserData = getSnUserInfo($sn_ansUser);
             //avatar 
-            $sn_anspostimg = $db->fetch_field($db->simple_select("sn_users", "sn_avatar", "uid = '$sn_ansUser'"), "sn_avatar");
-            if ($sn_anspostimg == "") $sn_anspostimg = $defaultava;
+            $sn_anspostimg = $sn_ansUserData['sn_avatar'];
             //name (nickname or username?)
-            $ansname =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$sn_ansUser'"), "sn_nickname"));
-            if ($ansname == "") $ansname =  htmlspecialchars_uni($db->fetch_field($db->simple_select("users", "username", "uid = '$sn_ansUser'"), "username"));
+            $ansname =   $sn_ansUserData['sn_nickname'];
             $sn_ansname = '<a href="member.php?action=profile&uid=' . $sn_ansUser . '&area=socialnetwork">' . $ansname . '</a>';
 
             //handle of deleted user
@@ -1737,7 +1743,9 @@ function showPosts($query, $type)
                 $sn_ansname =  htmlspecialchars_uni($get_answer['sn_del_name']);
                 $sn_anspostimg = $defaultava;
             }
+            //edit delete Image/ show image etc
             if ($thisuser == $sn_ansUser || $mybb->usergroup['canmodcp'] == 1) {
+                //no image, show add button
                 $socialnetwork_member_postimg_ans = "<span id=\"ans" . $ansid . "\"><button onClick=\"addImg('ans','" . $ansid . "')\" id=\"sn_addimg\" class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
             } else {
                 $socialnetwork_member_postimg_ans = "";
@@ -1803,48 +1811,34 @@ function showFriends()
     $titAccCnt = 0;
     while ($get_friend = $db->fetch_array($queryFriends)) {
         $friend = $get_friend['sn_friendwith'];
-        //Get Data of friend
-        $frienddata = get_user($friend);
-        $frienddataSN = getSnUserInfo($friend);
-        if ($frienddataSN['sn_avatar'] == "") {
-            $friendava = $defaultava;
-        } else {
-            $friendava = $frienddataSN['sn_avatar'];
-        }
-        if ($frienddataSN['sn_nickname'] == "") {
-            $friendname = "<a href=\"" . get_profile_link($friend) . "&area=socialnetwork\">" . $frienddata['username'] . "</a>";
-        } else {
-            $friendname = "<a href=\"" . get_profile_link($friend) . "&area=socialnetwork\">" . $frienddataSN['sn_nickname'] . "</a>";
-        }
 
+        //Get Data of friend
+        $frienddataSN = getSnUserInfo($friend);
+        $friendava = $frienddataSN['sn_avatar'];
+        $friendname = "<a href=\"" . get_profile_link($friend) . "&area=socialnetwork\">" . $frienddataSN['sn_nickname'] . "</a>";
         if ($thisuser == $thispage) {
             $frienddelete = "<a href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&friend=minus&friendid=" . $friend . "\">" . $lang->socialnetwork_member_delete . "</a>";
         }
 
+        //no friends at the moment
         if ($get_friend['sn_accepted'] != 0) {
             eval("\$socialnetwork_member_friendsbit .= \"" . $templates->get('socialnetwork_member_friendsbit') . "\";");
         } else if ($thisuser == $thispage && $get_friend['sn_uid'] == $thispage) {
-            $titAccCnt++;
+            //friends to accept
+            $titAccCnt++; //counting for get the title once
             if ($titAccCnt == 1) $socialnetwork_member_friendsbitToAccept = $lang->socialnetwork_member_openRequestFriendTit;
-
             eval("\$socialnetwork_member_friendsbitToAccept .= \"" . $templates->get('socialnetwork_member_friendsbitToAccept') . "\";");
         } else if ($thisuser == $thispage && $get_friend['sn_friendwith'] == $thispage) {
+            //friends asked
             $titcnt++;
-            if ($titcnt == 1) {
+            if ($titcnt == 1) { //get title once
                 $socialnetwork_member_friendsbitAsked = $lang->socialnetwork_member_openRequestFriendAskedTit;
             };
-            $askedFriend = get_user($get_friend['sn_uid']);
+
             $askedFriendSN = getSnUserInfo($get_friend['sn_uid']);
-            if ($askedFriendSN['sn_avatar'] == "") {
-                $friendava = $defaultava;
-            } else {
-                $friendava = $askedFriendSN['sn_avatar'];
-            }
-            if ($askedFriendSN['sn_nickname'] == "") {
-                $friendname = "<a href=\"" . get_profile_link($get_friend['sn_uid']) . "&area=socialnetwork\">" . $askedFriend['username'] . "</a>";
-            } else {
-                $friendname = "<a href=\"" . get_profile_link($get_friend['sn_uid']) . "&area=socialnetwork\">" . $askedFriendSN['sn_nickname'] . "</a>";
-            }
+            $friendava = $askedFriendSN['sn_avatar'];
+            $friendname = "<a href=\"" . get_profile_link($get_friend['sn_uid']) . "&area=socialnetwork\">" . $askedFriendSN['sn_nickname'] . "</a>";
+
             eval("\$socialnetwork_member_friendsbitAsked .= \"" . $templates->get('socialnetwork_member_friendsbitAsked') . "\";");
         }
     }
@@ -2471,8 +2465,24 @@ function get_avatit_size()
 function getSnUserInfo($userid)
 {
     global $mybb, $db;
+    $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
     $userArray = array();
     $userArray = ($db->fetch_array($db->simple_select("sn_users", "*", "uid = $userid", "limit 1")));
+    if (!empty($userArray)) {
+
+        if ($userArray['sn_nickname'] == "") {
+            $userArray['sn_nickname'] = ($db->fetch_field($db->simple_select("users", "username", "uid = $userid", "limit 1"), "username"));
+        }
+        $userArray['sn_nickname'] = htmlspecialchars_uni($userArray['sn_nickname']);
+        if ($userArray['sn_avatar'] == "") {
+            $userArray['sn_avatar'] = $defaultava;
+        } else {
+            $userArray['sn_avatar'] = $userArray['sn_avatar'];
+        }
+        if ($userArray['sn_userheader'] == "") $userArray['sn_userheader'] = "";
+        $userArray['sn_userheader'] = htmlspecialchars_uni($userArray['sn_userheader']);
+    } else $userArray = 0;
+
     return $userArray;
 }
 
@@ -2539,14 +2549,12 @@ $plugins->add_hook("fetch_wol_activity_end", "socialnetwork_online_activity");
 function socialnetwork_online_activity($user_activity)
 {
     global $parameters, $user;
-      // print_r($user_activity);
     $split_loc = explode(".php", $user_activity['location']);
     if ($split_loc[0] == $user['location']) {
         $filename = '';
     } else {
         $filename = my_substr($split_loc[0], -my_strpos(strrev($split_loc[0]), "/"));
     }
-
     switch ($filename) {
         case 'member':
             if ($parameters['area'] == "socialnetwork" && empty($parameters['site'])) {
@@ -2562,7 +2570,6 @@ function socialnetwork_online_activity($user_activity)
     return $user_activity;
 }
 
-
 $plugins->add_hook("build_friendly_wol_location_end", "socialnetwork_online_location");
 /**
  * Build text and link for online locations
@@ -2571,7 +2578,7 @@ $plugins->add_hook("build_friendly_wol_location_end", "socialnetwork_online_loca
 function socialnetwork_online_location($plugin_array)
 {
     global $lang;
-  // print_r($plugin_array);
+    // print_r($plugin_array);
     $pagedata = get_user($plugin_array['user_activity']['uid']);
     $pagelink = '<a href="' . get_profile_link($pagedata['uid']) . '&amp;area=socialnetwork" >' . $pagedata['username']  . '</a>';
 
@@ -2583,16 +2590,14 @@ function socialnetwork_online_location($plugin_array)
     if ($plugin_array['user_activity']['activity'] == "edit_socialnetwork") {
         $plugin_array['location_name'] = $lang->socialnetwork_wol_edit;
     }
-
     return $plugin_array;
 }
 
 $plugins->add_hook("modcp_start", "socialnetwork_modcp");
-function socialnetwork_modcp_nav() {
-    global $db, $cache, $mybb, $lang, $templates, $theme, $header, $headerinclude, $footer, $modcp_nav, $nav_rumors;
-   // $lang->load('rumors');
-//TODO NAVIGATION preg replace
-    eval("\$socialnetwork_modcp_nav= \"".$templates->get("socialnetwork_modcp_nav")."\";");
+function socialnetwork_modcp_nav()
+{
+    global $db, $cache, $mybb, $lang, $templates, $theme, $header, $headerinclude, $footer, $modcp_nav, $socialnetwork_modcp_nav, $altbg;
+    eval("\$socialnetwork_modcp_nav= \"" . $templates->get("socialnetwork_modcp_nav") . "\";");
 }
 
 
@@ -2601,15 +2606,167 @@ function socialnetwork_modcp()
 {
     global $mybb, $db, $cache, $lang, $templates, $theme, $headerinclude, $header, $footer, $modcp_nav;
     $lang->load("socialnetwork");
+    $uid = intval($mybb->input['uid']);
+
     $usergroups_cache = $cache->read("usergroups");
+    add_breadcrumb($lang->nav_modcp, "modcp.php");
+    add_breadcrumb($lang->socialnetwork_modcp, "modcp.php?action=socialnetwork");
 
-	if ($mybb->input['action'] == "socialnetwork") {
-        if (!$usergroups_cache[$mybb->user['usergroup']]['canuserpagemod']) {
+    if ($mybb->input['action'] == "socialnetwork") {
+        if ($mybb->usergroup['canmodcp'] == 0) {
             error_no_permission();
-            add_breadcrumb($lang->socialnetwork_modcp_nav, "modcp.php");
-            add_breadcrumb($lang->userpages_modcp, "modcp.php?action=socialnetwork");
-		}
+        }
+        $page = intval($mybb->input['page']);
 
+        if ($page < 1) {
+            $page = 1;
+        }
+        $offset = ($page - 1) * 10;
+
+        $query = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_users LIMIT " . $offset . ", 10 ");
+        $altbg = "trow2";
+        $socialnetwork_modcp_view = $lang->socialnetwork_modcp_view;
+        while ($user = $db->fetch_array($query)) {
+            $userdata = get_user($user['uid']);
+            if ($altbg == "trow1") {
+                $altbg = "trow2";
+            } else {
+                $altbg = "trow1";
+            }
+            if ($user['sn_nickname'] == "") {
+                $user['sn_nickname'] = $db->fetch_field($db->simple_select("users", "username", "uid=" . $user['uid'] . ""), "username");
+            }
+
+            $user['editsnlink'] = $mybb->settings['bburl'] . "/modcp.php?action=socialnetwork_edit&amp;uid=" . $user['uid'];
+            $lang->socialnetwork_modcp_view = $lang->sprintf($socialnetwork_modcp_view, $user['sn_nickname']);
+            $user['username'] = format_name(htmlspecialchars_uni($user['username']), $user['usergroup']);
+            $user['viewsnlink'] = get_profile_link($user['uid']) . "&amp;area=userpage";
+            eval("\$socialnetwork_modcp_singleuser .= \"" . $templates->get('socialnetwork_modcp_singleuser') . "\";");
+        }
+        eval("\$page = \"" . $templates->get('socialnetwork_modcp_main') . "\";");
+        output_page($page);
+        die();
+    } elseif ($mybb->input['action'] == "socialnetwork_edit") {
+        if ($mybb->usergroup['canmodcp'] == 0) {
+            error_no_permission();
+        }
+        $pm = $mybb->settings['socialnetwork_alertpn'];
+        $pm = $mybb->settings['socialnetwork_alertpn'];
+
+        $uid = intval($mybb->input['uid']);
+        $userSnData = getSnUserInfo($uid);
+        $socialnetwork_modcp_edittit = $lang->socialnetwork_modcp_edittit;
+        $lang->socialnetwork_modcp_edittit = $lang->sprintf($lang->socialnetwork_modcp_edittit, $userSnData['sn_nickname']);
+
+
+        $sizes = get_avatit_size();
+        $sn_avasizewidth = $sizes[0] . "px";
+        $sn_avasizeheight = $sizes[1] . "px";
+        $sn_titlesizewidth = $sizes[2] . "px";
+        $sn_titlesizeheight = $sizes[3] . "px";
+
+        $nickname = $userSnData['sn_nickname'];
+        $profilbild = $userSnData['sn_avatar'];
+        if ($profilbild == $db->escape_string($mybb->settings['socialnetwork_defaultavatar'])) $profilbild = "";
+        $titelbild = $userSnData['sn_userheader'];
+        $sn_alertPost = $userSnData['sn_alertPost'];
+        $sn_alertFriend = $userSnData['sn_alertFriend'];
+        $sn_alertLike = $userSnData['sn_alertLike'];
+        $sn_alertMention = $userSnData['sn_alertMention'];
+        $sn_alertfriendReqcheck = $userSnData['sn_alertFriendReq'];
+
+        if ($sn_alertPost == 1) $sn_postcheck = "checked";
+        else $sn_postcheck = "";
+        if ($sn_alertFriend == 1) $sn_likecheck = "checked";
+        else $sn_likecheck = "";
+        if ($sn_alertLike == 1) $sn_friendcheck = "checked";
+        else $sn_friendcheck = "";
+        if ($sn_alertMention == 1) $sn_mentioncheck = "checked";
+        else $sn_mentioncheck = "";
+        if ($sn_alertfriendReqcheck == 1) $sn_friendReqcheck = "checked";
+        else $sn_friendReqcheck = "";
+
+        if ($pm == 1) {
+            eval("\$socialnetwork_ucp_pmAlert .= \"" . $templates->get('socialnetwork_ucp_pmAlert') . "\";");
+        } else {
+            $socialnetwork_ucp_pmAlert = "";
+        }
+
+        $fields = getOwnFields();
+        if (empty($fields)) $socialnetwork_ucp_ownFieldsBit = "Keine weiteren Felder.";
+        foreach ($fields as $field) {
+            $sn_fieldtitle = $field;
+            $get_input  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $uid), "own_" . $field);
+            eval("\$socialnetwork_ucp_ownFieldsBit .= \"" . $templates->get('socialnetwork_ucp_ownFieldsBit') . "\";");
+        }
+
+        add_breadcrumb($lang->nav_modcp, "modcp.php");
+        add_breadcrumb($lang->socialnetwork_modcp, "modcp.php?action=socialnetwork");
+        add_breadcrumb($lang->socialnetwork_modcp_modify);
+
+        eval("\$page = \"" . $templates->get('socialnetwork_modcp_modify') . "\";");
+        output_page($page);
+        die();
+    } elseif ($mybb->input['action'] == "editsn_do" && $mybb->request_method == "post") {
+        if ($mybb->usergroup['canmodcp'] == 0) {
+            error_no_permission();
+        }
+
+
+        verify_post_check($mybb->input['my_post_key']);
+        //handle of checkboxes
+        if (isset($mybb->input['alertPost'])) $alertPost = "1";
+        else $alertPost = "0";
+        if (isset($mybb->input['alertLike'])) $alertLike = "1";
+        else $alertLike = "0";
+        if (isset($mybb->input['alertFriend'])) $alertFriend = "1";
+        else $alertFriend = "0";
+        if (isset($mybb->input['alertMention'])) $alertMention = "1";
+        else $alertMention = "0";
+        //handle of the default values
+        $nickname = $db->escape_string($mybb->input['nickname']);
+        $avatar = $db->escape_string($mybb->input['profilbild']);
+        $titelbild = $db->escape_string($mybb->input['titelbild']);
+        //the funny part, handle of the dynamic fields
+        //get them
+        $ownfields = getOwnFields();
+        //some intial stuff
+        $strOwnFields = "";
+        $strownIns = "";
+        $strUpdate = "";
+        //are there own fields? 
+        if (!empty($ownfields)) {
+            //we need some strings to make our query work
+            $strownIns = ",";
+            $strOwnFields = ",";
+            $strUpdate = ",";
+            //and now we have to puzzle
+            foreach ($ownfields as $ownfield) {
+                $strOwnFields .= "own_" . $ownfield . ",";
+                $strownIns .= "'" . $db->escape_string($mybb->input[$ownfield]) . "',";
+                $inputvalue = $db->escape_string($mybb->input[$ownfield]);
+                $strUpdate .= "own_" . $ownfield . "='" . $inputvalue . "',";
+            }
+            //we don't want the last , so cut it off
+            $strOwnFields = substr($strOwnFields, 0, -1);
+            $strownIns = substr($strownIns, 0, -1);
+            $strUpdate = substr($strUpdate, 0, -1);
+        }
+
+        if ($db->write_query("UPDATE " . TABLE_PREFIX . "sn_users SET
+        sn_nickname='$nickname', 
+        sn_avatar='$avatar', 
+        sn_userheader='$titelbild',
+        sn_alertPost = '$alertPost', 
+        sn_alertLike='$alertLike', 
+        sn_alertFriend='$alertFriend', 
+        sn_alertMention ='$alertMention'
+        " . $strUpdate . "
+        WHERE uid = $uid")) {
+            redirect("modcp.php?action=socialnetwork", $lang->socialnetwork_updated);
+        } else {
+            redirect("modcp.php?action=socialnetwork", $lang->socialnetwork_notupdated);
+        }
     }
 }
 
