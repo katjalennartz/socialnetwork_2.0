@@ -16,7 +16,8 @@ $options = array(
     "allow_videocode" => $mybb->settings['socialnetwork_videos'],
 ); // "me_username" => $memprofile['username'],
 
-$thisuser = intval($mybb->user['uid']);
+$thispage = intval($mybb->input['uid']);
+
 $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
 
 $pageno = intval($_POST['pageno']);
@@ -29,7 +30,7 @@ if ($no_of_records_per_page == "") $no_of_records_per_page = 5;
 $offset = ($pageno - 1) * $no_of_records_per_page;
 $cnt_likes_post = "";
 
-$nextposts = $db->query("SELECT * FROM mybb_sn_posts WHERE sn_pageid =  " . $pageid . " ORDER by sn_date DESC LIMIT $offset, $no_of_records_per_page");
+$nextposts = $db->query("SELECT * FROM mybb_sn_posts WHERE sn_pageid =  " . $pageid . " ORDER by sn_date DESC, sn_post_id ASC LIMIT $offset, $no_of_records_per_page");
 
 while ($get_post = $db->fetch_array($nextposts)) {
 

@@ -77,8 +77,8 @@ function socialnetwork_install()
         `sn_pageid` int(20) NOT NULL,
 		`sn_uid` int(20) NOT NULL,
         `sn_date` datetime NOT NULL,
-  		`sn_social_post` varchar(300) NOT NULL,
-  		`sn_del_username` varchar(300) DEFAULT NUll,
+  		`sn_social_post` varchar(500) NOT NULL,
+  		`sn_del_username` varchar(100) DEFAULT NUll,
 	PRIMARY KEY (`sn_post_id`)
     ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
@@ -88,8 +88,8 @@ function socialnetwork_install()
 		`sn_post_id` int(20) NOT NULL,
   		`sn_date` datetime NOT NULL,
   		`sn_uid` int(20) NOT NULL,
-  		`sn_answer` varchar(300) NOT NULL,
-  		`sn_del_username` varchar(300) DEFAULT NUll,
+  		`sn_answer` varchar(500) NOT NULL,
+  		`sn_del_username` varchar(100) DEFAULT NUll,
   	PRIMARY KEY (`sn_aid`)
 	) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
@@ -417,15 +417,9 @@ function socialnetwork_addtemplates()
         <head>
         <title>{$lang->socialnetwork_view}</title>
         <link rel="stylesheet" href="social/css/bootstrap.min.css">
-        
-            
-        {$headerinclude}
-            <script src="social/js/script.js"></script>
-            <script src="social/js/jquery.inview.js"></script>
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <!--  <link rel="stylesheet" href="/resources/demos/style.css">
-          <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-          <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        {$headerinclude}
         </head>
         <body>
         {$header}
@@ -436,16 +430,16 @@ function socialnetwork_addtemplates()
                 <div class="container">
                 <div class="row">
                     <div class="col-12">
-                         <div class="sn_titel" style="background:url({$tit_img});height:{$sn_titlesizeheight};"></div>
-                        <div class="sn_profil" style="width:{$sn_avasizewidth};height:{$sn_avasizeheight};">{$sn_thispage[\\\'sn_avatar\\\']}</div>
-                        <div class="sn_username"><h1>{$sn_nickname}</h1></div>
+                         <div class="sn_titel" style="background:url({$sn_thispage[\\\'sn_userheader\\\']});height:{$sn_titlesizeheight};"></div>
+                        <div class="sn_profil" style="width:{$sn_avasizewidth};height:{$sn_avasizeheight};"><img src="{$sn_thispage[\\\'sn_avatar\\\']}" alt="profilbild" /></div>
+                        <div class="sn_username"><h1>{$sn_thispage[\\\'sn_nickname\\\']}</h1></div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-3">
-        <div class="sn_links">
+       				 <div class="sn_links">
                         <div class="sn_logo"><img src="social/logo_150px.png" alt="social logo"/></div>
-                          {$socialnetwork_member_infobit}
+                         {$socialnetwork_member_infobit}
                         {$socialnetwork_member_friendsAddDelete}
                         </div>
                         {$socialnetwork_member_friends}
@@ -454,12 +448,10 @@ function socialnetwork_addtemplates()
                     <div class="sn_rechts">
                       <fieldset>
                          <legend>Beitrag erstellen</legend>
-                        <!--action=profile&uid=7&area=socialnetwork-->
-                         <form enctype="multipart/form-data" name="picform" id="picform" method="post"> <!--ohne action?-->
-                        <!--<form name="uploadformular" enctype="multipart/form-data" action="dateiupload.php" method="post">-->	 
+                         <form enctype="multipart/form-data" name="picform" id="picform" method="post">
                          <input type="date" value="2017-08-01" name="datum" /> <input type="time" name="sn_uhrzeit" value="12:00" /><br />
                          <textarea id="sn_post" name="sn_post" rows="4" cols="50"></textarea><br />
-        <div id="suggest" style="display:none;"></div><br>
+        				<div id="suggest" style="display:none;"></div><br>
                         <input type="file" name="uploadImg" size="60" maxlength="255"><br />
                         <input class="sn_send" type="submit" name="sendPost" value="senden">
                          </form>
@@ -470,18 +462,19 @@ function socialnetwork_addtemplates()
                         </div>
                         <input type="hidden" id="pageno" value="1">
                         <input type="hidden" id="thispage" value="{$mybb->input[\\\'uid\\\']}">
-                        {$infinitescrolling}
-        
+                     {$infinitescrolling}
                     </div>
-                    
-        
                   </div>
                 </div>				
         </td>
         </tr>
         </table>
             </div>
+			<script src="social/js/jquery.inview.js"></script>
+			<script src="social/js/script.js"></script>
+			
                 {$footer}
+
             </body>
         </html>',
         "sid" => "-2",
@@ -495,6 +488,7 @@ function socialnetwork_addtemplates()
             <div class="container snpost">
             <div class="row snpost">
                 <div class="col-1">
+                    <input type="hidden"  value="{$postuser}" name="author" />
                     <a id="{$sn_postid}"></a>
                     <img class="sn_postProfilbild" src="{$sn_postimg}" alt="" />
                 </div>
@@ -532,7 +526,7 @@ function socialnetwork_addtemplates()
         "title" => 'socialnetwork_member_postimg',
         "template" => '<div class="sn_img">
         <a href="#popinfo{$postImgId}"><img src="social/userimages/{$postImgFilename}" style="max-width:98%; max-height:300px;" /></a>
-        {$manage_img}
+            {$manage_img}
         </div>
         <div id="popinfo{$postImgId}" class="infopop">
           <div class="pop"><img src="social/userimages/{$postImgFilename}" style="max-width:100%; max-height:100%;" /></div><a href="#closepop" class="closepop"></a>
@@ -544,9 +538,8 @@ function socialnetwork_addtemplates()
     $template[2] = array(
         "title" => 'socialnetwork_member_postedit',
         "template" => '
-        <input type="button" class="editDelete" name="editpost" onclick="change({$sn_postid},\\\'{$sn_date_date}\\\',\\\'{$sn_date_time}\\\')" value="[e]"/>
-        <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&postdelete={$sn_postid}" class="editDelete" >[d]</a>
-        ',
+        <button class="editDelete" name="editpost" onclick="change({$sn_postid},\\\'{$sn_date_date}\\\',\\\'{$sn_date_time}\\\')" ><i class="fas fa-pen"></i></button>
+        <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&postdelete={$sn_postid}" class="editDelete" ><i class="fas fa-trash"></i></a>',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -572,14 +565,7 @@ function socialnetwork_addtemplates()
         <td class="trow2">
             <div class="ucp_social">
 			<form method="post" action="usercp.php">
-            <fieldset>
-            <legend>Benachrichtigungseinstellungen</legend>
-            <input type="checkbox" name="alertPost" {$sn_postcheck}> bei neuem Post oder Antwort.<br>
-            <input type="checkbox" name="alertLike" {$sn_likecheck}> wenn jemanden ein Post oder eine Antwort von dir gefällt.<br>
-            <input type="checkbox" name="alertFriend" {$sn_friendcheck}> wenn jeman dein Freund sein will.<br>
-            <input type="checkbox" name="alertMention" {$sn_mentioncheck}> wenn dich jemand erwähnt.</br>
-            </fieldset>
-        
+{$socialnetwork_ucp_pmAlert}
             <fieldset>
                 <legend>Charakterinformationen</legend>
                 <label>Nickname:</label> <input type="text" name="nickname" value="{$nickname}"/><br />
@@ -595,7 +581,7 @@ function socialnetwork_addtemplates()
             
             <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
             <input type="hidden" name="action" value="editsn_do" />
-            <input type="submit" value="Speichern" name="Speichern" class="button" />
+		<input type="submit" value="{$lang->socialnetwork_save}" name="{$lang->socialnetwork_save}" class="button" />
 			</form>
             </div>
         </td>
@@ -619,15 +605,20 @@ function socialnetwork_addtemplates()
         "dateline" => TIME_NOW
     );
     $template[5] = array(
-        "title" => 'socialnetwork_newsfeed_all',
-        "template" => 'NEWSFEED FROM ALL CHARAS ',
-        "sid" => "-2",
-        "version" => "1.0",
-        "dateline" => TIME_NOW
-    );
-    $template[6] = array(
-        "title" => 'socialnetwork_newsfeed_friends',
-        "template" => 'NEWSFEED FROM FRIENDS ',
+        "title" => 'socialnetwork_modcp_singleuser',
+        "template" => '
+        <tr>
+        <td class="{$altbg}">
+            <a href="{$user[\\\'editsnlink\\\']}" title="{$lang->socialnetwork_modcp_edit}">{$userdata[\\\'username\\\']}</a>
+        </td>
+        <td class="{$altbg}" align="center">
+            <a href="{$user[\\\'viewsnlink\\\']}">{$lang->socialnetwork_modcp_view}</a>
+        </td>
+        <td class="{$altbg}" align="center">
+            <a href="{$user[\\\'editsnlink\\\']}">{$lang->socialnetwork_modcp_edit}</a>
+        </td>
+    </tr>
+        ',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -679,7 +670,7 @@ function socialnetwork_addtemplates()
         <img src="{$friendava}" width="35px"/>  {$friendname} 
          <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&friend=accept&friendid={$friend}"><span class="fas fa-user-check" aria-label="accept"></span></a>
         <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&friend=deny&friendid={$friend}"><span class="fas fa-user-times" aria-label="deny"></span></a></div>
-          ',
+        ',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -698,8 +689,7 @@ function socialnetwork_addtemplates()
     $template[12] = array(
         "title" => 'socialnetwork_member_friendsbit',
         "template" => '
-        <div class="sn_friend"><img src="{$friendava}" width="35px"/> {$friendname} {$frienddelete}</div>
-        ',
+        <div class="sn_friend"><img src="{$friendava}" width="35px"/> {$friendname} {$frienddelete}</div>        ',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
@@ -767,22 +757,262 @@ function socialnetwork_addtemplates()
     $template[17] = array(
         "title" => 'socialnetwork_modcp_nav',
         "template" => '
-        <tr>
-		<td class="tcat">
-			<div class="float_right"><img src="{$theme[\\\'imgdir\\\']}/collapse{$collapsedimg[\\\'modcpsocialnetwork\\\']}.gif" id="socialnetwork_img" class="expander" alt="[-]" title="[-]" /></div>
-			<div><span class="smalltext"><strong>{$lang->socialnetwork_modcp}</strong></span></div>
-		</td>
-	</tr>
-	<tbody style="{$collapsed[\\\'modcpsocialnetwork_e\\\']}" id="modcpsocialnetwork_e">
-		<tr><td class="trow1 smalltext"><a href="modcp.php?action=socialnetwork" class="modcp_nav_item modcp_nav_editprofile">{$lang->moderate_userpages}</a></td></tr>
-	</tbody>
+        <tr><td class="trow1 smalltext"><a href="modcp.php?action=socialnetwork" class="modcp_nav_item modcp_nav_editprofile">{$lang->socialnetwork_modcp_nav}</a></td></tr>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[18] = array(
+        "title" => 'socialnetwork_misc_answerbit',
+        "template" => '
+        <div class="sn_answer">
+        <a id="ans_{$ansid}"></a>
+            <input type="hidden" id="ans_{$ansid}" value="{$ansid}" name="ansid" />
+            <img class="sn_ansProfilbild" src="{$sn_anspostimg}" alt="" />
+            <span class="sn_ansName">{$sn_ansname}</span>
+            <span class="sn_ansDate">{$sn_ansdate}</span>
+            <div class="sn_socialAnswer" id="a{$ansid}">{$sn_showAnswer}</div>
+			{$socialnetwork_misc_postimg_ans}
+        </div>
+        <div class="sn_likes">
+            Gefällt {$cnt_likes_ans} Mal <a href="misc.php?action=sn_newsfeedAll&like={$likevar_ans}&postid=0&ansid={$ansid}">{$sn_like_ans}</a>
+        </div>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[19] = array(
+        "title" => 'socialnetwork_misc_main',
+        "template" => '
+        <html>
+        <head>
+        <title>{$lang->socialnetwork_view_newsfeedAll}</title>
+        <link rel="stylesheet" href="social/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        {$headerinclude}
+         
+        </head>
+        <body>
+        {$header}
+        <div class="socialmain">
+        <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder">
+            <tr>
+            <td class="trow1">
+                <div class="container">
+               
+                <div class="row">
+					<div class="col-6 newsfeed_pages">
+						{$multipage}
+					</div>
+					<div class="col-6 newsfeed_links">
+						<h1> {$newsfeed_links}</h1>
+					</div>
+
+                    <div class="col-12" class="posts">
+                       {$socialnetwork_misc_postbit}
+                        <div  id="posts" style="width:100%">
+                        </div>
+                        <input type="hidden" id="page" value="1">
+                        <input type="hidden" id="thispage" value="{$mybb->input[\\\'uid\\\']}">
+        				{$multipage}
+                    </div>
+                  </div>
+                </div>				
+        </td>
+        </tr>
+        </table>
+            </div>
+                {$footer}
+				<script src="social/js/script.js"></script>
+			    <script src="social/js/jquery.inview.js"></script>
+            </body>
+        </html>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[20] = array(
+        "title" => 'socialnetwork_misc_postbit',
+        "template" => '
+        <div class="sn_rechts">
+	<fieldset>
+		<div class="container snpost">
+		<div class="row snpost">
+    		<div class="col-1">
+				<input type="hidden"  value="{$postuser}" name="author" />
+				<img class="sn_postProfilbild" src="{$sn_postimg}" alt="" />
+				<a id="{$sn_postid}" href="{$posturl}" class="gotolink"><span class="fas fa-arrow-right"></i></a>
+			</div>
+    		<div class="col-11">
+			<span class="sn_postName">{$sn_postname}</span>
+			<span class="sn_postDate">{$sn_date}</span>
+				<div class="sn_socialPost" id="p{$sn_postid}">{$sn_showPost}</div>
+				{$socialnetwork_misc_postimg}
+			<div class="sn_likes">
+			Gefällt {$cnt_likes_post} Mal <a href="misc.php?action=sn_newsfeedAll&like={$likevar}&postid={$sn_postid}&ansid=0">{$sn_like}</a>
+
+			</div>
+				{$socialnetwork_misc_answerbit}
+				<div class="sn_answer_form">
+					<form method="post" enctype="multipart/form-data" name="picform" id="picform" >
+					<input type="hidden"  value="{$sn_postid}" name="postid" />
+					<img class="sn_answerFormProfilbild" src="{$sn_ansFormImg}" alt="" />
+					<input type="date" value="2017-08-01" name="sn_ansDatum" /> <input type="time" name="sn_ansUhrzeit" value="12:00" /><br />
+					<textarea id="sn_answer" name="sn_answer" rows="1" cols="60"></textarea><br />
+					<input type="file" name="uploadImg" size="60" maxlength="255"><br />
+					<input class="sn_send" type="submit" name="sendAnswer" value="senden">
+					</form>
+				</div>
+			</div>
+			</div>
+		</div>
+	</fieldset>
+</div>        
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[21] = array(
+        "title" => 'socialnetwork_misc_postimg',
+        "template" => '
+        <div class="sn_img">
+        <a href="#popinfo{$postImgId}"><img src="social/userimages/{$postImgFilename}" style="max-width:98%; max-height:300px;" /></a>
+        </div>
+        <div id="popinfo{$postImgId}" class="infopop">
+          <div class="pop"><img src="social/userimages/{$postImgFilename}" style="max-width:100%; max-height:100%;" /></div><a href="#closepop" class="closepop"></a>
+        </div>
         ',
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
     );
 
+    $template[22] = array(
+        "title" => 'socialnetwork_modcp_main',
+        "template" => '
+        <html>
+        <head>
+            <title>{$lang->socialnetwork_modcp_tit} - {$mybb->settings[\\\'bbname\\\']}</title>
+            {$headerinclude}
+        </head>
+        <body>
+            {$header}
+            <table width="100%" border="0" align="center">
+                <tr>
+                    {$modcp_nav}
+                    <td valign="top" align="left">
+                        {$multipage}
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">
+                        
+                        <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder">
+                            <tr>
+                                <td class="thead" colspan="3"><strong>{$lang->socialnetwork_modcp_tit}</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="tcat"><strong>{$lang->username}</strong></td>
+                                <td class="tcat" colspan="2" align="center"><strong>{$lang->action}</strong></td>
+                            </tr>
+                            {$socialnetwork_modcp_singleuser}
+                        </table>
+                        {$multipage}
+                    </td>
+                </tr>
+            </table>
+            {$footer}
+        </body>
+    </html>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[23] = array(
+        "title" => 'socialnetwork_modcp_modify',
+        "template" => '
+        <html>
+        <head>
+            <title>{$mybb->settings[\\\'bbname\\\']} - {$lang->socialnetwork_modcp_edittit}</title>
+            {$headerinclude}
+        </head>
+        <body>
+            {$header}
+    <table width="100%" border="0" align="center">
+        <tr>
+        {$modcp_nav}
+        <td valign="top">
+        <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder">
+            <tr>
+            <td class="thead" colspan="2"><strong>{$lang->socialnetwork_modcp_edittit}</strong></td>
+            </tr>
+            <tr>
+            <td class="trow2">
+                
+                <div class="modcp_social">
+                    <form method="post" action="modcp.php">
+                {$socialnetwork_ucp_pmAlert}						
+                <fieldset>
+                <legend>Charakterinformationen</legend>
+                <label>Nickname:</label> <input type="text" name="nickname" value="{$nickname}"/><br />
+                <label>Avatar:<div class="ucp_smallinfo">Avatargröße: {$sizes[0]}x{$sizes[1]}px</div></label> <input type="text" name="profilbild" value="{$profilbild}"/><br />
+                <label>Titelbild:<div class="ucp_smallinfo">Titelbildgröße: {$sizes[2]}x{$sizes[3]}px</div></label> <input type="text" name="titelbild" value="{$titelbild}"/><br />    
+                </fieldset>
+                            <fieldset>
+                    <legend>Weitere Felder:</legend>
+                    {$socialnetwork_ucp_ownFieldsBit}
+                </fieldset>
+                        <div align="center">
+             <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+            <input type="hidden" name="action" value="editsn_do" />
+                            <input type="hidden" name="uid" value="{$uid}" />
+            <input type="submit" value="{$lang->socialnetwork_save}" name="{$lang->socialnetwork_save}" class="button" />
+                
+            </div>		
+            </form>		
+                </div>
+            </td>
+            </tr>
+            </table>
+            <br />
+    
+        </td>
+        </tr>
+        </table>
+        
+            {$footer}
+        </body>
+    </html>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
 
+    $template[25] = array(
+        "title" => '',
+        "template" => '
+
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+    $template[26] = array(
+        "title" => '',
+        "template" => '
+        <tr><td class="trow1 smalltext"><a href="modcp.php?action=socialnetwork" class="modcp_nav_item modcp_nav_editprofile">{$lang->socialnetwork_modcp_nav}</a></td></tr>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
 
     foreach ($template as $row) {
         $db->insert_query("templates", $row);
@@ -1105,7 +1335,6 @@ function socialnetwork_menu($sub_menu)
     return $sub_menu;
 }
 
-//TODO add positionfield -> feld reihenfolge
 /*
  * Fügt die Verwaltung des Social Networks ins UCP Menü ein 
  */
@@ -1292,19 +1521,19 @@ function socialnetwork_mainpage()
         $fields = getOwnFields();
         // $socialnetwork_ucp_ownFieldsBit
         $getOrder = $db->escape_string($mybb->settings['socialnetwork_orderOffFields']);
-        // echo($getOrder);
+
         $orderArray = explode(',',  $getOrder);
 
         foreach ($orderArray as $order) {
             foreach ($fields as $field) {
-                if($order == $field) {
-                $sn_fieldtitle = $field;
-                $get_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_thispage['uid']), "own_" . $field);
-                $own_title = $field;
-                if ($get_value == "") $own_value = $lang->socialnetwork_member_ownNotFilled;
-                else $own_value = $get_value;
-                eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
-            }
+                if ($order == $field) {
+                    $sn_fieldtitle = $field;
+                    $get_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_thispage['uid']), "own_" . $field);
+                    $own_title = $field;
+                    if ($get_value == "") $own_value = $lang->socialnetwork_member_ownNotFilled;
+                    else $own_value = $get_value;
+                    eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
+                }
             }
         }
 
@@ -1383,10 +1612,10 @@ function socialnetwork_mainpage()
 
         if ($mybb->input['like'] == 'like') {
             checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
-            like($thispage, $sn_postid, $sn_ansid, $sn_uid);
+            like($thispage, $sn_postid, $sn_ansid, $sn_uid, "page");
         }
         if ($mybb->input['like'] == 'dislike') {
-            dislike($thispage, $sn_postid, $sn_ansid, $sn_uid);
+            dislike($thispage, $sn_postid, $sn_ansid, $sn_uid, "page");
         }
 
         if ($mybb->input['postdelete'] != "" && is_numeric($mybb->input['postdelete'])) {
@@ -1459,9 +1688,6 @@ function deleteAnswer($toDelete, $thispage)
     }
 }
 
-
-//TODO NEWSFEED FRIENDS & ALL
-//TODO Komma hinzufügen wenn fehlt
 
 /**
  * handle when user is deleted -> nickname empty? save username, else keep nickname
@@ -1576,12 +1802,11 @@ function showPostsNormal()
 
     $thispage = intval($mybb->input['uid']);
 
-    $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $thispage", array(
-        "order_by" => 'sn_date, sn_post_id',
-        "order_dir" => 'DESC',
-    ));
+    $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_pageid = $thispage ORDER BY sn_date DESC, sn_post_id ASC");
+
     showPosts($queryPosts, "normal");
 }
+
 
 /** *****
  * INFINITE SCROLLING
@@ -1600,13 +1825,14 @@ function showPostsAjax()
     if ($no_of_records_per_page == "") $no_of_records_per_page = 5;
     $thispage = intval($mybb->input['uid']);
 
-    $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $thispage", array(
-        "order_by" => 'sn_date, sn_post_id',
-        "order_dir" => 'DESC',
-        "limit start" => $offset,
-        "limit" => $no_of_records_per_page
-    ));
-    //TODO Testen ob socialpagination noch variablen richtig ausliest!
+    $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_pageid = $thispage ORDER BY sn_date DESC, sn_post_id ASC LIMIT $offset, $no_of_records_per_page");
+
+    // $queryPosts = $db->simple_select("sn_posts", "*", "sn_pageid = $thispage", array(
+    //     "order_by" => 'sn_date, sn_post_id',
+    //     "order_dir" => 'DESC',
+    //     "limit start" => $offset,
+    //     "limit" => $no_of_records_per_page
+    // ));
     showPosts($queryPosts, "infinite");
 }
 
@@ -1615,7 +1841,7 @@ function showPostsAjax()
  */
 function showPosts($query, $type)
 {
-    global  $thispage, $db, $lang, $mybb, $templates, $parser, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg, $infinitescrolling;
+    global  $thispage, $db, $lang, $mybb, $templates, $parser, $socialnetwork_member_postbit, $socialnetwork_member_answerbit, $socialnetwork_member_postimg, $infinitescrolling, $socialnetwork_misc_postbit, $socialnetwork_misc_answerbit;
     $options = array(
         "allow_html" => $mybb->settings['socialnetwork_html'],
         "allow_mycode" => $mybb->settings['socialnetwork_mybbcode'],
@@ -1624,7 +1850,10 @@ function showPosts($query, $type)
         "nl2br" => 1,
         "allow_videocode" => $mybb->settings['socialnetwork_videos'],
     );
+
+
     $thispage = intval($mybb->input['uid']);
+
     $thispagedata = getSnUserInfo($thispage);
     $thisuser = intval($mybb->user['uid']);
     $thisusersndata = getSnUserInfo($thisuser);
@@ -1633,10 +1862,11 @@ function showPosts($query, $type)
 
 
     while ($get_post = $db->fetch_array($query)) {
+        //stuff for newsfeed
+
         $likevar = "like";
         $sn_like = $lang->socialnetwork_member_like;
         if ($type == "infinite") {
-            //echo $infinitescrolling;
             $infinitescrolling = '<span style="text-align:center; display:block;"><img id="loader" src="images/spinner.gif"></div>';
         } else {
             $infinitescrolling = "";
@@ -1665,7 +1895,10 @@ function showPosts($query, $type)
 
         $sn_showPost = $parser->parse_message($get_post['sn_social_post'], $options);
         $sn_postid = intval($get_post['sn_post_id']);
-
+        if ($type == "newsfeed") {
+            $pageid = getPageId($sn_postid, "post");
+            $posturl = $mybb->settings['bburl'] . "/member.php?action=profile&uid=" . $pageid . "&area=socialnetwork#" . $sn_postid;
+        }
         $sn_post_ed_del = "";
         //edit and delete
         if (($thisuser == $postuser) || ($mybb->usergroup['canmodcp'] == 1)) {
@@ -1676,6 +1909,8 @@ function showPosts($query, $type)
 
         //we have to clear the variables first
         $socialnetwork_member_answerbit = "";
+        //  $socialnetwork_misc_answerbit = "";
+        $socialnetwork_misc_postimg = "";
         $socialnetwork_member_postimg = "";
         //Get all likes
         $likeQuery = $db->simple_select("sn_likes", "*", "sn_postid = $sn_postid");
@@ -1691,17 +1926,22 @@ function showPosts($query, $type)
 
         //Do the user upload an image to the post?
         $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $sn_postid and sn_type = 'post'"));
-        //echo  $sn_postid;
+
         if ($thisuser == $postuser || $mybb->usergroup['canmodcp'] == 1) {
             $socialnetwork_member_postimg = "<span id=\"post" . $sn_postid . "\"><button onClick=\"addImg('post','" . $sn_postid . "')\"  class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
+            $socialnetwork_misc_postimg = "";
         } else {
             $socialnetwork_member_postimg = "";
+            $socialnetwork_misc_postimg = "";
         }
         if (!empty($postImg)) {
             $postImgFilename = $postImg['sn_filename'];
             $postImgId = $postImg['sn_imgId'];
             if ($thisuser == $postImg['sn_uid'] || $mybb->usergroup['canmodcp'] == 1) {
                 $manage_img = "<a href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&deleteImgPid=" . $sn_postid . "&type=post\" class=\"editDelete\" ><i class=\"fas fa-trash\"></i></a>";
+            }
+            if ($type == "newsfeed") {
+                eval("\$socialnetwork_misc_postimg = \"" . $templates->get('socialnetwork_misc_postimg') . "\";");
             }
             eval("\$socialnetwork_member_postimg = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
         }
@@ -1713,6 +1953,8 @@ function showPosts($query, $type)
             "order_dir" => 'DESC'
         ));
         $sn_ans_ed_del = "";
+        $socialnetwork_member_answerbit = "";
+        $socialnetwork_misc_answerbit = "";
         while ($get_answer = $db->fetch_array($queryAnswer)) {
             //Initial like stuff for answers
             $likevar_ans = "like";
@@ -1747,8 +1989,10 @@ function showPosts($query, $type)
             if ($thisuser == $sn_ansUser || $mybb->usergroup['canmodcp'] == 1) {
                 //no image, show add button
                 $socialnetwork_member_postimg_ans = "<span id=\"ans" . $ansid . "\"><button onClick=\"addImg('ans','" . $ansid . "')\" id=\"sn_addimg\" class=\"editDelete\"><i class=\"fas fa-camera-retro\"></i></button></span>";
+                $socialnetwork_misc_postimg_ans = "";
             } else {
                 $socialnetwork_member_postimg_ans = "";
+                $socialnetwork_misc_postimg_ans = "";
             }
             $postImgAns = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $ansid and sn_type = 'answer'"));
             if (!empty($postImgAns)) {
@@ -1756,6 +2000,9 @@ function showPosts($query, $type)
                 $postImgId = $postImgAns['sn_imgId'];
                 if ($thisuser == $postImg['sn_uid'] || $mybb->usergroup['canmodcp'] == 1) {
                     $manage_img = "<a href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&deleteImgPid=" . $ansid . "&type=answer\" class=\"editDelete\" ><i class=\"fas fa-trash\"></i></a>";
+                }
+                if ($type == "newsfeed") {
+                    eval("\$socialnetwork_misc_postimg_ans = \"" . $templates->get('socialnetwork_misc_postimg') . "\";");
                 }
                 eval("\$socialnetwork_member_postimg_ans = \"" . $templates->get('socialnetwork_member_postimg') . "\";");
             }
@@ -1766,13 +2013,24 @@ function showPosts($query, $type)
                 // eval("\$sn_post_ed_del = \"".$templates->get("socialnetwork_member_postedit")."\";");
                 $ansdate = date('Y-m-d', strtotime($get_answer['sn_date']));
                 $anstime = date('H:i', strtotime($get_answer['sn_date']));
-                eval("\$sn_ans_ed_del = \"" . $templates->get("socialnetwork_member_answeredit") . "\";");
+                eval("\$sn_ans_ed_del = \"" . $templates->get("socialnetwork_misc_answeredit") . "\";");
             }
 
             $sn_showAnswer = $parser->parse_message($get_answer['sn_answer'], $options);
-            eval("\$socialnetwork_member_answerbit .= \"" . $templates->get('socialnetwork_member_answerbit') . "\";");
+            if ($type == "newsfeed") {
+
+                eval("\$socialnetwork_misc_answerbit .= \"" . $templates->get('socialnetwork_misc_answerbit') . "\";");
+            } else {
+
+                eval("\$socialnetwork_member_answerbit .= \"" . $templates->get('socialnetwork_member_answerbit') . "\";");
+            }
         }
-        eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
+        if ($type == "newsfeed") {
+
+            eval("\$socialnetwork_misc_postbit .= \"" . $templates->get('socialnetwork_misc_postbit') . "\";");
+        } else {
+            eval("\$socialnetwork_member_postbit .= \"" . $templates->get('socialnetwork_member_postbit') . "\";");
+        }
     }
 }
 /**
@@ -1919,7 +2177,7 @@ function addFriend($userid, $thisuser)
 function deleteFriend($userid, $thisuser, $flagFriends)
 {
     global $db, $mybb;
-    // echo "falsch". $flagFriends;
+
     //$userid == $this user -> user is on is own page and is allowed to delete this friendship
     //User is not on his own page, but they are friends and user wants to delete this friendship, so they have to be in the flag
     if ($userid == $thisuser || (strpos($flagFriends, (string)$userid) !== false && strpos($flagFriends, (string)$thisuser) !== false)) {
@@ -2098,6 +2356,8 @@ function checkMentions($type, $pageid, $uid, $pid, $aid)
             }
 
             //The owner of page = page id
+            //function checkMentions($type, $pageid, $uid, $pid, $aid)
+            // checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
             if ($alert == 1 && class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
                 $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('sn_Answer');
                 //Not null, the user wants an alert and the user is not on his own page.
@@ -2368,25 +2628,35 @@ function updatePostOrAnswer($id, $date, $message, $type)
  * @param int $sn_postid
  * @param int $sn_ansid
  * @param int $sn_uid
+ * @param string $type newsfeed or page? 
  */
-function like($thispage, $sn_postid, $sn_ansid, $sn_uid)
+function like($thispage, $sn_postid, $sn_ansid, $sn_uid, $type)
 {
     global $db;
-
+    //workaround newsfeedpage
+    if ($thispage == "newsfeed") {
+        if ($sn_ansid == 0) $thispage == getPageId($sn_postid, "post");
+        if ($sn_ansid != 0) $thispage == getPageId($sn_ansid, "answer");
+    }
     $isokay = true;
     if ($sn_postid != 0) {
         //we need to check, if the user allready liked the post or the answer 
         $queryCheck = $db->simple_select("sn_likes", "*", "sn_postid = $sn_postid AND sn_uid = $sn_uid ");
         if (!empty($db->fetch_array($queryCheck))) {
             $isokay = false;
-            redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+            if ($type == "page") {
+                redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+            }
+            if ($type == "newsfeed") {
+                //      redirect('misc.php?action=sn_newsfeedAll');
+            }
         }
     }
     if ($sn_ansid != 0) {
         $queryCheck = $db->simple_select("sn_likes", "*", "sn_answerid = $sn_ansid AND sn_uid = $sn_uid ");
         if (!empty($db->fetch_array($queryCheck))) {
             $isokay = false;
-            redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+            //    redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
         }
     }
     //we don't want user to like a post more than once!
@@ -2398,7 +2668,12 @@ function like($thispage, $sn_postid, $sn_ansid, $sn_uid)
         );
 
         $db->insert_query("sn_likes", $insert_array);
-        redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+        if ($type == "page") {
+            redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+        }
+        if ($type == "newsfeed") {
+            //        redirect('misc.php?action=sn_newsfeedAll');
+        }
     }
 }
 /**
@@ -2407,19 +2682,30 @@ function like($thispage, $sn_postid, $sn_ansid, $sn_uid)
  * @param int $sn_postid
  * @param int $sn_ansid
  * @param int $sn_uid
+ * @param string $type newsfeed or page? 
  */
-function dislike($thispage, $sn_postid, $sn_ansid, $sn_uid)
+function dislike($thispage, $sn_postid, $sn_ansid, $sn_uid, $type)
 {
     global $db;
     //we're disliking a post
     if ($sn_postid != 0) {
         $db->delete_query("sn_likes", "sn_uid = $sn_uid AND sn_postid = $sn_postid");
-        redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+        if ($type == "page") {
+            redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+        }
+        if ($type == "newsfeed") {
+            redirect('misc.php?action=sn_newsfeedAll');
+        }
     }
     //we're disliking an answer
     if ($sn_ansid != 0) {
         $db->delete_query("sn_likes", "sn_uid = $sn_uid AND sn_answerid = $sn_ansid");
-        redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+        if ($type == "page") {
+            redirect('member.php?action=profile&uid=' . $thispage . '&area=socialnetwork');
+        }
+        if ($type == "newsfeed") {
+            redirect('misc.php?action=sn_newsfeedAll');
+        }
     }
 }
 
@@ -2486,6 +2772,22 @@ function getSnUserInfo($userid)
     return $userArray;
 }
 
+/** 
+ * get the pageid of post/answer
+ */
+function getPageId($postid, $type)
+{
+    global $db;
+    if ($type == "post") {
+        $pageid = $db->fetch_field($db->simple_select("sn_posts", "sn_pageid", "sn_post_id = " . $postid), "sn_pageid");
+    }
+    if ($type == "answer") {
+        $post = $db->fetch_field($db->simple_select("sn_answers", "sn_post_id", "sn_aid = " . $postid), "sn_post_id");
+        $pageid = $db->fetch_field($db->simple_select("sn_posts", "sn_pageid", "sn_post_id = " . $post), "sn_pageid");
+    }
+    return $pageid;
+}
+
 /**
  * Get the next id of an auto increment field in Database
  * @param string $tablename - name of table, from which we want the next id
@@ -2532,13 +2834,117 @@ function deleteLikes($postid, $type)
     }
 }
 
-/**********
- *  My Alert Integration
- * *** ****/
-if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
-    $plugins->add_hook("global_start", "socialnetwork_alert");
-}
+/**
+ * Handle of the newsfeed pages 
+ */
+$plugins->add_hook("misc_start", "socialnetwork_newsfeed");
+function socialnetwork_newsfeed()
+{
+    global $db, $mybb, $lang, $templates, $infinitescrolling, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme,  $newsfeed_links, $socialnetwork_member_postbit, $socialnetwork_member_friendsbit, $socialnetwork_member_postimg, $socialnetwork_member_friends, $socialnetwork_member_friendsAddDelete, $socialnetwork_misc_postbit, $socialnetwork_misc_answerbit, $multipage;
 
+    add_breadcrumb($lang->socialnetwork_view_newsfeedAll, "misc.php?action=sn_newsfeedAll");
+
+    $thisuser = intval($mybb->user['uid']);
+    $userUseSN = 1;
+    $numpages = $mybb->settings['socialnetwork_recordsperpage'];
+    if ($numpages == "") $numpages = 5;
+
+    $userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = $thisuser"), "uid");
+    if ($userUseSNQuery == "") {
+        $userUseSN = 0;
+    }
+
+    $usergroups_cache = $cache->read("usergroups");
+    if (!$usergroups_cache[$mybb->user['usergroup']]['socialnetwork_isallowed']) {
+        error_no_permission();
+    }
+    //we want some pagination.
+    $page = intval($mybb->input['page']);
+    if ($page < 1) {
+        $page = 1;
+    }
+    $offset = ($page - 1) * 2;
+
+    //show all posts of erveryone
+    if ($mybb->input['action'] == "sn_newsfeedAll") {
+        $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts order by sn_date, sn_post_id DESC LIMIT $offset, $numpages");
+        showPosts($queryPosts, "newsfeed");
+        $numposts = $db->fetch_field($db->write_query("SELECT COUNT(sn_post_id) AS count FROM " . TABLE_PREFIX . "sn_posts"), "count");
+        $newsfeed_links = "<b>Newsfeed aller Charaktere</b> - <a href=\"misc.php?action=sn_newsfeedFriends\">Newsfeed der Freunde</a>";
+    }
+
+    //show posts of friends 
+    if ($mybb->input['action'] == "sn_newsfeedFriends") {
+        $queryPostsFriends = $db->write_query(" 
+            SELECT DISTINCT(sn_post_id), sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name, sn_del_nickname, sn_del_avatar FROM 
+                (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name, sn_del_nickname, sn_del_avatar 
+                    FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
+                    JOIN " . TABLE_PREFIX . "sn_posts ON sn_uid = sn_friendwith
+                UNION
+            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab order by sn_date, sn_post_id DESC LIMIT $offset, $numpages
+            ");
+
+        showPosts($queryPostsFriends, "newsfeed");
+        $numposts = $db->fetch_field(
+            $db->write_query(" 
+            SELECT count(DISTINCT(sn_post_id)) as count FROM 
+                (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name, sn_del_nickname, sn_del_avatar 
+                    FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
+                    JOIN " . TABLE_PREFIX . "sn_posts ON sn_uid = sn_friendwith
+                UNION
+            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab
+            "),
+            "count"
+        );
+        $newsfeed_links = "<a href=\"misc.php?action=sn_newsfeedAll\">Newsfeed aller Charaktere</a> - <b>Newsfeed der Freunde</b>";
+    }
+
+    if (isset($mybb->input['sendAnswer']) && $userUseSN == 1) {
+        $toPostId = intval($mybb->input['postid']);
+        $thispage = getPageId($toPostId, "post");
+        $answerid = getNextId("sn_answers");
+        $datetime = $db->escape_string($mybb->input['sn_ansDatum'] . " " . $mybb->input['sn_ansUhrzeit']);
+        $answer = $db->escape_string($mybb->input['sn_answer']);
+
+        if (isset($_FILES['uploadImg']['name']) && $_FILES['uploadImg']['name'] != '') {
+            uploadImg($answerid, "answer");
+        }
+        checkMentions("answer", $thispage, $thisuser, $toPostId, $answerid);
+        if ($answer != '') {
+            mentionUser($answer, $thispage, $toPostId, $answerid);
+            savingPostOrAnswer($toPostId, $thisuser, $datetime, $answer, "sn_answers");
+            redirect("misc.php?action=sn_newsfeedAll");
+        } else {
+            echo "<script>alert('" . $lang->socialnetwork_member_errorMessageEmpty . ".');</script>";
+        }
+    } else if (isset($mybb->input['sendAnswer']) && $userUseSN == 0) {
+        echo "<script>alert('" . $lang->socialnetwork_member_errorNoOwnPage . ".');</script>";
+    }
+
+    if ($mybb->input['like'] == 'like') {
+
+        $sn_postid = intval($_GET['postid']);
+        $sn_ansid = intval($_GET['ansid']);
+
+        if ($_GET['ansid'] == 0) $thispage = getPageId($sn_postid, "post");
+        if ($_GET['ansid'] != 0) $thispage = getPageId($sn_ansid, "answer");
+
+        checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
+        like($thispage, $sn_postid, $sn_ansid, $thisuser, "newsfeed");
+    }
+
+    if ($mybb->input['like'] == 'dislike') {
+        $sn_postid = intval($_GET['postid']);
+        if ($_GET['ansid'] == 0) $thispage = getPageId($sn_postid, "post");
+        if ($_GET['ansid'] != 0) $thispage = getPageId($sn_ansid, "answer");
+        dislike($thispage, $sn_postid, $sn_ansid, $thisuser, "newsfeed");
+    }
+    $multipage = multipage($numposts, $numpages, $page, $_SERVER['PHP_SELF'] . "?action=sn_newsfeedAll");
+
+    eval("\$outpage .= \"" . $templates->get('socialnetwork_misc_main') . "\";");
+    output_page($outpage);
+    die();
+}
 
 $plugins->add_hook("fetch_wol_activity_end", "socialnetwork_online_activity");
 /**
@@ -2600,7 +3006,10 @@ function socialnetwork_modcp_nav()
     eval("\$socialnetwork_modcp_nav= \"" . $templates->get("socialnetwork_modcp_nav") . "\";");
 }
 
-
+/**
+ * MOD CP Moderation of Social Network of users.
+ * (moderators und admins) edit of the userfields
+ */
 $plugins->add_hook('modcp_nav', 'socialnetwork_modcp_nav');
 function socialnetwork_modcp()
 {
@@ -2712,7 +3121,6 @@ function socialnetwork_modcp()
             error_no_permission();
         }
 
-
         verify_post_check($mybb->input['my_post_key']);
         //handle of checkboxes
         if (isset($mybb->input['alertPost'])) $alertPost = "1";
@@ -2771,8 +3179,65 @@ function socialnetwork_modcp()
 }
 
 /**
+ * Function to show a link to network in the postbit
+ */
+$plugins->add_hook("postbit", "socialnetwork_getlinkinpost");
+function socialnetwork_getlinkinpost(&$post)
+{
+    global $mybb, $db, $lang;
+    $userArray = getSnUserInfo($post['uid']);
+    if ($userArray != 0) {
+        $post['social_link'] = '<a href="member.php?action=profile&uid=' . $post['uid'] . '&area=socialnetwork">' . $lang->socialnetwork_sn_postlink . '</a>';
+    } else {
+        $post['social_link'] = "";
+    }
+}
+
+/**
+ * Function to show a link to network in memberlist
+ */
+$plugins->add_hook("memberlist_user", "socialnetwork_getlinkinmemberlist");
+function socialnetwork_getlinkinmemberlist(&$user)
+{
+    global $mybb, $db, $lang;
+    $userArray = getSnUserInfo($user['uid']);
+    if ($userArray != 0) {
+        $user['social_link'] = '<a href="member.php?action=profile&uid=' . $user['uid'] . '&area=socialnetwork">' . $lang->socialnetwork_sn_postlink . '</a>';
+    } else {
+        $user['social_link'] = "";
+    }
+}
+
+/**
+ * Function to show a link to network from user who is online, 
+ * can be used in header 
+ * here are also the links for the newsfeed defined
+ */
+$plugins->add_hook("global_start", "socialnetwork_getlinkglobal");
+function socialnetwork_getlinkglobal()
+{
+    global $mybb, $db, $lang, $sn_newsfeedFriend, $sn_newsfeedAll, $sn_page;
+    $thisuser = intval($mybb->user['uid']);
+    $userArray = getSnUserInfo($thisuser);
+    $url = $mybb->settings['bburl'];
+    $lang->load("socialnetwork");
+    $sn_newsfeedFriend = "<a href=\"" . $url . "/misc.php?action=sn_newsfeedFriends\">" . $lang->socialnetwork_newsfeedFriends . "</a>";
+    $sn_newsfeedAll = "<a href=\"" . $url . "/misc.php?action=sn_newsfeedAll\">" . $lang->socialnetwork_newsfeedAll . "</a>";
+    if ($userArray != 0) {
+        $sn_page =  "<a href=\"" . $url . "/member.php?action=profile&uid=" . $thisuser . "&area=socialnetwork\">" . $lang->socialnetwork_linkToOwn . "</a>";
+    }
+}
+/**
  * integrate MyAlerts
  */
+
+/**********
+ *  My Alert Integration
+ * *** ****/
+if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+    $plugins->add_hook("global_start", "socialnetwork_alert");
+}
+
 function socialnetwork_alert()
 {
     global $mybb, $lang;

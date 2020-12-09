@@ -4,6 +4,7 @@
  */
 
 $l['socialnetwork_view'] = "{1}'s soziales Netzwerk";
+$l['socialnetwork_view_newsfeedAll'] = "Newsfeed Soziales Netzwerk";
 $l['socialnetwork_usercp'] = "soziales Netzwerk";
 $l['socialnetwork_change'] = "bearbeite dein Profil vom Sozialen Netzwerk";
 $l['socialnetwork_save'] = "speichern";
@@ -85,6 +86,13 @@ $l['myalerts_setting_sn_Mention'] = 'Soziales Netzwerk: Benachrichtigung, wenn d
 
 $l['socialnetwork_sn_FriendRequest'] = '{1} hat auf deine Freundschaftsanfrage reagiert.';
 $l['myalerts_setting_sn_FriendRequest'] = 'Soziales Netzwerk: Benachrichtigung, wenn jemand auf deine Freundschaftsanfrage reagiert hat.';
+
+//LINKS
+$l['socialnetwork_sn_postlink'] = 'Soziales Netzwerk';
+$l['socialnetwork_newsfeedFriends'] = 'Newsfeed Friends';
+$l['socialnetwork_newsfeedAll'] = 'Newsfeed All';
+$l['socialnetwork_linkToOwn'] = 'Soziales Netzwerk';
+
 
 //MODERATION
 $l['socialnetwork_modcp_edittit'] = 'Soziales Netzwerk von {1} bearbeiten';
