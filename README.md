@@ -26,7 +26,7 @@ Postbit:
 2. CHMOD Rechte von social/userimages auf 777 setzen. (z.b über ein FTP Programm)
 3. optional: Daten übertragen bei Bedarf (boardadresse/social_saveold.php)
 4. social_saveold.php löschen
-5. Gruppen Berechtigungen überprüfen und evt. speichern
+5. Gruppen Berechtigungen überprüfen und einmal speichern. 
 6. Felder anlegen, die ausgefüllt werden sollen/können
 7. Einstellungen vornehmen. (Benachrichtigung per PN oder Alert etc.)
 8. Bei Bedarf weitere Variablen einfügen (Mitgliederliste, Postbit, Globale sind per Default NICHT eingebunden)
