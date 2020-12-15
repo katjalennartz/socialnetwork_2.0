@@ -290,6 +290,7 @@ function socialnetwork_install()
 
     socialnetwork_addtemplates();
     socialnetwork_addstylesheets();
+    $cache->update_usergroups();
 }
 
 function socialnetwork_activate()
@@ -344,6 +345,7 @@ function socialnetwork_activate()
         $alertTypeFriendReq->setEnabled(true);
         $alertTypeManager->add($alertTypeFriendReq);
     }
+    $cache->update_usergroups();
 }
 
 function socialnetwork_deactivate()
