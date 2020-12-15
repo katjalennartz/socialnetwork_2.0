@@ -7,7 +7,7 @@ function change($id,$date,$time) {
     +'<input type="date" value="'+$date+'" name="sn_postDatumEdit" />'
     +'<input type="time" name="sn_postUhrzeitEdit" value="'+$time+'" /></br>'
     +'<input type="submit" value="speichern" name="saveEditPost"/>'
-    +'<input type="button" value="abbrechen" onclick="abort(' + $id + ',\'' + $post + '\')"/></form>';
+    +'<input type="button" value="abbrechen" onclick="abort(' + $id + ',\'' + escape($post) + '\')"/></form>';
 }
 
 function abort($id, $post) {
@@ -24,7 +24,7 @@ function changeAns($id,$date,$time){
     + '<input type="date" value="'+$date+'" name="sn_ansDatumEdit" />'
     + '<input type="time" name="sn_ansUhrzeitEdit" value="'+$time+'" /></br>'
     + '<br /><input type="submit" value="speichern" name="saveEditAns"/>'
-    + '<input type="button" value="abbrechen" onclick="abortAns('+$id+',\''+$ans+'\')\"/></form>';
+    + '<input type="button" value="abbrechen" onclick="abortAns('+$id+',\''+escape($ans)+'\')\"/></form>';
 }
 function abortAns($id,$ans){
     $aid = 'a' + $id;

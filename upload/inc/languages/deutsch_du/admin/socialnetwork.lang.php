@@ -49,9 +49,9 @@ $l['socialnetwork_settings_recordsperpage_tit']='Anzahl der geladenen Posts?';
 $l['socialnetwork_settings_recordsperpage']='Wieviele Posts sollen zunächst angezeigt und dann nachgeladen werden?';
 
 $l['socialnetwork_perm'] = "Soziales Netzwerk";
-$l['socialnetwork_perm_base'] = "Darf die Seiten des sozialen Netzwerks sehen?";
-$l['socialnetwork_perm_edit'] = "Darf die eine Seite erstellen und sie bearbeiten?";
-$l['socialnetwork_perm_mod'] = "Darf das soziale Netzwerk moderieren?";
+$l['socialnetwork_perm_base'] = "Darf die Seiten des Sozialen Netzwerks sehen?";
+$l['socialnetwork_perm_edit'] = "Darf eine Seite erstellen und sie bearbeiten?";
+$l['socialnetwork_perm_mod'] = "Darf das Soziale Netzwerk moderieren?";
 
 $l['socialnetwork_module_title'] = "Soziales Netzwerk Felder Verwaltung";
 $l['socialnetwork_module_descr'] = "Hier kannst du weitere Felder hinzufügen.";
@@ -61,6 +61,6 @@ Wenn du die Felder änderst und Felder rausnimmst wird der Inhalt bei allen Migl
 Anwendung: Felder mit , getrennt ins Textfeld schreiben. Die Darstellungsreihenfolge kannst du in den Pluginsettings einstellen.<br/>
 <b>Beispiel:</b> Status,Wohnohrt,Geburtstag</div>";
 
-$l['socialnetwork_tplgroup'] = "socialnetwork";
+$l['socialnetwork_tplgroup'] = "Soziales Netzwerk";
 
 ?>

@@ -4,8 +4,9 @@
  */
 
 $l['socialnetwork_view'] = "{1}'s soziales Netzwerk";
+$l['socialnetwork_view2'] = "Soziales Netzwerk";
 $l['socialnetwork_view_newsfeedAll'] = "Newsfeed Soziales Netzwerk";
-$l['socialnetwork_usercp'] = "soziales Netzwerk";
+$l['socialnetwork_usercp'] = "Soziales Netzwerk";
 $l['socialnetwork_change'] = "bearbeite dein Profil vom Sozialen Netzwerk";
 $l['socialnetwork_save'] = "speichern";
 $l['socialnetwork_updated'] = "dein soziales Netzwerk Profil wurde erfolgreich gespeichert";
