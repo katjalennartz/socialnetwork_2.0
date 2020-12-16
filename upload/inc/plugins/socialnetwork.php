@@ -9,8 +9,8 @@
  * 
  */
 // enable for Debugging:
-//error_reporting(E_ERROR | E_PARSE);
-//ini_set('display_errors', true);
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', true);
 
 // Disallow direct access to this file for security reasons
 if (!defined("IN_MYBB")) {
@@ -55,7 +55,7 @@ function socialnetwork_is_installed()
 
 function socialnetwork_install()
 {
-    global $db, $lang;
+    global $db, $lang, $cache;
     $lang->load("socialnetwork");
     socialnetwork_uninstall();
     //create tables for userdata
@@ -295,6 +295,7 @@ function socialnetwork_install()
 
 function socialnetwork_activate()
 {
+    global $cache;
     include MYBB_ROOT . "/inc/adminfunctions_templates.php";
     //add variables to member_profile to show link to social network
     find_replace_templatesets("member_profile", "#" . preg_quote('{$userstars}') . "#i", '{$userstars}{$sn_page_profil}');
@@ -609,7 +610,7 @@ function socialnetwork_addtemplates()
         <td class="{$altbg}">
             <a href="{$user[\\\'editsnlink\\\']}" title="{$lang->socialnetwork_modcp_edit}">{$userdata[\\\'username\\\']}</a>
         </td>
-        <td class="{$altbg}" align="center">
+        <td class="{$altbg}" align="left">
             <a href="{$user[\\\'viewsnlink\\\']}">{$lang->socialnetwork_modcp_view}</a>
         </td>
         <td class="{$altbg}" align="center">
