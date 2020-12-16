@@ -1,27 +1,27 @@
-Soziales Network 2.0
-von Risuena
-Kontakt: https://lslv.de/risu
-Download: https://github.com/katjalennartz/socialnetwork_2.0
-LICENSE: GNU General Public License v3.0
+Soziales Network 2.0  
+von Risuena  
+Kontakt: https://lslv.de/risu  
+Download: https://github.com/katjalennartz/socialnetwork_2.0  
+LICENSE: GNU General Public License v3.0  
 
-##################################
-Wichtige Variablen.
+##################################  
+Wichtige Variablen.  
 
-Member Profil in member_profile:
-{$sn_page_profil}
+Member Profil in member_profile:  
+{$sn_page_profil}  
 
-Global verwendbar:
-{$sn_newsfeedFriend} - link zum Newsfeed der Freunde
-{$sn_newsfeedAll} - link zum Newsfeed (alle Beiträge)
-{$sn_page} - Link zum Userprofil (vom user der online ist)
+Global verwendbar:  
+{$sn_newsfeedFriend} - link zum Newsfeed der Freunde  
+{$sn_newsfeedAll} - link zum Newsfeed (alle Beiträge)  
+{$sn_page} - Link zum Userprofil (vom user der online ist)  
+    
+Mitglieder Liste - einbinden in memberlist_user:  
+{$user['social_link']} - link zum Profil des Nutzers  
 
-Mitglieder Liste - einbinden in memberlist_user:
-{$user['social_link']} - link zum Profil des Nutzers
+Postbit:  
+{$post['social_link']}  
 
-Postbit:
-{$post['social_link']}
-
-##################################
+##################################  
 1. Plugn installieren
 2. CHMOD Rechte von social/userimages auf 777 setzen. (z.b über ein FTP Programm)
 3. optional: Daten übertragen bei Bedarf (boardadresse/social_saveold.php)
@@ -31,46 +31,47 @@ Postbit:
 7. Einstellungen vornehmen. (Benachrichtigung per PN oder Alert etc.)
 8. Bei Bedarf weitere Variablen einfügen (Mitgliederliste, Postbit, Globale sind per Default NICHT eingebunden)
 9. Font Awseome einbinden, falls nicht sowieso schon eingebunden.
-
+  
 #################################
-Inhalt:
-admin/modules/tools/socialnetwork.php
-inc/languages/deutsch_du/socialnetwork.lang.php
-inc/languages/deutsch_du/admin/socialnetwork.lang.php
-inc/plugins/socialnetwork.php
-social/js/jquery.inview.js
-social/js/script.js
-social/logo.png
-social/profil_leer.png
-social_saveold.php
-social/userimages  (ACHTUNG! CHMOD RECHTE AUF 777)
-socialpagination.php
-
-
-Templates: 
-Gruppe: Soziales Netzwerk
-socialnetwork_member_answerbit
-socialnetwork_member_answeredit
-socialnetwork_member_friends
-socialnetwork_member_friendsbit
-socialnetwork_member_friendsbitAsked
-socialnetwork_member_friendsbitToAccept
-socialnetwork_member_infobit
-socialnetwork_member_main
-socialnetwork_member_postbit
-socialnetwork_member_postedit
-socialnetwork_misc_answerbit
-socialnetwork_misc_main
-socialnetwork_misc_postbit
-socialnetwork_misc_postimg
-socialnetwork_modcp_main
-socialnetwork_modcp_modify
-socialnetwork_modcp_nav
-socialnetwork_modcp_singleuser
-socialnetwork_ucp_main
-socialnetwork_ucp_nav
-socialnetwork_ucp_ownFieldsBit
-socialnetwork_ucp_pmAlert
-
-CSS
-socialnetwork.css
+Inhalt:  
+admin/modules/tools/socialnetwork.php  
+inc/languages/deutsch_du/socialnetwork.lang.php  
+inc/languages/deutsch_du/admin/socialnetwork.lang.php  
+inc/plugins/socialnetwork.php  
+social/js/jquery.inview.js  
+social/js/script.js  
+social/logo.png  
+social/profil_leer.png  
+social_saveold.php  
+social/userimages  (ACHTUNG! CHMOD RECHTE AUF 777)  
+socialpagination.php  
+  
+  
+Templates:   
+Gruppe: Soziales Netzwerk  
+socialnetwork_member_answerbit  
+socialnetwork_member_answeredit  
+socialnetwork_member_friends  
+socialnetwork_member_friendsbit  
+socialnetwork_member_friendsbitAsked  
+socialnetwork_member_friendsbitToAccept  
+socialnetwork_member_infobit  
+socialnetwork_member_main  
+socialnetwork_member_postbit  
+socialnetwork_member_postedit  
+socialnetwork_misc_answerbit  
+socialnetwork_misc_main  
+socialnetwork_misc_postbit  
+socialnetwork_misc_postimg  
+socialnetwork_modcp_main  
+socialnetwork_modcp_modify  
+socialnetwork_modcp_nav  
+socialnetwork_modcp_singleuser  
+socialnetwork_ucp_main  
+socialnetwork_ucp_nav  
+socialnetwork_ucp_ownFieldsBit  
+socialnetwork_ucp_pmAlert  
+   
+     
+CSS  
+socialnetwork.css  
