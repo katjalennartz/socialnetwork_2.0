@@ -3336,7 +3336,7 @@ function socialnetwork_getglobals()
             $userinfo['linkauthor'] = build_profile_link($userinfo['sn_nickname'], $last_post['sn_uid']);
         }
         if ($last_post['sn_social_post'] != "") {
-            $last_post['sn_social_post'] = $parser->parse_message($last_post['sn_social_post']);
+            $last_post['sn_social_post'] = $parser->parse_message($last_post['sn_social_post'], $options);
         } 
         
         $last_post['linktopost'] = "<a href=\"member.php?action=profile&uid=" . $last_post['sn_pageid'] . "&area=socialnetwork#" . $last_post['sn_post_id'] . "\">" . $lang->socialnetwork_linkToLastpost . "</a>";
