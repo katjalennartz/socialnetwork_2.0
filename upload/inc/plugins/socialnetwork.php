@@ -291,6 +291,11 @@ function socialnetwork_install()
     socialnetwork_addtemplates();
     socialnetwork_addstylesheets();
     $cache->update_usergroups();
+
+    if (!is_writable(MYBB_ROOT . 'social/userimages/'))
+    {
+        @chmod(MYBB_ROOT . 'social/userimages/',0755);
+    }
 }
 
 function socialnetwork_activate()
