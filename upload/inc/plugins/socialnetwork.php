@@ -9,8 +9,8 @@
  * 
  */
 // enable for Debugging:
-error_reporting(E_ERROR | E_PARSE);
-ini_set('display_errors', true);
+//error_reporting(E_ERROR | E_PARSE);
+//ini_set('display_errors', true);
 
 // Disallow direct access to this file for security reasons
 if (!defined("IN_MYBB")) {
@@ -1548,6 +1548,8 @@ function socialnetwork_mainpage()
     $usergroups_cache = $cache->read("usergroups");
     $thisuser = intval($mybb->user['uid']);
     $userUseSN = 1;
+    $userspageid = intval($mybb->input['uid']);
+
     //$logo = '<img src="' . $mybb->settings['socialnetwork_logo'] . '" alt="social logo"/>';
     $logo = "<img src=\"" . $mybb->settings['socialnetwork_logo'] . "\"/>";
     $url = $mybb->settings['bburl'];
@@ -1575,7 +1577,6 @@ function socialnetwork_mainpage()
 
         //user have no page
         if ($sn_thispage == 0) error_no_permission();
-        //TODO Link
         //  $sn_page_profil = "<a href=\"" . $url . "member.php?action=profile&uid=" . $sn_thispage['uid'] . "&area=socialnetwork\">";
         $socialnetwork_view = $lang->socialnetwork_view;
         $lang->socialnetwork_view = $lang->sprintf($socialnetwork_view, $sn_thispage['sn_nickname']);
@@ -1712,7 +1713,7 @@ function socialnetwork_mainpage()
         die();
     }
 
-    $sn_page_profil = "<a href=\"" . $url . "/member.php?action=profile&uid=" .  $thisuser  . "&area=socialnetwork\">" . $lang->socialnetwork_view2 . "</a>";
+    $sn_page_profil = "<a href=\"" . $url . "/member.php?action=profile&uid=" .  $userspageid  . "&area=socialnetwork\">" . $lang->socialnetwork_view2 . "</a>";
 }
 /**
  * deletes a Post, and answers and images belonging to it
