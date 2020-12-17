@@ -1540,7 +1540,7 @@ function socialnetwork_usercp()
     }
 }
 
-//TODO REST CSS (BNEUTZERPROFIL ETC)
+
 /***
  * The Mainpage of Network, bundle all the work
  */
@@ -3313,7 +3313,9 @@ function socialnetwork_getglobals()
     if ($userArray != 0) {
         $sn_page =  "<a href=\"" . $url . "/member.php?action=profile&uid=" . $thisuser . "&area=socialnetwork\">" . $lang->socialnetwork_linkToOwn . "</a>";
     }
-
+    require_once MYBB_ROOT."inc/class_parser.php";
+    $parser = new postParser;
+    
     $options = array(
         "allow_html" => $mybb->settings['socialnetwork_html'],
         "allow_mycode" => $mybb->settings['socialnetwork_mybbcode'],
