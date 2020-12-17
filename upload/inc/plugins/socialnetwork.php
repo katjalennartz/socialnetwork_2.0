@@ -1478,6 +1478,7 @@ function socialnetwork_usercp()
 
         eval("\$page = \"" . $templates->get('socialnetwork_ucp_main') . "\";");
         output_page($page);
+        die();
     }
 
     if ($mybb->input['action'] == "editsn_do" && $mybb->request_method == "post") {
