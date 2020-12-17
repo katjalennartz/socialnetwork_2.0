@@ -3324,27 +3324,29 @@ function socialnetwork_getglobals()
     );
 
     $get_lastpost = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_post_id = (SELECT max(sn_post_id) FROM " . TABLE_PREFIX . "sn_posts AS max)");
-     $last_post = $db->fetch_array($get_lastpost);
-     $userinfo = getSnUserInfo($last_post['sn_uid']);
-     
-     if ($userinfo == 0){ 
-         $userinfo['sn_nickname'] = $last_post['sn_del_name'];
-         $userinfo['linkauthor'] = $last_post['sn_del_name'];
-    } else {
-        $userinfo['linkauthor'] = build_profile_link($last_post['nickname'], $last_post['sn_uid']);  
+
+    if (mysqli_num_rows($get_lastpost) > 0) {
+        $last_post = $db->fetch_array($get_lastpost);
+        $userinfo = getSnUserInfo($last_post['sn_uid']);
+
+        if ($userinfo == 0) {
+            $userinfo['sn_nickname'] = $last_post['sn_del_name'];
+            $userinfo['linkauthor'] = $last_post['sn_del_name'];
+        } else {
+            $userinfo['linkauthor'] = build_profile_link($last_post['nickname'], $last_post['sn_uid']);
+        }
+        if ($last_post['sn_social_post'] != "") {
+            $last_post['sn_social_post'] = $parser->parse_message($last_post['sn_social_post']);
+        }
+        $last_post['linktopost'] = "<a href=\"member.php?action=profile&uid=" . $last_post['sn_pageid'] . "&area=socialnetwork#" . $last_post['sn_post_id'] . "\">" . $lang->socialnetwork_linkToLastpost . "</a>";
     }
-    $last_post['sn_social_post'] = $parser->parse_message($last_post['sn_social_post']);
-    $last_post['linktopost']= "<a href=\"member.php?action=profile&uid=".$last_post['sn_pageid']."&area=socialnetwork#".$last_post['sn_post_id']."\">".$lang->socialnetwork_linkToLastpost."</a>"; 
-
     // member.php?action=profile&uid=".$last_post['sn_pageid']."&area=socialnetwork#".$last_post['sn_post_id']."\">".$lang->socialnetwork_linkToLastpost."</a>";
-
     //$last_post['sn_social_post']; Postinhalt
     //$userinfo['linkauthor'] Link zum Autor
     //$last_post['linktopost'] Link zum Beitrag
-   // $last_post['sn_social_post']
-     
-    
-}   
+    // $last_post['sn_social_post']
+
+}
 /**
  * integrate MyAlerts
  */
