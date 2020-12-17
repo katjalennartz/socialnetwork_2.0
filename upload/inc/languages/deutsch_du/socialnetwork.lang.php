@@ -93,6 +93,7 @@ $l['socialnetwork_sn_postlink'] = 'Soziales Netzwerk';
 $l['socialnetwork_newsfeedFriends'] = 'Newsfeed Friends';
 $l['socialnetwork_newsfeedAll'] = 'Newsfeed All';
 $l['socialnetwork_linkToOwn'] = 'Soziales Netzwerk';
+$l['socialnetwork_linkToLastpost'] = 'Zum Beitrag';
 
 
 //MODERATION
@@ -102,7 +103,6 @@ $l['socialnetwork_modcp'] = 'Soziales Netzwerk';
 $l['socialnetwork_modcp_tit'] = 'Soziales Netzwerk ModCP';
 $l['socialnetwork_modcp_edit'] = 'bearbeiten';
 $l['socialnetwork_modcp_view'] = 'Soziales Netzwerk von {1} ansehen';
-
 
 
 ?>

@@ -52,6 +52,7 @@ $l['socialnetwork_perm'] = "Soziales Netzwerk";
 $l['socialnetwork_perm_base'] = "Darf die Seiten des Sozialen Netzwerks sehen?";
 $l['socialnetwork_perm_edit'] = "Darf eine Seite erstellen und sie bearbeiten?";
 $l['socialnetwork_perm_mod'] = "Darf das Soziale Netzwerk moderieren?";
+$l['socialnetwork_linkToLastpost'] = 'Zum Beitrag';
 
 $l['socialnetwork_module_title'] = "Soziales Netzwerk Felder Verwaltung";
 $l['socialnetwork_module_descr'] = "Hier kannst du weitere Felder hinzufügen.";

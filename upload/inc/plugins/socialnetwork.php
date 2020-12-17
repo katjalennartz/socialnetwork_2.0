@@ -292,9 +292,8 @@ function socialnetwork_install()
     socialnetwork_addstylesheets();
     $cache->update_usergroups();
 
-    if (!is_writable(MYBB_ROOT . 'social/userimages/'))
-    {
-        @chmod(MYBB_ROOT . 'social/userimages/',0755);
+    if (!is_writable(MYBB_ROOT . 'social/userimages/')) {
+        @chmod(MYBB_ROOT . 'social/userimages/', 0755);
     }
 }
 
@@ -3297,12 +3296,14 @@ function socialnetwork_getlinkinmemberlist(&$user)
 /**
  * Function to show a link to network from user who is online, 
  * can be used in header 
- * here are also the links for the newsfeed defined
+ * here are also the links for the newsfeed defined 
+ * and the informations about the last post - so you can use them 
+ * in your header, if you like.
  */
-$plugins->add_hook("global_start", "socialnetwork_getlinkglobal");
-function socialnetwork_getlinkglobal()
+$plugins->add_hook("global_start", "socialnetwork_getglobals");
+function socialnetwork_getglobals()
 {
-    global $mybb, $db, $lang, $sn_newsfeedFriend, $sn_newsfeedAll, $sn_page;
+    global $mybb, $db, $parser, $lang, $sn_newsfeedFriend, $sn_newsfeedAll, $sn_page, $last_post;
     $thisuser = intval($mybb->user['uid']);
     $userArray = getSnUserInfo($thisuser);
     $url = $mybb->settings['bburl'];
@@ -3312,7 +3313,38 @@ function socialnetwork_getlinkglobal()
     if ($userArray != 0) {
         $sn_page =  "<a href=\"" . $url . "/member.php?action=profile&uid=" . $thisuser . "&area=socialnetwork\">" . $lang->socialnetwork_linkToOwn . "</a>";
     }
-}
+
+    $options = array(
+        "allow_html" => $mybb->settings['socialnetwork_html'],
+        "allow_mycode" => $mybb->settings['socialnetwork_mybbcode'],
+        "allow_imgcode" => $mybb->settings['socialnetwork_img'],
+        "filter_badwords" => $mybb->settings['socialnetwork_badwords'],
+        "nl2br" => 1,
+        "allow_videocode" => $mybb->settings['socialnetwork_videos'],
+    );
+
+    $get_lastpost = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_post_id = (SELECT max(sn_post_id) FROM " . TABLE_PREFIX . "sn_posts AS max)");
+     $last_post = $db->fetch_array($get_lastpost);
+     $userinfo = getSnUserInfo($last_post['sn_uid']);
+     
+     if ($userinfo == 0){ 
+         $userinfo['sn_nickname'] = $last_post['sn_del_name'];
+         $userinfo['linkauthor'] = $last_post['sn_del_name'];
+    } else {
+        $userinfo['linkauthor'] = build_profile_link($last_post['nickname'], $last_post['sn_uid']);  
+    }
+    $last_post['sn_social_post'] = $parser->parse_message($last_post['sn_social_post']);
+    $last_post['linktopost']= "<a href=\"member.php?action=profile&uid=".$last_post['sn_pageid']."&area=socialnetwork#".$last_post['sn_post_id']."\">".$lang->socialnetwork_linkToLastpost."</a>"; 
+
+    // member.php?action=profile&uid=".$last_post['sn_pageid']."&area=socialnetwork#".$last_post['sn_post_id']."\">".$lang->socialnetwork_linkToLastpost."</a>";
+
+    //$last_post['sn_social_post']; Postinhalt
+    //$userinfo['linkauthor'] Link zum Autor
+    //$last_post['linktopost'] Link zum Beitrag
+   // $last_post['sn_social_post']
+     
+    
+}   
 /**
  * integrate MyAlerts
  */

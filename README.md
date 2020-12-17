@@ -14,6 +14,12 @@ Global verwendbar:
 {$sn_newsfeedFriend} - link zum Newsfeed der Freunde  
 {$sn_newsfeedAll} - link zum Newsfeed (alle Beiträge)  
 {$sn_page} - Link zum Userprofil (vom user der online ist)  
+    Letzter Post: 
+    {$last_post['sn_social_post']} Postinhalt  
+    {$userinfo['linkauthor']} Link zum Autor  
+    {$last_post['linktopost']} Link zum Beitrag  
+    {$last_post['sn_social_post']}  Post
+     
     
 Mitglieder Liste - einbinden in memberlist_user:  
 {$user['social_link']} - link zum Profil des Nutzers  
