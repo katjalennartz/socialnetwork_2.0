@@ -3343,7 +3343,7 @@ function socialnetwork_getglobals()
             $last_post['sn_social_post'] = $parser->parse_message($last_post['sn_social_post'], $options);
         }
         //Do the user upload an image to the post?
-        $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = $last_post and sn_type = 'post'"));
+        $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = ".$last_post['sn_uid']." and sn_type = 'post'"));
 
         if (!empty($postImg)) {
             $postImgFilename = $postImg['sn_filename'];
