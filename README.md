@@ -23,7 +23,7 @@ Postbit:
 
 ##################################  
 1. Plugn installieren
-2. CHMOD Rechte von social/userimages auf 777 setzen. (z.b über ein FTP Programm)
+2. CHMOD Rechte von social/userimages evt. auf 755 setzen. (z.b über ein FTP Programm)
 3. optional: Daten übertragen bei Bedarf (boardadresse/social_saveold.php)
 4. social_saveold.php löschen
 5. Gruppen Berechtigungen überprüfen und einmal speichern. 
