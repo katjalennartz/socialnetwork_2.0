@@ -1942,6 +1942,8 @@ function showPosts($query, $type)
     $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
     $cnt_likes_post = "";
 
+    require_once MYBB_ROOT . "inc/class_parser.php";
+    $parser = new postParser;
 
     while ($get_post = $db->fetch_array($query)) {
         //stuff for newsfeed
@@ -3345,7 +3347,7 @@ function socialnetwork_getglobals()
 
         if (!empty($postImg)) {
             $postImgFilename = $postImg['sn_filename'];
-            $last_post['sn_social_post'] .= "<br/> <img src=\"social/userimages/".$postImgFilename."\" style=\"width:90%\"/>";
+            $last_post['sn_social_post'] .= "<br/> <img src=\"social/userimages/" . $postImgFilename . "\" style=\"width:90%\"/>";
         }
         $last_post['linktopost'] = "<a href=\"member.php?action=profile&uid=" . $last_post['sn_pageid'] . "&area=socialnetwork#" . $last_post['sn_post_id'] . "\">" . $lang->socialnetwork_linkToLastpost . "</a>";
     }
