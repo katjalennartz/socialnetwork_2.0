@@ -10,7 +10,7 @@
 // ini_set('display_errors', true);
 
 define("IN_MYBB", 1);
-
+include (MYBB_ROOT."inc/plugins/socialnetwork.php");
 require("global.php");
 global $db, $mybb, $user;
 $this_user = intval($mybb->user['uid']);
@@ -91,9 +91,27 @@ In dem Fall, am besten im Support melden :D <br/>
       $db->write_query("INSERT INTO `" . TABLE_PREFIX . "sn_likes`
         (sn_like_id, sn_postid, sn_answerid, sn_uid) 
         SELECT id, postid, antwortid, uid  FROM `" . TABLE_PREFIX . "sociallikes`");
-      echo "likes übertragen
-        <h1>WHUP! PARTY! Jetzt die Datei löschen und social network 1.0 deinstallieren</h1></div>";
+      echo "likes übertragen";
+
+
+      echo "<h1>WHUP! PARTY! Jetzt die Datei löschen und social network 1.0 deinstallieren</h1></div>";
     }
+echo "<div style=\"width:75%; margin:auto auto;padding:10px;\">
+    Die neuen Templates wurden bei der Deinstallation von 1.0 mit gelöscht? <br>
+    Dann einmal hier drücken und sie neu einfügen:<br>
+    <form method=\"post\" name=\"templates\" id=\"templates\"> 
+    <input type=\"submit\" name=\"sendTemp\" value=\"add templates again\">
+    </form>
+</div>" ;
+if ($mybb->input['sendTemp']) { 
+  $templateTest = $db->write_query("SELECT * FROM " . TABLE_PREFIX ."templates WHERE title like 'socialnetwork%'");
+  if (mysqli_num_rows($templateTest) > 0){
+    echo "Sicher das keine Templates da sind? Schau noch einmal nach. Du findest sie in jedem Style in der Gruppe 'Soziales Netzwerk.";
+  } else {
+    socialnetwork_addtemplates();
+  }
+} 
+
   }
 } else {
   error_no_permission();
