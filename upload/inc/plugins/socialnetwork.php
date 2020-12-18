@@ -2926,6 +2926,7 @@ function socialnetwork_newsfeed()
 {
     global $db, $mybb, $lang, $templates, $infinitescrolling, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme,  $newsfeed_links, $socialnetwork_member_postbit, $socialnetwork_member_friendsbit, $socialnetwork_member_postimg, $socialnetwork_member_friends, $socialnetwork_member_friendsAddDelete, $socialnetwork_misc_postbit, $socialnetwork_misc_answerbit, $multipage;
 
+    if ($mybb->input['action'] == "sn_newsfeedAll" || $mybb->input['action'] == "sn_newsfeedFriends") {
     add_breadcrumb($lang->socialnetwork_view_newsfeedAll, "misc.php?action=sn_newsfeedAll");
 
     $thisuser = intval($mybb->user['uid']);
@@ -2937,7 +2938,6 @@ function socialnetwork_newsfeed()
     if ($userUseSNQuery == "") {
         $userUseSN = 0;
     }
-
     $usergroups_cache = $cache->read("usergroups");
     if (!$mybb->usergroup['socialnetwork_isallowed']) {
         error_no_permission();
@@ -3028,6 +3028,7 @@ function socialnetwork_newsfeed()
     eval("\$outpage .= \"" . $templates->get('socialnetwork_misc_main') . "\";");
     output_page($outpage);
     die();
+}
 }
 
 $plugins->add_hook("fetch_wol_activity_end", "socialnetwork_online_activity");
