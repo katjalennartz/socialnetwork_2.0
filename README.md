@@ -16,8 +16,8 @@ Global verwendbar:
 {$sn_page} - Link zum Userprofil (vom user der online ist)   
 
 Letzter Post:  
-{$last_post['sn_social_post']} Postinhalt  
-{$userinfo['linkauthor']} Link zum Autor 
+{$last_post['sn_social_post']} Postinhalt    
+{$userinfo['linkauthor']} Link zum Autor  
 {$last_post['linktopost']} Link zum Beitrag  
 {$last_post['sn_social_post']}  Post  
      
