@@ -96,7 +96,11 @@ In dem Fall, am besten im Support melden :D <br/>
 
       echo "<h1>WHUP! PARTY! Jetzt die Datei löschen und social network 1.0 deinstallieren</h1></div>";
     }
-echo "<div style=\"width:75%; margin:auto auto;padding:10px;\">
+
+
+  }
+
+  echo "<div style=\"width:75%; margin:auto auto;padding:10px;\">
     Die neuen Templates wurden bei der Deinstallation von 1.0 mit gelöscht? <br>
     Dann einmal hier drücken und sie neu einfügen:<br>
     <form method=\"post\" name=\"templates\" id=\"templates\"> 
@@ -111,8 +115,6 @@ if ($mybb->input['sendTemp']) {
     socialnetwork_addtemplates();
   }
 } 
-
-  }
 } else {
   error_no_permission();
 }
