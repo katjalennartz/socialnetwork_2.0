@@ -10,10 +10,10 @@
 // ini_set('display_errors', true);
 
 define("IN_MYBB", 1);
-include (MYBB_ROOT."inc/plugins/socialnetwork.php");
 require("global.php");
 global $db, $mybb, $user;
 $this_user = intval($mybb->user['uid']);
+include (MYBB_ROOT."inc/plugins/social/socialnetwork_temp_and_style.php");
 //TO DO: USER // BEWERBER
 $opt_blShow_user = intval($mybb->settings['blacklistAlert_show_user']);
 $opt_blShow_guest = intval($mybb->settings['blacklistAlert_show_guest']);
@@ -113,6 +113,7 @@ if ($mybb->input['sendTemp']) {
     echo "Sicher das keine Templates da sind? Schau noch einmal nach. Du findest sie in jedem Style in der Gruppe 'Soziales Netzwerk.";
   } else {
     socialnetwork_addtemplates();
+    echo "Die Templates sollten jetzt wieder da sein :)";
   }
 } 
 } else {
