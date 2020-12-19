@@ -287,7 +287,7 @@ function socialnetwork_install()
         'isdefault' => 1
     );
     $db->insert_query("templategroups", $templategrouparray);
-    
+
     include MYBB_ROOT . "/inc/plugins/social/socialnetwork_temp_and_style.php";
 
     socialnetwork_addtemplates();
@@ -666,7 +666,10 @@ function socialnetwork_mainpage()
             if (empty($fields)) $socialnetwork_member_infobit = "";
             foreach ($fields as $field) {
                 $own_title = $field;
-                $own_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_thispage['uid']), "own_" . $field);
+                $get_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_thispage['uid']), "own_" . $field);
+                if ($get_value == "") {   
+                    $own_value = $lang->socialnetwork_member_ownNotFilled;
+                } else $own_value = $get_value;
 
                 eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
             }
@@ -679,8 +682,9 @@ function socialnetwork_mainpage()
 
                         $get_value  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $sn_thispage['uid']), "own_" . $field);
                         $own_title = $field;
-                        if ($get_value == "") $own_value = $lang->socialnetwork_member_ownNotFilled;
-                        else $own_value = $get_value;
+                        if ($get_value == "") {   
+                            $own_value = $lang->socialnetwork_member_ownNotFilled;
+                        } else $own_value = $get_value;
                         eval("\$socialnetwork_member_infobit .= \"" . $templates->get('socialnetwork_member_infobit') . "\";");
                     }
                 }

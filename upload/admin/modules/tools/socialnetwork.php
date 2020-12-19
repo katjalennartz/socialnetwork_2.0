@@ -14,11 +14,11 @@ if (!$mybb->input['action']) {
     $oldfieldsstring = "";
     //save them in an array and save a string - without the prefix own_
     while($column = $db->fetch_array($columns)) {
-        array_push($oldfields, str_replace('own_', '',$column['Field']));
+        array_push($oldfields, $column['Field']);
         $oldfieldsstring .= $column['Field'].",";
     }
-    $oldfieldsstring = substr($oldfieldsstring, 0, -1);
-    $oldfieldsstring = str_replace('own_', '',$oldfieldsstring);
+     $oldfieldsstring = substr($oldfieldsstring, 0, -1);
+     $oldfieldsstring = str_replace('own_', '',$oldfieldsstring);
 
     //what we do after the button is clicked
     if ($mybb->request_method == "post") {
@@ -28,6 +28,8 @@ if (!$mybb->input['action']) {
             $fields = array();
             //Get the input
             $get_fieldinput = $db->escape_string($mybb->get_input('socialnetworkfields'));
+            //be sure there no spaces, we don't want them!
+            $get_fieldinput = str_replace(" ", "", $get_fieldinput);
             //and we want to get an array
             $fields = explode(',', $get_fieldinput);
             

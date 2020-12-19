@@ -595,7 +595,9 @@ function socialnetwork_addstylesheets()
         ul.trow1 {
             z-index: 10;
         }
-        
+        .socialmain.container{
+            color:#000;
+        }
         .socialmain fieldset,
         .ucp_social fieldset {
             padding: 12px;
