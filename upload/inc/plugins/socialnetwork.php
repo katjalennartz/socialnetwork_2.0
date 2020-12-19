@@ -1818,13 +1818,13 @@ function uploadImg($id, $type)
     $uploadImgHeight = intval($mybb->settings['socialnetwork_uploadImgHeight']);
     $maxfilesize = intval($mybb->settings['socialnetwork_uploadImgSize']);
     $fail = false;
+    $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
 
-    if ($id == "") $id = 1;
     $imgpath = "social/userimages/";
     // Check if gallery path is writable
-    if (!is_writable('social/userimages/')) echo "<script>alert('" . $lang->socialnetwork_upload_errorPath . "')</script>";
-
-    $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
+    if (!is_writable('social/userimages/')) {
+        echo "<script>alert('" . $lang->socialnetwork_upload_errorPath . "')</script>";
+    }
 
     if ($sizes === false) {
         @unlink($imgpath);
@@ -1833,27 +1833,28 @@ function uploadImg($id, $type)
         $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
         $fail = true;
     }
+
     // No size, so something could be wrong with image
-    if ($sizes === false) echo "<script>alert('" . $lang->socialnetwork_upload_errorSizes . "')</script>";
-    elseif ((!empty($uploadImgWidth) && $sizes[0] >  $uploadImgWidth) || (!empty($uploadImgHeight) && $sizes[1] > $uploadImgHeight)) {
-        //delete 
-        @unlink($_FILES['uploadImg']['tmp_name']);
+    if ($sizes === false) {
+        echo "<script>alert('" . $lang->socialnetwork_upload_errorSizes . "')</script>";
+    } elseif ((!empty($uploadImgWidth) && $sizes[0] >  $uploadImgWidth) || (!empty($uploadImgHeight) && $sizes[1] > $uploadImgHeight)) {
+        @unlink($_FILES['uploadImg']['tmp_name']);  //delete 
         echo "<script>alert('" . $lang->socialnetwork_upload_errorSizes . "')</script>";
     } else {
+
         $filesize = $_FILES['uploadImg']['size'];
         if (!empty($maxfilesize) && $filesize > $maxfilesize) {
-            //delete
-            @unlink($_FILES['uploadImg']['tmp_name']);
+            @unlink($_FILES['uploadImg']['tmp_name']); //delete
             echo "<script>alert('" . $lang->socialnetwork_upload_errorFileSize . "')</script>";
         }
+
         $filetypes = array(
             1 => 'gif',
             2 => 'jpeg',
             3 => 'png',
             4 => 'bmp',
             5 => 'tiff',
-            6 => 'jpeg',
-            7 => 'jpg',
+            6 => 'jpg',
         );
 
         if (isset($filetypes[$sizes[2]])) {
@@ -2927,39 +2928,39 @@ function socialnetwork_newsfeed()
     global $db, $mybb, $lang, $templates, $infinitescrolling, $cache, $page, $headerinclude, $header, $footer, $usercpnav, $theme,  $newsfeed_links, $socialnetwork_member_postbit, $socialnetwork_member_friendsbit, $socialnetwork_member_postimg, $socialnetwork_member_friends, $socialnetwork_member_friendsAddDelete, $socialnetwork_misc_postbit, $socialnetwork_misc_answerbit, $multipage;
 
     if ($mybb->input['action'] == "sn_newsfeedAll" || $mybb->input['action'] == "sn_newsfeedFriends") {
-    add_breadcrumb($lang->socialnetwork_view_newsfeedAll, "misc.php?action=sn_newsfeedAll");
+        add_breadcrumb($lang->socialnetwork_view_newsfeedAll, "misc.php?action=sn_newsfeedAll");
 
-    $thisuser = intval($mybb->user['uid']);
-    $userUseSN = 1;
-    $numpages = $mybb->settings['threadsperpage'];
-    if ($numpages == "") $numpages = 5;
+        $thisuser = intval($mybb->user['uid']);
+        $userUseSN = 1;
+        $numpages = $mybb->settings['threadsperpage'];
+        if ($numpages == "") $numpages = 5;
 
-    $userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = $thisuser"), "uid");
-    if ($userUseSNQuery == "") {
-        $userUseSN = 0;
-    }
-    $usergroups_cache = $cache->read("usergroups");
-    if (!$mybb->usergroup['socialnetwork_isallowed']) {
-        error_no_permission();
-    }
-    //we want some pagination.
-    $page = intval($mybb->input['page']);
-    if ($page < 1) {
-        $page = 1;
-    }
-    $offset = ($page - 1) * 2;
+        $userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = $thisuser"), "uid");
+        if ($userUseSNQuery == "") {
+            $userUseSN = 0;
+        }
+        $usergroups_cache = $cache->read("usergroups");
+        if (!$mybb->usergroup['socialnetwork_isallowed']) {
+            error_no_permission();
+        }
+        //we want some pagination.
+        $page = intval($mybb->input['page']);
+        if ($page < 1) {
+            $page = 1;
+        }
+        $offset = ($page - 1) * 2;
 
-    //show all posts of erveryone
-    if ($mybb->input['action'] == "sn_newsfeedAll") {
-        $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts order by sn_date, sn_post_id DESC LIMIT $offset, $numpages");
-        showPosts($queryPosts, "newsfeed");
-        $numposts = $db->fetch_field($db->write_query("SELECT COUNT(sn_post_id) AS count FROM " . TABLE_PREFIX . "sn_posts"), "count");
-        $newsfeed_links = "<b>Newsfeed aller Charaktere</b> - <a href=\"misc.php?action=sn_newsfeedFriends\">Newsfeed der Freunde</a>";
-    }
+        //show all posts of erveryone
+        if ($mybb->input['action'] == "sn_newsfeedAll") {
+            $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts order by sn_date, sn_post_id DESC LIMIT $offset, $numpages");
+            showPosts($queryPosts, "newsfeed");
+            $numposts = $db->fetch_field($db->write_query("SELECT COUNT(sn_post_id) AS count FROM " . TABLE_PREFIX . "sn_posts"), "count");
+            $newsfeed_links = "<b>Newsfeed aller Charaktere</b> - <a href=\"misc.php?action=sn_newsfeedFriends\">Newsfeed der Freunde</a>";
+        }
 
-    //show posts of friends 
-    if ($mybb->input['action'] == "sn_newsfeedFriends") {
-        $queryPostsFriends = $db->write_query(" 
+        //show posts of friends 
+        if ($mybb->input['action'] == "sn_newsfeedFriends") {
+            $queryPostsFriends = $db->write_query(" 
             SELECT DISTINCT(sn_post_id), sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name FROM 
                 (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name 
                     FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
@@ -2968,9 +2969,9 @@ function socialnetwork_newsfeed()
             SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab order by sn_date, sn_post_id DESC LIMIT $offset, $numpages
             ");
 
-        showPosts($queryPostsFriends, "newsfeed");
-        $numposts = $db->fetch_field(
-            $db->write_query(" 
+            showPosts($queryPostsFriends, "newsfeed");
+            $numposts = $db->fetch_field(
+                $db->write_query(" 
             SELECT count(DISTINCT(sn_post_id)) as count FROM 
                 (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name 
                     FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
@@ -2978,57 +2979,57 @@ function socialnetwork_newsfeed()
                 UNION
             SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab
             "),
-            "count"
-        );
-        $newsfeed_links = "<a href=\"misc.php?action=sn_newsfeedAll\">Newsfeed aller Charaktere</a> - <b>Newsfeed der Freunde</b>";
-    }
-
-    if (isset($mybb->input['sendAnswer']) && $userUseSN == 1) {
-        $toPostId = intval($mybb->input['postid']);
-        $thispage = getPageId($toPostId, "post");
-        $answerid = getNextId("sn_answers");
-        $datetime = $db->escape_string($mybb->input['sn_ansDatum'] . " " . $mybb->input['sn_ansUhrzeit']);
-        $answer = $db->escape_string($mybb->input['sn_answer']);
-
-        if (isset($_FILES['uploadImg']['name']) && $_FILES['uploadImg']['name'] != '') {
-            uploadImg($answerid, "answer");
+                "count"
+            );
+            $newsfeed_links = "<a href=\"misc.php?action=sn_newsfeedAll\">Newsfeed aller Charaktere</a> - <b>Newsfeed der Freunde</b>";
         }
-        checkMentions("answer", $thispage, $thisuser, $toPostId, $answerid);
-        if ($answer != '') {
-            mentionUser($answer, $thispage, $toPostId, $answerid);
-            savingPostOrAnswer($toPostId, $thisuser, $datetime, $answer, "sn_answers");
-            redirect("misc.php?action=sn_newsfeedAll");
-        } else {
-            echo "<script>alert('" . $lang->socialnetwork_member_errorMessageEmpty . ".');</script>";
+
+        if (isset($mybb->input['sendAnswer']) && $userUseSN == 1) {
+            $toPostId = intval($mybb->input['postid']);
+            $thispage = getPageId($toPostId, "post");
+            $answerid = getNextId("sn_answers");
+            $datetime = $db->escape_string($mybb->input['sn_ansDatum'] . " " . $mybb->input['sn_ansUhrzeit']);
+            $answer = $db->escape_string($mybb->input['sn_answer']);
+
+            if (isset($_FILES['uploadImg']['name']) && $_FILES['uploadImg']['name'] != '') {
+                uploadImg($answerid, "answer");
+            }
+            checkMentions("answer", $thispage, $thisuser, $toPostId, $answerid);
+            if ($answer != '') {
+                mentionUser($answer, $thispage, $toPostId, $answerid);
+                savingPostOrAnswer($toPostId, $thisuser, $datetime, $answer, "sn_answers");
+                redirect("misc.php?action=sn_newsfeedAll");
+            } else {
+                echo "<script>alert('" . $lang->socialnetwork_member_errorMessageEmpty . ".');</script>";
+            }
+        } else if (isset($mybb->input['sendAnswer']) && $userUseSN == 0) {
+            echo "<script>alert('" . $lang->socialnetwork_member_errorNoOwnPage . ".');</script>";
         }
-    } else if (isset($mybb->input['sendAnswer']) && $userUseSN == 0) {
-        echo "<script>alert('" . $lang->socialnetwork_member_errorNoOwnPage . ".');</script>";
+
+        if ($mybb->input['like'] == 'like') {
+
+            $sn_postid = intval($_GET['postid']);
+            $sn_ansid = intval($_GET['ansid']);
+
+            if ($_GET['ansid'] == 0) $thispage = getPageId($sn_postid, "post");
+            if ($_GET['ansid'] != 0) $thispage = getPageId($sn_ansid, "answer");
+
+            checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
+            like($thispage, $sn_postid, $sn_ansid, $thisuser, "newsfeed");
+        }
+
+        if ($mybb->input['like'] == 'dislike') {
+            $sn_postid = intval($_GET['postid']);
+            if ($_GET['ansid'] == 0) $thispage = getPageId($sn_postid, "post");
+            if ($_GET['ansid'] != 0) $thispage = getPageId($sn_ansid, "answer");
+            dislike($thispage, $sn_postid, $sn_ansid, $thisuser, "newsfeed");
+        }
+        $multipage = multipage($numposts, $numpages, $page, $_SERVER['PHP_SELF'] . "?action=sn_newsfeedAll");
+
+        eval("\$outpage .= \"" . $templates->get('socialnetwork_misc_main') . "\";");
+        output_page($outpage);
+        die();
     }
-
-    if ($mybb->input['like'] == 'like') {
-
-        $sn_postid = intval($_GET['postid']);
-        $sn_ansid = intval($_GET['ansid']);
-
-        if ($_GET['ansid'] == 0) $thispage = getPageId($sn_postid, "post");
-        if ($_GET['ansid'] != 0) $thispage = getPageId($sn_ansid, "answer");
-
-        checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
-        like($thispage, $sn_postid, $sn_ansid, $thisuser, "newsfeed");
-    }
-
-    if ($mybb->input['like'] == 'dislike') {
-        $sn_postid = intval($_GET['postid']);
-        if ($_GET['ansid'] == 0) $thispage = getPageId($sn_postid, "post");
-        if ($_GET['ansid'] != 0) $thispage = getPageId($sn_ansid, "answer");
-        dislike($thispage, $sn_postid, $sn_ansid, $thisuser, "newsfeed");
-    }
-    $multipage = multipage($numposts, $numpages, $page, $_SERVER['PHP_SELF'] . "?action=sn_newsfeedAll");
-
-    eval("\$outpage .= \"" . $templates->get('socialnetwork_misc_main') . "\";");
-    output_page($outpage);
-    die();
-}
 }
 
 $plugins->add_hook("fetch_wol_activity_end", "socialnetwork_online_activity");
@@ -3344,8 +3345,8 @@ function socialnetwork_getglobals()
             $last_post['sn_social_post'] = $parser->parse_message($last_post['sn_social_post'], $options);
         }
         //Do the user upload an image to the post?
-        $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = ".$last_post['sn_post_id']." and sn_type = 'post'"));
-     
+        $postImg = $db->fetch_array($db->simple_select("sn_imgs", "*", "sn_postId = " . $last_post['sn_post_id'] . " and sn_type = 'post'"));
+
         if (!empty($postImg)) {
             $postImgFilename = $postImg['sn_filename'];
             $last_post['sn_social_post'] .= "<br/> <img src=\"social/userimages/" . $postImgFilename . "\" style=\"width:90%\"/>";

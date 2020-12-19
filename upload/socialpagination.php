@@ -43,6 +43,7 @@ while ($get_post = $db->fetch_array($nextposts)) {
     $postuser = intval($get_post['sn_uid']);
 
     //did the poster have a nickname if not take the username
+    
     $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("sn_users", "sn_nickname", "uid = '$postuser'"), "sn_nickname"));
     if ($name == "") {
         $name =  htmlspecialchars_uni($db->fetch_field($db->simple_select("users", "username", "uid = '$postuser'"), "username"));
