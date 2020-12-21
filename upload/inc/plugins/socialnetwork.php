@@ -2026,7 +2026,7 @@ function socialnetwork_newsfeed()
 
         //show all posts of erveryone
         if ($mybb->input['action'] == "sn_newsfeedAll") {
-            $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts order by sn_date, sn_post_id DESC LIMIT $offset, $numpages");
+            $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts order by sn_date DESC LIMIT $offset, $numpages");
             showPosts($queryPosts, "newsfeed");
             $numposts = $db->fetch_field($db->write_query("SELECT COUNT(sn_post_id) AS count FROM " . TABLE_PREFIX . "sn_posts"), "count");
             $newsfeed_links = "<b>Newsfeed aller Charaktere</b> - <a href=\"misc.php?action=sn_newsfeedFriends\">Newsfeed der Freunde</a>";
@@ -2040,7 +2040,7 @@ function socialnetwork_newsfeed()
                     FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
                     JOIN " . TABLE_PREFIX . "sn_posts ON sn_uid = sn_friendwith
                 UNION
-            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab order by sn_date, sn_post_id DESC LIMIT $offset, $numpages
+            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab order by sn_date DESC LIMIT $offset, $numpages
             ");
 
             showPosts($queryPostsFriends, "newsfeed");
