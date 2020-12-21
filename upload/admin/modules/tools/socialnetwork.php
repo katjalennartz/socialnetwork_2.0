@@ -11,15 +11,16 @@ if (!$mybb->input['action']) {
     //get alle existing columns in table sn_users
     $columns = $db->write_query("SHOW COLUMNS FROM " . TABLE_PREFIX . "sn_users WHERE field LIKE 'own_%'"); //
     $oldfields= array();
+    $old = array();
     $oldfieldsstring = "";
     //save them in an array and save a string - without the prefix own_
     while($column = $db->fetch_array($columns)) {
         array_push($oldfields, $column['Field']);
+        array_push($old, str_replace('own_', '',$column['Field']));
         $oldfieldsstring .= $column['Field'].",";
     }
      $oldfieldsstring = substr($oldfieldsstring, 0, -1);
      $oldfieldsstring = str_replace('own_', '',$oldfieldsstring);
-
     //what we do after the button is clicked
     if ($mybb->request_method == "post") {
         //we don't want it empty
@@ -41,10 +42,10 @@ if (!$mybb->input['action']) {
                 }
             }
             //take the old ones and compare it to the new ones, so we can test if we have to delete columns
-            foreach($oldfields as $oldfield){
+            foreach($old as $oldfield){
                 if(!in_array($oldfield,$fields)){
                      $db->write_query("ALTER TABLE ".TABLE_PREFIX."sn_users
-                     DROP COLUMN `own_".$oldfield."`");
+                    DROP COLUMN `own_".$oldfield."`");
                 }
             }
             admin_redirect("index.php?module=tools-socialnetwork");
