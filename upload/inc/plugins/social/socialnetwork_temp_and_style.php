@@ -598,6 +598,15 @@ function socialnetwork_addstylesheets()
         .socialmain.container{
             color:#000;
         }
+        
+        .socialmain a{
+            color:#000;
+        }
+        
+        .sn_socialPost img {
+            max-width: 100%;
+        }
+       
         .socialmain fieldset,
         .ucp_social fieldset {
             padding: 12px;
