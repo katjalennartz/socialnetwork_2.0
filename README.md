@@ -15,7 +15,7 @@ Global verwendbar:
 {$sn_newsfeedAll} - link zum Newsfeed (alle Beiträge)  
 {$sn_page} - Link zum Userprofil (vom user der online ist)   
 
-Letzter Post:  
+Letzter Post(global):  
 {$last_post['sn_social_post']} Postinhalt    
 {$userinfo['linkauthor']} Link zum Autor  
 {$last_post['linktopost']} Link zum Beitrag  
