@@ -795,7 +795,7 @@ function socialnetwork_addstylesheets()
             text-align: right;
             border-bottom: 1px solid #ddd;
             font-size: 0.8em;
-            margin-top: -20px;
+            margin-top: -10px;
             padding-bottom: 6px;
         }
         
