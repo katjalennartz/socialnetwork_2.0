@@ -50,7 +50,7 @@ social/js/script.js
 social/logo.png  
 social/profil_leer.png  
 social_saveold.php  
-social/userimages  (ACHTUNG! CHMOD RECHTE AUF 777)  
+social/userimages  (ACHTUNG! CHMOD RECHTE AUF 755)  
 socialpagination.php  
   
   
