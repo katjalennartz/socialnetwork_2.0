@@ -2178,10 +2178,11 @@ function socialnetwork_modcp()
     $uid = intval($mybb->input['uid']);
     $numpages = $mybb->settings['socialnetwork_recordsperpage'];
     $usergroups_cache = $cache->read("usergroups");
-    add_breadcrumb($lang->nav_modcp, "modcp.php");
-    add_breadcrumb($lang->socialnetwork_modcp, "modcp.php?action=socialnetwork");
+
 
     if ($mybb->input['action'] == "socialnetwork") {
+	add_breadcrumb($lang->nav_modcp, "modcp.php");
+    	add_breadcrumb($lang->socialnetwork_modcp, "modcp.php?action=socialnetwork");
         if ($mybb->usergroup['canmodcp'] == 0) {
             error_no_permission();
         }
