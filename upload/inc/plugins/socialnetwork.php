@@ -2210,7 +2210,7 @@ function socialnetwork_modcp()
             $user['editsnlink'] = $mybb->settings['bburl'] . "/modcp.php?action=socialnetwork_edit&amp;uid=" . $user['uid'];
             $lang->socialnetwork_modcp_view = $lang->sprintf($socialnetwork_modcp_view, $user['sn_nickname']);
             $user['username'] = format_name(htmlspecialchars_uni($user['username']), $user['usergroup']);
-            $user['viewsnlink'] = get_profile_link($user['uid']) . "&amp;area=userpage";
+            $user['viewsnlink'] = get_profile_link($user['uid']) . "&amp;area=socialnetwork";
             eval("\$socialnetwork_modcp_singleuser .= \"" . $templates->get('socialnetwork_modcp_singleuser') . "\";");
         }
         $numusers = $db->fetch_field($db->simple_select("sn_users", "COUNT(uid) AS count"), "count");
