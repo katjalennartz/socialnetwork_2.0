@@ -863,7 +863,7 @@ function socialnetwork_userdelete()
     );
     $db->update_query("sn_posts", $updateArr, "sn_uid ='" . $todelete . "'");
     $db->update_query("sn_answers", $updateArr, "sn_uid ='" . $todelete . "'");
-    $db->delete_query("sn_friends", "sn_uid = $todelete OR sn_friendith = $todelete");
+    $db->delete_query("sn_friends", "sn_uid = $todelete OR sn_friendwith = $todelete");
     $db->delete_query("sn_likes", "sn_uid= $todelete");
 }
 
