@@ -455,7 +455,7 @@ function socialnetwork_editgroupdo()
  *  freien index finden
  */
 $plugins->add_hook("admin_tools_menu", "socialnetwork_menu");
-function socialnetwork_menu($sub_menu)
+function socialnetwork_menu(&$sub_menu)
 {
     $key = count($sub_menu) * 10 + 10; /* We need a unique key here so this works well. */
     $sub_menu[$key] = array(
