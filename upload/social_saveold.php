@@ -14,10 +14,7 @@ require("global.php");
 global $db, $mybb, $user;
 $this_user = intval($mybb->user['uid']);
 include (MYBB_ROOT."inc/plugins/social/socialnetwork_temp_and_style.php");
-//TO DO: USER // BEWERBER
-$opt_blShow_user = intval($mybb->settings['blacklistAlert_show_user']);
-$opt_blShow_guest = intval($mybb->settings['blacklistAlert_show_guest']);
-//echo $opt_blShow_user;
+
 if ($mybb->usergroup['canmodcp'] == 1) {
   //Einstellungen holen
   $this_user = intval($mybb->user['uid']); //wer ist online
