@@ -27,6 +27,14 @@ Mitglieder Liste - einbinden in memberlist_user:
 
 Postbit:  
 {$post['social_link']}  
+##################################
+
+member.php?action=profile&uid=X&area=socialnetwork  (ersetze X mit uid des users)
+
+misc.php?action=sn_newsfeedAll. //feed mit allen posts
+misc.php?action=sn_newsfeedFriends //feed mit Posts von Freunden
+
+usercp.php?action=socialnetwork  //Link zum UCP
 
 ##################################  
 1. Plugn installieren
