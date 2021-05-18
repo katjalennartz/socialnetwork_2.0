@@ -2349,7 +2349,10 @@ $plugins->add_hook("postbit", "socialnetwork_getlinkinpost");
 function socialnetwork_getlinkinpost(&$post)
 {
     global $mybb, $db, $lang;
-    $userArray = getSnUserInfo($post['uid']);
+	
+    if ($post['uid'] != 0) {
+        $userArray = getSnUserInfo($post['uid']);
+    }
     if ($userArray != 0) {
         $post['social_link'] = '<a href="member.php?action=profile&uid=' . $post['uid'] . '&area=socialnetwork">' . $lang->socialnetwork_sn_postlink . '</a>';
     } else {
