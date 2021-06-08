@@ -2098,7 +2098,11 @@ function socialnetwork_newsfeed()
             if ($_GET['ansid'] != 0) $thispage = getPageId($sn_ansid, "answer");
             dislike($thispage, $sn_postid, $sn_ansid, $thisuser, "newsfeed");
         }
-        $multipage = multipage($numposts, $numpages, $page, $_SERVER['PHP_SELF'] . "?action=sn_newsfeedAll");
+        if ($mybb->input['action'] == "sn_newsfeedAll") {
+        	$multipage = multipage($numposts, $numpages, $page, $_SERVER['PHP_SELF'] . "?action=sn_newsfeedAll");
+        } elseif ($mybb->input['action'] == "sn_newsfeedFriends") {
+        	$multipage = multipage($numposts, $numpages, $page, $_SERVER['PHP_SELF'] . "?action=sn_newsfeedFriends");
+        }
 
         eval("\$outpage .= \"" . $templates->get('socialnetwork_misc_main') . "\";");
         output_page($outpage);
