@@ -355,7 +355,7 @@ function socialnetwork_addtemplates()
 			{$socialnetwork_misc_postimg_ans}
         </div>
         <div class="sn_likes">
-            Gefällt {$cnt_likes_ans} Mal <a href="misc.php?action=sn_newsfeedAll&like={$likevar_ans}&postid=0&ansid={$ansid}">{$sn_like_ans}</a>
+            Gefällt {$cnt_likes_ans} Mal <a href="misc.php?action={$mybb->input[\\\'action\\\']}&like={$likevar_ans}&postid=0&ansid={$ansid}">{$sn_like_ans}</a>
         </div>
         
         ',
@@ -433,7 +433,7 @@ function socialnetwork_addtemplates()
                     <div class="sn_socialPost" id="p{$sn_postid}">{$sn_showPost}</div>
                     {$socialnetwork_misc_postimg}
                     <div class="sn_likes">
-                Gefällt {$cnt_likes_post} Mal <a href="misc.php?action=sn_newsfeedAll&like={$likevar}&postid={$sn_postid}&ansid=0">{$sn_like}</a>
+                Gefällt {$cnt_likes_post} Mal <a href="misc.php?action={$mybb->input[\\\'action\\\']}&like={$likevar}&postid={$sn_postid}&ansid=0">{$sn_like}</a>
     
                         </div>
                                 {$socialnetwork_misc_answerbit}
@@ -598,15 +598,6 @@ function socialnetwork_addstylesheets()
         .socialmain.container{
             color:#000;
         }
-        
-        .socialmain a{
-            color:#000;
-        }
-        
-        .sn_socialPost img {
-            max-width: 100%;
-        }
-       
         .socialmain fieldset,
         .ucp_social fieldset {
             padding: 12px;
@@ -795,7 +786,7 @@ function socialnetwork_addstylesheets()
             text-align: right;
             border-bottom: 1px solid #ddd;
             font-size: 0.8em;
-            margin-top: -10px;
+            margin-top: -20px;
             padding-bottom: 6px;
         }
         
