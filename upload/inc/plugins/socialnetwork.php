@@ -27,7 +27,7 @@ function socialnetwork_info()
         "description" => $lang->socialnetwork_desc,
         "website" => "https://github.com/katjalennartz/socialnetwork_2.0",
         "author" => "risuena",
-        "authorsite" => "https://lslv.de/risu",
+        "authorsite" => "https://github.com/katjalennartz",
         "version" => "2.0",
         "compatability" => "18*"
     );
