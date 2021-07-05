@@ -23,7 +23,7 @@ $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar'])
 $pageno = intval($_POST['pageno']);
 $pageid = intval($_POST['pageid']);
 $thispage = intval($_POST['thispage']);
-
+$thisuser = intval($mybb->user['uid']);
 $no_of_records_per_page = $mybb->settings['socialnetwork_recordsperpage'];
 if ($no_of_records_per_page == "") $no_of_records_per_page = 5;
 
