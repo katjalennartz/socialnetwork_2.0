@@ -792,7 +792,16 @@ function socialnetwork_mainpage()
         die();
     }
 
-    $sn_page_profil = "<a href=\"" . $url . "/member.php?action=profile&uid=" .  $userspageid  . "&area=socialnetwork\">" . $lang->socialnetwork_view2 . "</a>";
+    //Get the data of the page, we are looking at
+    $sn_thispage = getSnUserInfo(intval($mybb->input['uid']));
+
+   //user have no page
+   if (!$sn_thispage == 0) {
+   $sn_page_profil = "<a href=\"" . $url . "/member.php?action=profile&uid=" .  $userspageid  . "&area=socialnetwork\">" . $lang->socialnetwork_view2 . "</a>";
+   } else {
+ $sn_page_profil ="";
+   }
+    
 }
 /**
  * deletes a Post, and answers and images belonging to it
