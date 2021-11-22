@@ -705,6 +705,7 @@ function socialnetwork_mainpage()
             if ($post != '') {
                 mentionUser($post, $thispage, $postid, 0);
                 savingPostOrAnswer($thispage, $thisuser, $datetime, $post, "sn_posts");
+		redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork");
             } else {
                 echo "<script>alert('" . $lang->socialnetwork_member_errorMessageEmpty . ".');</script>";
             }
@@ -725,6 +726,7 @@ function socialnetwork_mainpage()
             if ($answer != '') {
                 mentionUser($answer, $thispage, $toPostId, $answerid);
                 savingPostOrAnswer($toPostId, $thisuser, $datetime, $answer, "sn_answers");
+		redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
             } else {
                 echo "<script>alert('" . $lang->socialnetwork_member_errorMessageEmpty . ".');</script>";
             }
@@ -738,6 +740,7 @@ function socialnetwork_mainpage()
             $datetime = $db->escape_string($mybb->input['sn_postDatumEdit'] . " " . $mybb->input['sn_postUhrzeitEdit']);
             if ($message != '') {
                 updatePostOrAnswer($id, $datetime, $message, "sn_posts");
+		redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
             }
         }
         if ((isset($mybb->input['saveEditAns']))) {
@@ -746,6 +749,7 @@ function socialnetwork_mainpage()
             $datetimeAns = $db->escape_string($mybb->input['sn_ansDatumEdit'] . " " . $mybb->input['sn_ansUhrzeitEdit']);
             if ($messageAns != '') {
                 updatePostOrAnswer($idAns, $datetimeAns, $messageAns, "sn_answers");
+		redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
             }
         }
         if (isset($mybb->input['saveImgpost'])) {
@@ -758,6 +762,7 @@ function socialnetwork_mainpage()
             $todelete = intval($mybb->input['deleteImgPid']);
             $typeis = $db->escape_string($mybb->input['type']);
             deleteImgs($todelete, $typeis);
+            redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
         }
 
         $sn_postid = intval($mybb->input['postid']);
@@ -767,18 +772,22 @@ function socialnetwork_mainpage()
         if ($mybb->input['like'] == 'like') {
             checkMentions("like", $thispage, $thisuser, $sn_postid, $sn_ansid);
             like($thispage, $sn_postid, $sn_ansid, $sn_uid, "page");
+            redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
         }
         if ($mybb->input['like'] == 'dislike') {
             dislike($thispage, $sn_postid, $sn_ansid, $sn_uid, "page");
+            redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
         }
 
         if ($mybb->input['postdelete'] != "" && is_numeric($mybb->input['postdelete'])) {
             $toDelete = intval($mybb->input['postdelete']);
             deletePost($toDelete, $thispage);
+            redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
         }
         if ($mybb->input['ansdelete'] != "" && is_numeric($mybb->input['ansdelete'])) {
             $toDelete = intval($mybb->input['ansdelete']);
             deleteAnswer($toDelete, $thispage);
+            redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork"); 
         }
         showFriends();
         //infinite scrolling or without?  
