@@ -906,66 +906,66 @@ function uploadImg($id, $type)
 {
     global $db, $mybb, $lang;
 
-    $uploadImgWidth = intval($mybb->settings['socialnetwork_uploadImgWidth']);
-    $uploadImgHeight = intval($mybb->settings['socialnetwork_uploadImgHeight']);
-    $maxfilesize = intval($mybb->settings['socialnetwork_uploadImgSize']);
-    $fail = false;
-    $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
+    // $uploadImgWidth = intval($mybb->settings['socialnetwork_uploadImgWidth']);
+    // $uploadImgHeight = intval($mybb->settings['socialnetwork_uploadImgHeight']);
+    // $maxfilesize = intval($mybb->settings['socialnetwork_uploadImgSize']);
+    // $fail = false;
+    // $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
 
-    $imgpath = "social/userimages/";
-    // Check if gallery path is writable
-    if (!is_writable('social/userimages/')) {
-        echo "<script>alert('" . $lang->socialnetwork_upload_errorPath . "')</script>";
-    }
+    // $imgpath = "social/userimages/";
+    // // Check if gallery path is writable
+    // if (!is_writable('social/userimages/')) {
+    //     echo "<script>alert('" . $lang->socialnetwork_upload_errorPath . "')</script>";
+    // }
 
-    if ($sizes === false) {
-        @unlink($imgpath);
-        move_uploaded_file($_FILES['uploadImg']['tmp_name'], 'upload/' . $_FILES['uploadImg']['name']);
-        $_FILES['uploadImg']['tmp_name'] = $imgpath;
-        $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
-        $fail = true;
-    }
+    // if ($sizes === false) {
+    //     @unlink($imgpath);
+    //     move_uploaded_file($_FILES['uploadImg']['tmp_name'], 'upload/' . $_FILES['uploadImg']['name']);
+    //     $_FILES['uploadImg']['tmp_name'] = $imgpath;
+    //     $sizes = getimagesize($_FILES['uploadImg']['tmp_name']);
+    //     $fail = true;
+    // }
 
-    // No size, so something could be wrong with image
-    if ($sizes === false) {
-        echo "<script>alert('" . $lang->socialnetwork_upload_errorSizes . "')</script>";
-    } elseif ((!empty($uploadImgWidth) && $sizes[0] >  $uploadImgWidth) || (!empty($uploadImgHeight) && $sizes[1] > $uploadImgHeight)) {
-        @unlink($_FILES['uploadImg']['tmp_name']);  //delete 
-        echo "<script>alert('" . $lang->socialnetwork_upload_errorSizes . "')</script>";
-    } else {
+    // // No size, so something could be wrong with image
+    // if ($sizes === false) {
+    //     echo "<script>alert('" . $lang->socialnetwork_upload_errorSizes . "')</script>";
+    // } elseif ((!empty($uploadImgWidth) && $sizes[0] >  $uploadImgWidth) || (!empty($uploadImgHeight) && $sizes[1] > $uploadImgHeight)) {
+    //     @unlink($_FILES['uploadImg']['tmp_name']);  //delete 
+    //     echo "<script>alert('" . $lang->socialnetwork_upload_errorSizes . "')</script>";
+    // } else {
 
-        $filesize = $_FILES['uploadImg']['size'];
-        if (!empty($maxfilesize) && $filesize > $maxfilesize) {
-            @unlink($_FILES['uploadImg']['tmp_name']); //delete
-            echo "<script>alert('" . $lang->socialnetwork_upload_errorFileSize . "')</script>";
-        }
+    //     $filesize = $_FILES['uploadImg']['size'];
+    //     if (!empty($maxfilesize) && $filesize > $maxfilesize) {
+    //         @unlink($_FILES['uploadImg']['tmp_name']); //delete
+    //         echo "<script>alert('" . $lang->socialnetwork_upload_errorFileSize . "')</script>";
+    //     }
 
-        $filetypes = array(
-            1 => 'gif',
-            2 => 'jpeg',
-            3 => 'png',
-            4 => 'bmp',
-            5 => 'tiff',
-            6 => 'jpg',
-        );
+    //     $filetypes = array(
+    //         1 => 'gif',
+    //         2 => 'jpeg',
+    //         3 => 'png',
+    //         4 => 'bmp',
+    //         5 => 'tiff',
+    //         6 => 'jpg',
+    //     );
 
-        if (isset($filetypes[$sizes[2]])) {
-            $filetyp = $filetypes[$sizes[2]];
-        } else {
-            $filetyp = '.bmp';
-        }
-        $filename = $mybb->user['uid'] . '-' . date('d_m_y_g_i_s') . '.' . $filetyp;
+    //     if (isset($filetypes[$sizes[2]])) {
+    //         $filetyp = $filetypes[$sizes[2]];
+    //     } else {
+    //         $filetyp = '.bmp';
+    //     }
+    //     $filename = $mybb->user['uid'] . '-' . date('d_m_y_g_i_s') . '.' . $filetyp;
 
-        if ($fail == false) {
-            move_uploaded_file($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
-        } else {
-            rename($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
-        }
-        @chmod($imgpath . $filename, 0644);
-        $db->write_query("INSERT INTO " . TABLE_PREFIX . "sn_imgs
-						(sn_filesize, sn_filename, sn_width, sn_height, sn_uid, sn_postId, sn_type)
-						VALUES ( $filesize,'$filename', $sizes[0], $sizes[1], " . $mybb->user['uid'] . ", $id, '$type')");
-    }
+    //     if ($fail == false) {
+    //         move_uploaded_file($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
+    //     } else {
+    //         rename($_FILES['uploadImg']['tmp_name'], $imgpath . $filename);
+    //     }
+    //     @chmod($imgpath . $filename, 0644);
+    //     $db->write_query("INSERT INTO " . TABLE_PREFIX . "sn_imgs
+	// 					(sn_filesize, sn_filename, sn_width, sn_height, sn_uid, sn_postId, sn_type)
+	// 					VALUES ( $filesize,'$filename', $sizes[0], $sizes[1], " . $mybb->user['uid'] . ", $id, '$type')");
+    // }
 }
 /**
  * Handle everything to show Posts, loading all Posts 
@@ -1234,7 +1234,7 @@ function showFriends()
         $friendValue = "minus";
         $flagFriends = "," . $thisuser . "," . $thispage . ",";
     }
-
+echo   $flagFriends."bla <br>";
     //Check if this user has allready asked for friendship
     $friendqueryAsked = $db->simple_select("sn_friends", "*", "(sn_uid = '$thispage' AND sn_friendwith = '$thisuser') AND sn_accepted=0");
 
@@ -1299,10 +1299,14 @@ function showFriends()
             echo '<script>alert("' . $lang->socialnetwork_member_toFriendNotAllowed . '")</script>';
         }
     }
-    if ($mybb->input['friend'] == "minus" && ($thispage == intval($mybb->input['friendid']))) {
+    if ($mybb->input['friend'] == "minus") {
         if ($allowed == 1) {
             $friendid = intval($mybb->input['friendid']);
-            deleteFriend($friendid, $thisuser, $flagFriends);
+            $friendquery2 = $db->simple_select("sn_friends", "*", "(sn_uid = '{$thisuser}' AND sn_friendwith = '{$friendid}') OR (sn_uid = '{$friendid}' AND sn_friendwith = '{$thisuser}') ");
+            if ($db->num_rows($friendquery2) > 0) {
+                $flagFriends2 = "," . $thisuser . "," . intval($mybb->input['friendid']) . ",";
+            }
+            deleteFriend($friendid, $thisuser, $flagFriends2);
         } else {
             echo '<script>alert("' . $lang->socialnetwork_member_toFriendNotAllowed . '")</script>';
         }
