@@ -1234,7 +1234,7 @@ function showFriends()
         $friendValue = "minus";
         $flagFriends = "," . $thisuser . "," . $thispage . ",";
     }
-echo   $flagFriends."bla <br>";
+
     //Check if this user has allready asked for friendship
     $friendqueryAsked = $db->simple_select("sn_friends", "*", "(sn_uid = '$thispage' AND sn_friendwith = '$thisuser') AND sn_accepted=0");
 
