@@ -907,7 +907,7 @@ function socialnetwork_action_handler($actions)
 function uploadImg($id, $type)
 {
     global $db, $mybb, $lang;
-
+    if($mybb->user['uid'] == 0) error_no_permission();
     $uploadImgWidth = intval($mybb->settings['socialnetwork_uploadImgWidth']);
     $uploadImgHeight = intval($mybb->settings['socialnetwork_uploadImgHeight']);
     $maxfilesize = intval($mybb->settings['socialnetwork_uploadImgSize']);
