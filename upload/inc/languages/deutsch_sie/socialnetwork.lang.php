@@ -25,6 +25,9 @@ $l['socialnetwork_member_ownNotFilled'] = "keine Angabe";
 $l['socialnetwork_member_errorMessageEmpty'] = "Sie können keinen leeren Beitrag setzen";
 $l['socialnetwork_member_errorNoOwnPage'] = "Sie können nur posten, wenn sie selbst eine Social Network Seite haben.";
 $l['socialnetwork_member_errorMessageDelete'] = "Löschen nicht möglich.";
+$l['socialnetwork_member_ownNotFilled'] = "keine Angabe";
+$l['socialnetwork_error_nopage'] = "Der Charakter hat keine Daten für das soziales Netzwerk hinterlegt.";
+$l['socialnetwork_error_nopage_title'] = "Kein soziales Netzwerk";
 
 //Like/Dislike fontawesome! 
 $l['socialnetwork_member_like'] = '<i class="far fa-heart"></i>';
