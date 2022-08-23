@@ -141,7 +141,7 @@ function socialnetwork_addtemplates()
     $template[3] = array(
         "title" => 'socialnetwork_member_postedit',
         "template" => '
-        <button class="editDelete" name="editpost" onclick="change({$sn_postid},\\\'{$sn_date_date}\\\',\\\'{$sn_date_time}\\\')" ><i class="fas fa-pen"></i></button>
+        <button class="editDelete" name="editpost" id="edit{$sn_postid}" onclick="change({$sn_postid},\\\'{$sn_date_date}\\\',\\\'{$sn_date_time}\\\')" ><i class="fas fa-pen"></i></button>
         <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&postdelete={$sn_postid}" class="editDelete" ><i class="fas fa-trash"></i></a>',
         "sid" => "-2",
         "version" => "1.0",
@@ -289,7 +289,7 @@ function socialnetwork_addtemplates()
     $template[13] = array(
         "title" => 'socialnetwork_member_answeredit',
         "template" => '
-        <button class="editDelete" name="editans" onclick="changeAns({$ansid},\\\'{$ansdate}\\\',\\\'{$anstime}\\\')"><i class="fas fa-pen"></i></button>
+        <button class="editDelete" name="editans" id="ansedit{$ansid}" onclick="changeAns({$ansid},\\\'{$ansdate}\\\',\\\'{$anstime}\\\')"><i class="fas fa-pen"></i></button>
         <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&ansdelete={$ansid}" class="editDelete" ><i class="fas fa-trash"></i></a>
         <button class="editDelete" name="editans" onclick=""></button>
         ',
