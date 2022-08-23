@@ -1,6 +1,8 @@
 function change($id,$date,$time) {
     $pid = 'p' + $id;
     $post = document.getElementById($pid).innerHTML;
+    // document.getElementById('edit'+$pid).add
+    $('#edit'+$id).css("display","none");
     document.getElementById($pid).innerHTML = '<form action="" method="post">'
     + '<textarea name ="editPost" class='+$pid+' id='+$pid+'>'+$post+'</textarea><br />'
     +'<input type="hidden" value="'+$id+'" name="sn_postEditId" />'
@@ -12,12 +14,14 @@ function change($id,$date,$time) {
 
 function abort($id, $post) {
     $pid = 'p' + $id;
-    document.getElementById($pid).innerHTML = $post;
+    $('#edit'+$id).css("display","inline-block");
+    document.getElementById($pid).innerHTML = decodeURI($post);
 }
 
 function changeAns($id,$date,$time){
     $aid = 'a' + $id;
     $ans = document.getElementById($aid).innerHTML;
+    $('#ansedit'+$id).css("display","none");
     document.getElementById($aid).innerHTML = '<form action="" method="post">' 
     + '<textarea name="editAnswer" class=' +$aid +' id=' +$aid +'>'+$ans+'</textarea><br />'
     + '<input type="hidden" value="'+$id+'" name="sn_ansEditId" />'
@@ -28,7 +32,8 @@ function changeAns($id,$date,$time){
 }
 function abortAns($id,$ans){
     $aid = 'a' + $id;
-    document.getElementById($aid).innerHTML = $ans;
+    document.getElementById($aid).innerHTML = decodeURI($ans);
+    $('#ansedit'+$id).css("display","inline-block");
 }
 
 function addImg($type, $postid){
