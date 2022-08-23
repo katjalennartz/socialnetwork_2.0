@@ -650,8 +650,10 @@ function socialnetwork_mainpage()
         //Get the data of the page, we are looking at
         $sn_thispage = getSnUserInfo(intval($mybb->input['uid']));
 
-        //user have no page
-        if ($sn_thispage == 0) error_no_permission();
+        //user has no page
+        if ($sn_thispage == 0) {
+            error($lang->socialnetwork_error_nopage, $lang->socialnetwork_error_nopage_title);
+        }
         //  $sn_page_profil = "<a href=\"" . $url . "member.php?action=profile&uid=" . $sn_thispage['uid'] . "&area=socialnetwork\">";
         $socialnetwork_view = $lang->socialnetwork_view;
         $lang->socialnetwork_view = $lang->sprintf($socialnetwork_view, $sn_thispage['sn_nickname']);
