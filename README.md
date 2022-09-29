@@ -1,6 +1,6 @@
 Soziales Network 2.0  
 von Risuena  
-Kontakt: https://lslv.de/risu  
+Kontakt: Discord: risuena#5389
 Download: https://github.com/katjalennartz/socialnetwork_2.0  
 LICENSE: GNU General Public License v3.0  
 
