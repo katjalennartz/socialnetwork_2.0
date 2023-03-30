@@ -1,6 +1,7 @@
 <?php
 /**
  * Social Network - Administrator Language File
+ * last edit: 30-03-2023
  */
 
 $l['socialnetwork_title'] = "Soziales Netzwerk 2.0 für MyBB";
@@ -47,14 +48,17 @@ $l['socialnetwork_settings_scrolling_tit']='Unendliches Scrollen?';
 $l['socialnetwork_settings_scrolling']='Du kannst dadurch dynamisches Nachladen der Inhalte aktivieren (wie bei Facebook). Allerdings funktionieren dann die direktlinks zu den Posts bei Erwähnungen eventuell nicht mehr.';
 $l['socialnetwork_settings_recordsperpage_tit']='Anzahl der geladenen Posts?';
 $l['socialnetwork_settings_recordsperpage']='Wieviele Posts sollen zunächst angezeigt und dann nachgeladen werden?';
+$l['socialnetwork_settings_mentionsownpage_tit']='Posts mit mentions?';
+$l['socialnetwork_settings_mentionsownpage']='Sollen die Posts auf der eigenen Seite angezeigt werden, in denen man auf einer anderen Seite erwähnt wurde?';
 
 $l['socialnetwork_perm'] = "Soziales Netzwerk";
 $l['socialnetwork_perm_base'] = "Darf die Seiten des Sozialen Netzwerks sehen?";
 $l['socialnetwork_perm_edit'] = "Darf eine Seite erstellen und sie bearbeiten?";
 $l['socialnetwork_perm_mod'] = "Darf das Soziale Netzwerk moderieren?";
+$l['socialnetwork_linkToLastpost'] = 'Zum Beitrag';
 
 $l['socialnetwork_module_title'] = "Soziales Netzwerk Felder Verwaltung";
-$l['socialnetwork_module_descr'] = "Hier kannst du weitere Felder hinzufügen.";
+$l['socialnetwork_module_descr'] = "Hier können Sie weitere Felder hinzufügen.";
 $l['socialnetwork_module_contitle'] = "Soziales Netzwerk Verwaltung";
 $l['socialnetwork_module_explanation'] = "<label>Achtung</label> <div class=\"description\">Bitte mit Vorsicht benutzen. 
 Wenn du die Felder änderst und Felder rausnimmst wird der Inhalt bei allen Miglieder gelöscht! Die Standardfelder (Nickname, Avatar, Titelbild) können nicht geändert werden.
