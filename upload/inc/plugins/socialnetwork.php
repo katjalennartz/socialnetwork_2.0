@@ -6,6 +6,8 @@
  * @author risuena
  * @version 2.0
  * @copyright risuena 2020
+ * last change: 20-03-2023
+ * adding upgradescript!
  * 
  */
 // enable for Debugging:
@@ -91,6 +93,7 @@ function socialnetwork_install()
   		`sn_uid` int(20) NOT NULL,
   		`sn_answer` varchar(500) NOT NULL,
   		`sn_del_name` varchar(100) DEFAULT NUll,
+        `sn_page_id` int(10) NOT NULL DEFAULT 0,
   	PRIMARY KEY (`sn_aid`)
 	) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
 
@@ -863,17 +866,17 @@ function socialnetwork_mainpage()
 
         //Daten von allen Antworten und Posts bekommen
         $getall = $db->write_query("
-                SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `mybb_sn_posts` where sn_pageid = {$thispage}
+                SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `".TABLE_PREFIX."sn_posts` where sn_pageid = {$thispage}
                 UNION
-                SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `mybb_sn_answers` where sn_page_id = {$thispage}");
+                SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `".TABLE_PREFIX."sn_answers` where sn_page_id = {$thispage}");
 
         //anzahl zählen
         $countall = $db->num_rows($getall);
-        $lastpost = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `mybb_sn_posts` where sn_pageid = {$thispage} ORDER BY id DESC LIMIT 1"));
-        $lastanswer = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `mybb_sn_answers` where sn_page_id = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastpost = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `".TABLE_PREFIX."sn_posts` where sn_pageid = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastanswer = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `".TABLE_PREFIX."sn_answers` where sn_page_id = {$thispage} ORDER BY id DESC LIMIT 1"));
 
-        $lastpostthis = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `mybb_sn_posts` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
-        $lastanswerthis = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `mybb_sn_answers` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastpostthis = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `".TABLE_PREFIX."sn_posts` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastanswerthis = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `".TABLE_PREFIX."sn_answers` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
         if (!empty($lastpost)) {
             $lastpost['sndate'] = date("d.m.Y - H:i",  strtotime($lastpost['sndate']));
             $userpost = get_user($lastpost['poster']);
