@@ -1,6 +1,7 @@
 <?php
 /**
  * Social Network - Administrator Language File
+ * last edit: 30-03-2023
  */
 
 $l['socialnetwork_title'] = "Soziales Netzwerk 2.0 für MyBB";
@@ -47,6 +48,8 @@ $l['socialnetwork_settings_scrolling_tit']='Unendliches Scrollen?';
 $l['socialnetwork_settings_scrolling']='Du kannst dadurch dynamisches Nachladen der Inhalte aktivieren (wie bei Facebook). Allerdings funktionieren dann die direktlinks zu den Posts bei Erwähnungen eventuell nicht mehr.';
 $l['socialnetwork_settings_recordsperpage_tit']='Anzahl der geladenen Posts?';
 $l['socialnetwork_settings_recordsperpage']='Wieviele Posts sollen zunächst angezeigt und dann nachgeladen werden?';
+$l['socialnetwork_settings_mentionsownpage_tit']='Posts mit mentions?';
+$l['socialnetwork_settings_mentionsownpage']='Sollen die Posts auf der eigenen Seite angezeigt werden, in denen man auf einer anderen Seite erwähnt wurde?';
 
 $l['socialnetwork_perm'] = "Soziales Netzwerk";
 $l['socialnetwork_perm_base'] = "Darf die Seiten des Sozialen Netzwerks sehen?";
