@@ -7,7 +7,6 @@ LICENSE: GNU General Public License v3.0
 
 ## wichtiges Update        
 * **update script durchfüren**: -> update_sn_march23.php              
-* update_sn_march23.php    
 * Neue Settings: Anzeige von Mentions auf eigener Seite Ja / Nein       
 * Neues DB Feld in sn_anwers         
 * Neue Templates socialnetwork_member_shortinfos und socialnetwork_member_shortinfos_nopage (wird in update script hinzugefügt) 
