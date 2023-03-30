@@ -11,7 +11,8 @@ LICENSE: GNU General Public License v3.0
 * Neues DB Feld in sn_anwers         
 * Neue Templates socialnetwork_member_shortinfos und socialnetwork_member_shortinfos_nopage (wird in update script hinzugefügt) 
           
-* Neue Darstellung von Infos auf member Seite bei wunsch: (Variable dafür siehe nächster abschnitt)       
+* Neue Darstellung von Infos auf member Seite bei wunsch: (Variable dafür siehe nächster abschnitt)    
+* Neue Sprachvariablen!    
 
 ## Wichtige Variablen.  
 
