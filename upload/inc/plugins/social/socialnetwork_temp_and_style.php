@@ -575,6 +575,73 @@ function socialnetwork_addtemplates()
         "dateline" => TIME_NOW
     );
 
+    $template[23] = array(
+        "title" => 'socialnetwork_member_shortinfos',
+        "template" => '<div class="socialprofile">
+          <div class="sociallogo">
+              {$logo}
+          </div>
+          <div class="sn_memInfo">
+            <div class="sninfowrap--img">
+              <img src="{$sn_thispage[\\\'sn_avatar\\\']}" class="imghighlight sn-profilbild" alt="profilbild" />
+            </div>
+            <div class="sninfowrap">
+            <div class="socialcard">
+              <h2 class="heading2">{$sn_thispage[\\\'sn_nickname\\\']}</h2>
+              {$socialnetwork_member_infobit}
+            </div>
+            <div class="socialcard">
+              <div class="sninfos__item answertit heading3">{$sn_thispage[\\\'sn_nickname\\\']}\\\'s friends</div>
+        
+              {$socialnetwork_member_friendsbit}
+            </div>
+            <div class="socialcard sninfos">
+              <div class="sninfos__item answertit heading3">last post on {$sn_thispage[\\\'sn_nickname\\\']}\\\'s page</div>
+              <div class="sninfos__item poster heading4">{$lastpost[\\\'poster\\\']}</div>
+              <div class="sninfos__item post">{$lastpost[\\\'post\\\']}</div>
+              <div class="sninfos__item date">{$lastpost[\\\'sndate\\\']}</div>
+            </div>
+              <div class="socialcard">
+              <div class="sninfos__item answertit heading3">last answer on {$sn_thispage[\\\'sn_nickname\\\']}\\\'s page</div>
+              <div class="sninfos__item poster heading4">{$lastanswer[\\\'poster\\\']}</div>
+              <div class="sninfos__item post">{$lastanswer[\\\'post\\\']}</div>
+              <div class="sninfos__item date">{$lastanswer[\\\'sndate\\\']} </div>
+            </div>
+                <div class="socialcard sninfos">
+              <div class="sninfos__item answertit heading3">last post from {$sn_thispage[\\\'sn_nickname\\\']}</div>
+              <div class="sninfos__item poster heading4">{$lastpostthis[\\\'poster\\\']}</div>
+              <div class="sninfos__item post">{$lastpostthis[\\\'post\\\']}</div>
+              <div class="sninfos__item date">{$lastpostthis[\\\'sndate\\\']}</div>
+            </div>
+              <div class="socialcard">
+              <div class="sninfos__item answertit heading3">last answer from {$sn_thispage[\\\'sn_nickname\\\']}</div>
+              <div class="sninfos__item poster heading4">{$lastanswerthis[\\\'poster\\\']}</div>
+              <div class="sninfos__item post">{$lastanswerthis[\\\'post\\\']}</div>
+              <div class="sninfos__item date">{$lastanswerthis[\\\'sndate\\\']} </div>
+            </div>
+            </div>
+              <div class="sociallink">
+                 <h2 class="heading2"><a href="{$url}/member.php?action=profile&uid={$userspageid}&area=socialnetwork">Zu {$sn_thispage[\\\'sn_nickname\\\']}\\\'s Heartstring</a></h2>
+          </div>
+           </div>
+        
+        </div>',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+      );
+      $template[24] = array(
+        "title" => 'socialnetwork_member_shortinfos_nopage',
+        "template" => '<div class="socialprofile">
+          {$logo}<br>
+          {$memprofile[\\\'username\\\']} besitzt kein Social Network.
+        </div>
+          ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+      );
+
     foreach ($template as $row) {
         $db->insert_query("templates", $row);
     }
