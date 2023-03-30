@@ -1,6 +1,7 @@
 <?php
 /**
- * Social Network 1.0 Main Language File
+ * Social Network Main Language File
+ * last edit: 30-03-2023
  */
 
 $l['socialnetwork_view'] = "{1}'s soziales Netzwerk";
@@ -13,7 +14,10 @@ $l['socialnetwork_updated'] = "dein soziales Netzwerk Profil wurde erfolgreich g
 $l['socialnetwork_notupdated'] = "Entschuldige, irgendwas ist beim Speichern deines Profils schief gegangen.";
 
 $l['socialnetwork_ucp_link'] = "Soziales Netzwerk ansehen";
+$l['socialnetwork_deletepost'] = "Willst du diesen Beitrag wirklich löschen? Die Aktion kann nicht rückgängig gemacht werden.";
+$l['socialnetwork_deletefriend'] = "Willst du diesen Freund wirklich löschen? Die Aktion kann nicht rückgängig gemacht werden.";
 
+//Alert settings
 $l['socialnetwork_ucp_alertPost'] = "bei neuem Post oder Antwort.";
 $l['socialnetwork_ucp_alertLike'] = "wenn jemanden ein Post oder eine Antwort von dir gefällt.";
 $l['socialnetwork_ucp_alertFriend'] = "wenn jemand dein Freund sein will.";
