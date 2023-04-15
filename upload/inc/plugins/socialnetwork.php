@@ -866,17 +866,17 @@ function socialnetwork_mainpage()
 
         //Daten von allen Antworten und Posts bekommen
         $getall = $db->write_query("
-                SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `".TABLE_PREFIX."sn_posts` where sn_pageid = {$thispage}
+                SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `" . TABLE_PREFIX . "sn_posts` where sn_pageid = {$thispage}
                 UNION
-                SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `".TABLE_PREFIX."sn_answers` where sn_page_id = {$thispage}");
+                SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `" . TABLE_PREFIX . "sn_answers` where sn_page_id = {$thispage}");
 
         //anzahl zählen
         $countall = $db->num_rows($getall);
-        $lastpost = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `".TABLE_PREFIX."sn_posts` where sn_pageid = {$thispage} ORDER BY id DESC LIMIT 1"));
-        $lastanswer = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `".TABLE_PREFIX."sn_answers` where sn_page_id = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastpost = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `" . TABLE_PREFIX . "sn_posts` where sn_pageid = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastanswer = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `" . TABLE_PREFIX . "sn_answers` where sn_page_id = {$thispage} ORDER BY id DESC LIMIT 1"));
 
-        $lastpostthis = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `".TABLE_PREFIX."sn_posts` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
-        $lastanswerthis = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `".TABLE_PREFIX."sn_answers` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastpostthis = $db->fetch_array($db->write_query("SELECT sn_post_id as id, sn_uid as poster, sn_date as sndate, sn_social_post as post FROM `" . TABLE_PREFIX . "sn_posts` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
+        $lastanswerthis = $db->fetch_array($db->write_query("SELECT sn_aid as id, sn_uid as poster, sn_date as sndate, sn_answer as post FROM `" . TABLE_PREFIX . "sn_answers` where sn_uid = {$thispage} ORDER BY id DESC LIMIT 1"));
         if (!empty($lastpost)) {
             $lastpost['sndate'] = date("d.m.Y - H:i",  strtotime($lastpost['sndate']));
             $userpost = get_user($lastpost['poster']);
@@ -2269,8 +2269,10 @@ function socialnetwork_newsfeed()
         $thisuser = intval($mybb->user['uid']);
         $userUseSN = 1;
         $numpages = $mybb->settings['threadsperpage'];
-        if ($numpages == "") $numpages = 5;
 
+        if ($numpages == "") $numpages = 5;
+        // echo "page ist". $numpages;
+        $numpages = 3;
         $userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = $thisuser"), "uid");
         if ($userUseSNQuery == "") {
             $userUseSN = 0;
@@ -2279,33 +2281,12 @@ function socialnetwork_newsfeed()
         if (!$mybb->usergroup['socialnetwork_isallowed']) {
             error_no_permission();
         }
-        //we want some pagination.
-        $page = intval($mybb->input['page']);
-        if ($page < 1) {
-            $page = 1;
-        }
-        $offset = ($page - 1) * 2;
 
-        //show all posts of erveryone
         if ($mybb->input['action'] == "sn_newsfeedAll") {
-            $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts order by sn_date DESC LIMIT $offset, $numpages");
-            socialnetwork_showPosts($queryPosts, "newsfeed");
             $numposts = $db->fetch_field($db->write_query("SELECT COUNT(sn_post_id) AS count FROM " . TABLE_PREFIX . "sn_posts"), "count");
-            $newsfeed_links = "<b>Newsfeed aller Charaktere</b> - <a href=\"misc.php?action=sn_newsfeedFriends\">Newsfeed der Freunde</a>";
         }
 
-        //show posts of friends 
         if ($mybb->input['action'] == "sn_newsfeedFriends") {
-            $queryPostsFriends = $db->write_query(" 
-            SELECT DISTINCT(sn_post_id), sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name FROM 
-                (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name 
-                    FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
-                    JOIN " . TABLE_PREFIX . "sn_posts ON sn_uid = sn_friendwith
-                UNION
-            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab order by sn_date DESC LIMIT $offset, $numpages
-            ");
-
-            socialnetwork_showPosts($queryPostsFriends, "newsfeed");
             $numposts = $db->fetch_field(
                 $db->write_query(" 
             SELECT count(DISTINCT(sn_post_id)) as count FROM 
@@ -2317,6 +2298,42 @@ function socialnetwork_newsfeed()
             "),
                 "count"
             );
+        }
+        //we want some pagination.
+        $page = intval($mybb->input['page']);
+        if ($page) {
+            $start = ($page - 1) * $numpages;
+        } else {
+            $start = 0;
+            $page = 1;
+        }
+        $end = $start + $numposts;
+        $lower = $start + 1;
+        $upper = $end;
+        if ($upper > $numposts) {
+            $upper = $numposts;
+        }
+
+
+        //show all posts of erveryone
+        if ($mybb->input['action'] == "sn_newsfeedAll") {
+            $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts order by sn_date DESC LIMIT $start, $numpages");
+            socialnetwork_showPosts($queryPosts, "newsfeed");
+            $newsfeed_links = "<b>Newsfeed aller Charaktere</b> - <a href=\"misc.php?action=sn_newsfeedFriends\">Newsfeed der Freunde</a>";
+        }
+
+        //show posts of friends 
+        if ($mybb->input['action'] == "sn_newsfeedFriends") {
+            $queryPostsFriends = $db->write_query(" 
+            SELECT DISTINCT(sn_post_id), sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name FROM 
+                (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name 
+                    FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
+                    JOIN " . TABLE_PREFIX . "sn_posts ON sn_uid = sn_friendwith
+                UNION
+            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab order by sn_date DESC LIMIT $start, $numpages
+            ");
+
+            socialnetwork_showPosts($queryPostsFriends, "newsfeed");
             $newsfeed_links = "<a href=\"misc.php?action=sn_newsfeedAll\">Newsfeed aller Charaktere</a> - <b>Newsfeed der Freunde</b>";
         }
 
