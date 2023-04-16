@@ -2271,8 +2271,7 @@ function socialnetwork_newsfeed()
         $numpages = $mybb->settings['threadsperpage'];
 
         if ($numpages == "") $numpages = 5;
-        // echo "page ist". $numpages;
-        $numpages = 3;
+
         $userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = $thisuser"), "uid");
         if ($userUseSNQuery == "") {
             $userUseSN = 0;
