@@ -1423,9 +1423,9 @@ function socialnetwork_showFriends()
         //Get Data of friend
         $frienddataSN = socialnetwork_getSnUserInfo($friend);
         $friendava = $frienddataSN['sn_avatar'];
-        $friendname = "<a href=\"" . get_profile_link($friend) . "&area=socialnetwork\">" . $frienddataSN['sn_nickname'] . "</a>";
+        $friendname = "<a class=\"sn_link name\" href=\"" . get_profile_link($friend) . "&area=socialnetwork\">" . $frienddataSN['sn_nickname'] . "</a>";
         if ($thisuser == $thispage) {
-            $frienddelete = "<a href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&friend=minus&friendid=" . $friend . "\"  onClick=\"return confirm('{$lang->socialnetwork_deletefriend}');\" >" . $lang->socialnetwork_member_delete . "</a>";
+            $frienddelete = "<a class=\"sn_link name\" href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&friend=minus&friendid=" . $friend . "\"  onClick=\"return confirm('{$lang->socialnetwork_deletefriend}');\" >" . $lang->socialnetwork_member_delete . "</a>";
         }
 
         //no friends at the moment
@@ -2679,8 +2679,8 @@ function socialnetwork_getglobals()
     $url = $mybb->settings['bburl'];
     $lang->load("socialnetwork");
     //links für newsfeeds
-    $sn_newsfeedFriend = "<a href=\"" . $url . "/misc.php?action=sn_newsfeedFriends\">" . $lang->socialnetwork_newsfeedFriends . "</a>";
-    $sn_newsfeedAll = "<a href=\"" . $url . "/misc.php?action=sn_newsfeedAll\">" . $lang->socialnetwork_newsfeedAll . "</a>";
+    $sn_newsfeedFriend = "<a class=\"bl-btn\" href=\"" . $url . "/misc.php?action=sn_newsfeedFriends\">" . $lang->socialnetwork_newsfeedFriends . "</a>";
+    $sn_newsfeedAll = "<a class=\"bl-btn\" href=\"" . $url . "/misc.php?action=sn_newsfeedAll\">" . $lang->socialnetwork_newsfeedAll . "</a>";
     if ($userArray != 0) {
         $sn_page =  "<a href=\"" . $url . "/member.php?action=profile&uid=" . $thisuser . "&area=socialnetwork\">" . $lang->socialnetwork_linkToOwn . "</a>";
     }
@@ -2722,7 +2722,7 @@ function socialnetwork_getglobals()
         if ($thisuser == 0) {
             $userinfo['sn_avatar'] = "social/profil_leer.png";
         }
-        $last_post['linktopost'] = "<a href=\"member.php?action=profile&uid=" . $last_post['sn_pageid'] . "&area=socialnetwork#" . $last_post['sn_post_id'] . "\">" . $lang->socialnetwork_linkToLastpost . "</a>";
+        $last_post['linktopost'] = "<a class=\"bl-btn\" href=\"member.php?action=profile&uid=" . $last_post['sn_pageid'] . "&area=socialnetwork#" . $last_post['sn_post_id'] . "\">" . $lang->socialnetwork_linkToLastpost . "</a>";
     }
 
     // member.php?action=profile&uid=".$last_post['sn_pageid']."&area=socialnetwork#".$last_post['sn_post_id']."\">".$lang->socialnetwork_linkToLastpost."</a>";
