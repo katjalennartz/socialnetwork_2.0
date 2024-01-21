@@ -1061,11 +1061,13 @@ function socialnetwork_showPosts($query, $type)
             $infinitescrolling = "";
         }
         //show the image beside the anwser form
-        //TODO if guest
 
         $sn_ansFormImg = $thisusersndata['sn_avatar'];
+
+        //wenn leer default ava
         if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
 
+        //wenn gast und nicht erlaubt
         if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
             $sn_ansFormImg = $mybb->settings['socialnetwork_images_guests_default'];
         }
@@ -1297,7 +1299,12 @@ function socialnetwork_showFriends()
 
         //Get Data of friend
         $frienddataSN = socialnetwork_getSnUserInfo($friend);
-        $friendava = $frienddataSN['sn_avatar'];
+
+        if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
+            $friendava = $mybb->settings['socialnetwork_images_guests_default'];
+        } else {
+            $friendava =  $frienddataSN['sn_avatar'];
+        }
         $friendname = "<a class=\"sn_link name\" href=\"" . get_profile_link($friend) . "&area=socialnetwork\">" . $frienddataSN['sn_nickname'] . "</a>";
         if ($thisuser == $thispage) {
             $frienddelete = "<a class=\"sn_link name\" href=\"member.php?action=profile&uid=" . $thispage . "&area=socialnetwork&friend=minus&friendid=" . $friend . "\"  onClick=\"return confirm('{$lang->socialnetwork_deletefriend}');\" >" . $lang->socialnetwork_member_delete . "</a>";
@@ -1319,7 +1326,11 @@ function socialnetwork_showFriends()
             };
 
             $askedFriendSN = socialnetwork_getSnUserInfo($get_friend['sn_uid']);
-            $friendava = $askedFriendSN['sn_avatar'];
+            if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
+                $friendava = $mybb->settings['socialnetwork_images_guests_default'];
+            } else {
+                $friendava =  $askedFriendSN['sn_avatar'];
+            }
             $friendname = "<a href=\"" . get_profile_link($get_friend['sn_uid']) . "&area=socialnetwork\">" . $askedFriendSN['sn_nickname'] . "</a>";
 
             eval("\$socialnetwork_member_friendsbitAsked .= \"" . $templates->get('socialnetwork_member_friendsbitAsked') . "\";");
@@ -2056,10 +2067,14 @@ function socialnetwork_getSnUserInfo($userid)
             $userArray['sn_nickname'] = ($db->fetch_field($db->simple_select("users", "username", "uid = $userid", "limit 1"), "username"));
         }
         $userArray['sn_nickname'] = htmlspecialchars_uni($userArray['sn_nickname']);
+
+        if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
+            $userArray['sn_avatar'] = $mybb->settings['socialnetwork_images_guests_default'];
+        } else {
+            $userArray['sn_avatar'] =  $userArray['sn_avatar'];
+        }
         if ($userArray['sn_avatar'] == "") {
             $userArray['sn_avatar'] = $defaultava;
-        } else {
-            $userArray['sn_avatar'] = $userArray['sn_avatar'];
         }
         if ($userArray['sn_userheader'] == "") $userArray['sn_userheader'] = "";
         $userArray['sn_userheader'] = htmlspecialchars_uni($userArray['sn_userheader']);
@@ -2286,8 +2301,8 @@ function socialnetwork_userlist()
             }
             $sn_userdata = get_user($sn_user['uid']);
             $sn_profile_link = build_profile_link($sn_userdata['username'],  $sn_userdata['uid']);
-            $sn_link = "<a href=\"member.php?action=profile&uid={$sn_userdata['uid']}area=socialnetwork\">{$lang->socialnetwork_view_userlist_link}</a>";
-            
+            $sn_link = "<a href=\"member.php?action=profile&uid={$sn_userdata['uid']}&area=socialnetwork\">{$lang->socialnetwork_view_userlist_link}</a>";
+
             eval("\$socialnetwork_userlistbit .= \"" . $templates->get('socialnetwork_misc_userlist_bit') . "\";");
         }
         eval("\$outpage = \"" . $templates->get('socialnetwork_misc_userlist') . "\";");
