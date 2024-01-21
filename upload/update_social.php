@@ -53,6 +53,28 @@ if ($mybb->usergroup['canmodcp'] == 1) {
   if (isset($_POST['templates'])) {
     socialnetwork_addtemplates();
     echo "<b>Templates hinzugefügt</b><br>";
+    echo "<b>To Do: evt. Stylesheet änderungen manuell hinzufügen</b><br>
+    <textarea>
+    .sn_userlist_text { 
+      margin-bottom: 20px; 
+    }
+
+    .profileimage.sn_userlistbit__item img { 
+      border-radius: 50%; width: 80px; 
+    }
+    
+    .sn_userlist_container__item.sn_userlistbit { 
+      display: grid; grid-template-columns: 1fr 1fr 1fr; 
+      justify-content: center; 
+      width: 50%; 
+      gap: 20px; 
+      align-items: center; 
+      background-color: #f2f2f2; 
+      padding: 10px 20px; 
+      border-bottom: 1px solid #dedede; 
+      color: #000; 
+    }
+    </textarea>";
   }
   echo "<h1>CSS Nachträglich hinzufügen?</h1>";
   echo "<p>Nach einem MyBB Upgrade fehlen die Stylesheets? <br> Hier kannst du den Standard Stylesheet neu hinzufügen.</p>";
