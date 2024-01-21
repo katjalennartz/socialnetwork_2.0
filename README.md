@@ -109,6 +109,10 @@ socialnetwork_misc_userlist_bit
 socialnetwork.css  
 
 **css update zu userlist**
+.sn_userlist_text {
+	margin-bottom: 20px;
+}
+
 .profileimage.sn_userlistbit__item img {
     border-radius: 50%;
     width: 80px;
