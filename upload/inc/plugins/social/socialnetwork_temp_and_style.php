@@ -586,15 +586,19 @@ function socialnetwork_addtemplates($type = 'install')
         <body>
             {$header}
             <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder ">
-
-                <td class="trow1" align="center">
-                    {$lang->socialnetwork_view_userlist_text}
-                    {$socialnetwork_userlistbit}
-                </td>
-                </tr>
-            </table>
-        {$footer}
-        </body>
+			<td class="trow1" align="center">
+				<h1>{$lang->socialnetwork_view_userlist}</h1>
+				<div class="sn_userlist_text">
+				{$lang->socialnetwork_view_userlist_text}
+				</div>
+				<div class="sn_userlist_container">
+				{$socialnetwork_userlistbit}
+				</div>
+			</td>
+			</tr>
+		</table>
+	{$footer}
+	</body>
 </html>
         ',
         "sid" => "-2",
@@ -672,7 +676,11 @@ function socialnetwork_addtemplates($type = 'install')
     $template[26] = array(
         "title" => 'socialnetwork_misc_userlist_bit',
         "template" => '
-            userlist bit
+        <div class="sn_userlist_container__item sn_userlistbit">
+        <div class="profileimage sn_userlistbit__item">{$profileimage}</div>
+        <div class="profilelink sn_userlistbit__item">{$sn_profile_link}</div>
+        <div class="snlink sn_userlistbit__item">{$sn_link}</div>
+    </div>
         ',
         "sid" => "-2",
         "version" => "1.0",
@@ -1041,6 +1049,27 @@ function socialnetwork_addstylesheets($type = 'install')
             height: 1px;
             border: 0px;
         }
+
+        .sn_userlist_text { 
+            margin-bottom: 20px; 
+          }
+      
+          .profileimage.sn_userlistbit__item img { 
+            border-radius: 50%; width: 80px; 
+          }
+          
+          .sn_userlist_container__item.sn_userlistbit { 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; 
+            justify-content: center; 
+            width: 50%; 
+            gap: 20px; 
+            align-items: center; 
+            background-color: #f2f2f2; 
+            padding: 10px 20px; 
+            border-bottom: 1px solid #dedede; 
+            color: #000; 
+          }
+          
         ',
         'cachefile' => $db->escape_string(str_replace('/', '', 'socialnetwork.css')),
         'lastmodified' => time()
