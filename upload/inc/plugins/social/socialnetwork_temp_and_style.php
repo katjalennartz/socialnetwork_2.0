@@ -9,15 +9,15 @@
  * 
  */
 
- /** 
+/** 
  * add templates
  * */
 
- // Disallow direct access to this file for security reasons
+// Disallow direct access to this file for security reasons
 if (!defined("IN_MYBB")) {
     die("Direct initialization of this file is not allowed.<br /><br />Please make sure IN_MYBB is defined.");
 }
-function socialnetwork_addtemplates()
+function socialnetwork_addtemplates($type = 'install')
 {
     global $db, $mybb;
     $template[0] = array(
@@ -141,7 +141,7 @@ function socialnetwork_addtemplates()
     $template[3] = array(
         "title" => 'socialnetwork_member_postedit',
         "template" => '
-        <button class="editDelete" name="editpost" id="edit{$sn_postid}" onclick="change({$sn_postid},\\\'{$sn_date_date}\\\',\\\'{$sn_date_time}\\\')" ><i class="fas fa-pen"></i></button>
+        <button class="editDelete" name="editpost" onclick="change({$sn_postid},\\\'{$sn_date_date}\\\',\\\'{$sn_date_time}\\\')" ><i class="fas fa-pen"></i></button>
         <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&postdelete={$sn_postid}" class="editDelete" ><i class="fas fa-trash"></i></a>',
         "sid" => "-2",
         "version" => "1.0",
@@ -289,7 +289,7 @@ function socialnetwork_addtemplates()
     $template[13] = array(
         "title" => 'socialnetwork_member_answeredit',
         "template" => '
-        <button class="editDelete" name="editans" id="ansedit{$ansid}" onclick="changeAns({$ansid},\\\'{$ansdate}\\\',\\\'{$anstime}\\\')"><i class="fas fa-pen"></i></button>
+        <button class="editDelete" name="editans" onclick="changeAns({$ansid},\\\'{$ansdate}\\\',\\\'{$anstime}\\\')"><i class="fas fa-pen"></i></button>
         <a href="member.php?action=profile&uid={$thispage}&area=socialnetwork&ansdelete={$ansid}" class="editDelete" ><i class="fas fa-trash"></i></a>
         <button class="editDelete" name="editans" onclick=""></button>
         ',
@@ -514,6 +514,7 @@ function socialnetwork_addtemplates()
         "version" => "1.0",
         "dateline" => TIME_NOW
     );
+
     $template[22] = array(
         "title" => 'socialnetwork_modcp_modify',
         "template" => '
@@ -574,8 +575,34 @@ function socialnetwork_addtemplates()
         "version" => "1.0",
         "dateline" => TIME_NOW
     );
-
     $template[23] = array(
+        "title" => 'socialnetwork_misc_userlist',
+        "template" => '
+        <html>
+        <head>
+            <title>{$mybb->settings[\\\'bbname\\\']} - {$lang->socialnetwork_view_userlist}</title>
+            {$headerinclude}
+        </head>
+        <body>
+            {$header}
+            <table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder ">
+
+                <td class="trow1" align="center">
+                    {$lang->socialnetwork_view_userlist_text}
+                    {$socialnetwork_userlistbit}
+                </td>
+                </tr>
+            </table>
+        {$footer}
+        </body>
+</html>
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+
+    $template[24] = array(
         "title" => 'socialnetwork_member_shortinfos',
         "template" => '<div class="socialprofile">
           <div class="sociallogo">
@@ -629,8 +656,8 @@ function socialnetwork_addtemplates()
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
-      );
-      $template[24] = array(
+    );
+    $template[25] = array(
         "title" => 'socialnetwork_member_shortinfos_nopage',
         "template" => '<div class="socialprofile">
           {$logo}<br>
@@ -640,16 +667,30 @@ function socialnetwork_addtemplates()
         "sid" => "-2",
         "version" => "1.0",
         "dateline" => TIME_NOW
-      );
+    );
+
+    $template[26] = array(
+        "title" => 'socialnetwork_misc_userlist_bit',
+        "template" => '
+            userlist bit
+        ',
+        "sid" => "-2",
+        "version" => "1.0",
+        "dateline" => TIME_NOW
+    );
+
 
     foreach ($template as $row) {
-        $db->insert_query("templates", $row);
+        $check = $db->num_rows($db->simple_select("templates", "title", "title LIKE '{$row['title']}'"));
+        if ($check == 0) {
+            $db->insert_query("templates", $row);
+        }
     }
 }
 /**
  * add stylesheet
  */
-function socialnetwork_addstylesheets()
+function socialnetwork_addstylesheets($type = 'install')
 {
     global $db;
     $css = array(
@@ -1014,4 +1055,190 @@ function socialnetwork_addstylesheets()
     while ($theme = $db->fetch_array($tids)) {
         update_theme_stylesheet_list($theme['tid']);
     }
+}
+
+/**
+ * Adding all the settings
+ * Also Check if already exist, so we can use it also for updates
+ */
+
+function socialnetwork_add_settings($type = 'install')
+{
+    global $db, $mybb, $lang;
+    $lang->load("socialnetwork");
+    $lang->load("admin/socialnetwork");
+
+    //setting array
+    $setting_array = array(
+        'socialnetwork_html' => array(
+            'title' =>  $lang->socialnetwork_settings_html_tit,
+            'description' => $lang->socialnetwork_settings_html,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 1
+        ),
+        'socialnetwork_mybbcode' => array(
+            'title' => $lang->socialnetwork_settings_mybbcode_tit,
+            'description' => $lang->socialnetwork_settings_mybbcode,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 2
+        ),
+        'socialnetwork_img' => array(
+            'title' => $lang->socialnetwork_settings_img_tit,
+            'description' => $lang->socialnetwork_settings_img,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 3
+        ),
+        'socialnetwork_badwords' => array(
+            'title' => $lang->socialnetwork_settings_badwords_tit,
+            'description' => $lang->socialnetwork_settings_badwords,
+            'optionscode' => 'yesno',
+            'value' => '0', // Default
+            'disporder' => 4
+        ),
+        'socialnetwork_videos' => array(
+            'title' => $lang->socialnetwork_settings_video_tit,
+            'description' => $lang->socialnetwork_settings_video,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 5
+        ),
+        'socialnetwork_logo' => array(
+            'title' => $lang->socialnetwork_settings_logo_tit,
+            'description' => $lang->socialnetwork_settings_logo,
+            'optionscode' => 'text',
+            'value' => 'social/logo.png', // Default
+            'disporder' => 6
+        ),
+        'socialnetwork_defaultavatar' => array(
+            'title' => $lang->socialnetwork_settings_defavatar_tit,
+            'description' => $lang->socialnetwork_settings_defavatar,
+            'optionscode' => 'text',
+            'value' => 'social/profil_leer.png', // Default
+            'disporder' => 7
+        ),
+        'socialnetwork_avasize' => array(
+            'title' =>  $lang->socialnetwork_settings_avasize_tit,
+            'description' => $lang->socialnetwork_settings_avasize,
+            'optionscode' => 'text',
+            'value' => '150,150', // Default
+            'disporder' => 8
+        ),
+        'socialnetwork_titlesize' => array(
+            'title' => $lang->socialnetwork_settings_titlesize_tit,
+            'description' => $lang->socialnetwork_settings_titlesize,
+            'optionscode' => 'text',
+            'value' => '600,180', // Default
+            'disporder' => 9
+        ),
+        'socialnetwork_alertpn' => array(
+            'title' => $lang->socialnetwork_settings_pn_tit,
+            'description' => $lang->socialnetwork_settings_pn,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 10
+        ),
+        'socialnetwork_alertAlert' => array(
+            'title' => $lang->socialnetwork_settings_alert_tit,
+            'description' => $lang->socialnetwork_settings_alert,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 11
+        ),
+        'socialnetwork_uploadImg' => array(
+            'title' => $lang->socialnetwork_settings_upload_tit,
+            'description' => $lang->socialnetwork_settings_upload,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 12
+        ),
+        'socialnetwork_uploadImgSize' => array(
+            'title' => $lang->socialnetwork_settings_filesize_tit,
+            'description' => $lang->socialnetwork_settings_filesize,
+            'optionscode' => 'text',
+            'value' => '2000000', // Default
+            'disporder' => 13
+        ),
+        'socialnetwork_uploadImgWidth' => array(
+            'title' => $lang->socialnetwork_settings_uploadWidth_tit,
+            'description' => $lang->socialnetwork_settings_uploadWidth,
+            'optionscode' => 'text',
+            'value' => '400', // Default
+            'disporder' => 14
+        ),
+        'socialnetwork_uploadImgHeight' => array(
+            'title' => $lang->socialnetwork_settings_uploadHeight_tit,
+            'description' => $lang->socialnetwork_settings_uploadHeight,
+            'optionscode' => 'text',
+            'value' => '200', // Default
+            'disporder' => 15
+        ),
+        'socialnetwork_orderOffFields' => array(
+            'title' => $lang->socialnetwork_settings_orderOffFields_tit,
+            'description' => $lang->socialnetwork_settings_orderOffFields,
+            'optionscode' => 'text',
+            'value' => '', // Default
+            'disporder' => 16
+        ),
+        'socialnetwork_scrolling' => array(
+            'title' => $lang->socialnetwork_settings_scrolling_tit,
+            'description' => $lang->socialnetwork_settings_scrolling,
+            'optionscode' => 'yesno',
+            'value' => '0', // Default
+            'disporder' => 17
+        ),
+        'socialnetwork_recordsperpage' => array(
+            'title' => $lang->socialnetwork_settings_recordsperpage_tit,
+            'description' => $lang->socialnetwork_settings_recordsperpage,
+            'optionscode' => 'text',
+            'value' => '5', // Default
+            'disporder' => 18
+        ),
+        'socialnetwork_mentionsownpage' => array(
+            'title' => $lang->socialnetwork_settings_mentionsownpage_tit,
+            'description' => $lang->socialnetwork_settings_mentionsownpage,
+            'optionscode' => 'yesno',
+            'value' => '1', // Default
+            'disporder' => 18
+        ),
+        'socialnetwork_images_guests' => array(
+            'title' => $lang->socialnetwork_settings_images_guests_tit,
+            'description' => $lang->socialnetwork_settings_images_guests,
+            'optionscode' => 'yesno',
+            'value' => '0', // Default
+            'disporder' => 15
+        ),
+        'socialnetwork_images_guests_default' => array(
+            'title' => $lang->socialnetwork_settings_images_guests_default_tit,
+            'description' => $lang->socialnetwork_settings_images_guests_default,
+            'optionscode' => 'text',
+            'value' => '', // Default
+            'disporder' => 16
+        ),
+    );
+    if ($type == "install") {
+        $gid = $db->insert_id();
+        foreach ($setting_array as $name => $setting) {
+            $setting['name'] = $name;
+            $setting['gid'] = $gid;
+            $db->insert_query('settings', $setting);
+        }
+    } elseif ($type == "update") {
+
+        $gid = $db->fetch_field($db->write_query("SELECT gid FROM `" . TABLE_PREFIX . "settings` WHERE name like 'socialnetwork%' LIMIT 1;"), "gid");
+
+        foreach ($setting_array as $name => $setting) {
+            $check_query = $db->write_query("SELECT name FROM `" . TABLE_PREFIX . "settings` WHERE name LIKE '{$name}'");
+            $check = $db->num_rows($check_query);
+            if ($check == 0) {
+                echo "Die Einstellung {$name} fehlt und wurde hinzugefügt<br>";
+                $setting['name'] = $name;
+                $setting['gid'] = $gid;
+                $db->insert_query('settings', $setting);
+            }
+        }
+    }
+    rebuild_settings();
 }
