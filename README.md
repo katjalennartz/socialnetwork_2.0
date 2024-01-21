@@ -1,6 +1,6 @@
-# Soziales Network 2.0  
+# Soziales Network 2.1  
 von Risuena  
-Kontakt: Discord: risuena#5389
+Kontakt: Discord: risuena
 Download: https://github.com/katjalennartz/socialnetwork_2.0  
 LICENSE: GNU General Public License v3.0  
 **Last Update: 30.03.2023**
@@ -44,6 +44,7 @@ member.php?action=profile&uid=X&area=socialnetwork  (ersetze X mit uid des users
 
 misc.php?action=sn_newsfeedAll. //feed mit allen posts
 misc.php?action=sn_newsfeedFriends //feed mit Posts von Freunden
+misc.php?action=sn_userlist //auflistung aller nutzer
 
 usercp.php?action=socialnetwork  //Link zum UCP
 
@@ -100,6 +101,33 @@ socialnetwork_ucp_pmAlert
 **seit märz 2023:**              
 socialnetwork_member_shortinfos         
 socialnetwork_member_shortinfos_nopage
+**seit Januar2024:**
+socialnetwork_misc_userlist
+socialnetwork_misc_userlist_bit
      
 ### CSS  
 socialnetwork.css  
+
+**css update zu userlist**
+.sn_userlist_text {
+	margin-bottom: 20px;
+}
+
+.profileimage.sn_userlistbit__item img {
+    border-radius: 50%;
+    width: 80px;
+}
+
+.sn_userlist_container__item.sn_userlistbit {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: center;
+    width: 50%;
+    gap: 20px;
+    align-items: center;
+    /* margin-bottom: 20px; */
+    background-color: #f2f2f2;
+    padding: 10px 20px;
+    border-bottom: 1px solid #dedede;
+    color: #000;
+}

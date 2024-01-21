@@ -1,7 +1,7 @@
 <?php
 /**
  * Social Network - Administrator Language File
- * last edit: 30-03-2023
+* last edit: 12-01-2024
  */
 
 $l['socialnetwork_title'] = "Soziales Netzwerk 2.0 für MyBB";
@@ -50,6 +50,10 @@ $l['socialnetwork_settings_recordsperpage_tit']='Anzahl der geladenen Posts?';
 $l['socialnetwork_settings_recordsperpage']='Wieviele Posts sollen zunächst angezeigt und dann nachgeladen werden?';
 $l['socialnetwork_settings_mentionsownpage_tit']='Posts mit mentions?';
 $l['socialnetwork_settings_mentionsownpage']='Sollen die Posts auf der eigenen Seite angezeigt werden, in denen man auf einer anderen Seite erwähnt wurde?';
+$l['socialnetwork_settings_images_guests_tit']='Bilder Gäste?';
+$l['socialnetwork_settings_images_guests']='Dürfen Bilder Gäste sehen?';
+$l['socialnetwork_settings_images_guests_default_tit']='Default Image?';
+$l['socialnetwork_settings_images_guests_default']='Default Images für Gäste?';
 
 $l['socialnetwork_perm'] = "Soziales Netzwerk";
 $l['socialnetwork_perm_base'] = "Darf die Seiten des Sozialen Netzwerks sehen?";
