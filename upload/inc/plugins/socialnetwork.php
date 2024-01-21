@@ -11,8 +11,8 @@
  * 
  */
 // enable for Debugging:
-//error_reporting(E_ERROR | E_PARSE);
-//ini_set('display_errors', true);
+// error_reporting(E_ERROR | E_PARSE);
+// ini_set('display_errors', true);
 
 // Disallow direct access to this file for security reasons
 if (!defined("IN_MYBB")) {
@@ -30,7 +30,7 @@ function socialnetwork_info()
         "website" => "https://github.com/katjalennartz/socialnetwork_2.0",
         "author" => "risuena",
         "authorsite" => "https://github.com/katjalennartz",
-        "version" => "2.0",
+        "version" => "2.1",
         "compatability" => "18*"
     );
     if (socialnetwork_is_installed() && is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active']['socialnetwork']) {
@@ -134,6 +134,9 @@ function socialnetwork_install()
     $db->write_query('UPDATE ' . TABLE_PREFIX . 'usergroups SET socialnetwork_isallowed = 1 WHERE canusercp = 1');
     $db->write_query('UPDATE ' . TABLE_PREFIX . 'usergroups SET socialnetwork_canedit = 1, socialnetwork_canmoderate = 1 WHERE gid IN (2, 3, 4, 6)');
 
+
+    include MYBB_ROOT . "/inc/plugins/social/socialnetwork_temp_and_style.php";
+    //add settings
     $settings_group = array(
         "gid" => "",
         "name" => "socialnetwork",
@@ -143,151 +146,9 @@ function socialnetwork_install()
         "isdefault" => "0",
     );
 
+    socialnetwork_add_settings();
+
     $db->insert_query("settinggroups", $settings_group);
-    $gid = $db->insert_id();
-
-    $setting_array = array(
-        'socialnetwork_html' => array(
-            'title' =>  $lang->socialnetwork_settings_html_tit,
-            'description' => $lang->socialnetwork_settings_html,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 1
-        ),
-        'socialnetwork_mybbcode' => array(
-            'title' => $lang->socialnetwork_settings_mybbcode_tit,
-            'description' => $lang->socialnetwork_settings_mybbcode,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 2
-        ),
-        'socialnetwork_img' => array(
-            'title' => $lang->socialnetwork_settings_img_tit,
-            'description' => $lang->socialnetwork_settings_img,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 3
-        ),
-        'socialnetwork_badwords' => array(
-            'title' => $lang->socialnetwork_settings_badwords_tit,
-            'description' => $lang->socialnetwork_settings_badwords,
-            'optionscode' => 'yesno',
-            'value' => '0', // Default
-            'disporder' => 4
-        ),
-        'socialnetwork_videos' => array(
-            'title' => $lang->socialnetwork_settings_video_tit,
-            'description' => $lang->socialnetwork_settings_video,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 5
-        ),
-        'socialnetwork_logo' => array(
-            'title' => $lang->socialnetwork_settings_logo_tit,
-            'description' => $lang->socialnetwork_settings_logo,
-            'optionscode' => 'text',
-            'value' => 'social/logo.png', // Default
-            'disporder' => 6
-        ),
-        'socialnetwork_defaultavatar' => array(
-            'title' => $lang->socialnetwork_settings_defavatar_tit,
-            'description' => $lang->socialnetwork_settings_defavatar,
-            'optionscode' => 'text',
-            'value' => 'social/profil_leer.png', // Default
-            'disporder' => 7
-        ),
-        'socialnetwork_avasize' => array(
-            'title' =>  $lang->socialnetwork_settings_avasize_tit,
-            'description' => $lang->socialnetwork_settings_avasize,
-            'optionscode' => 'text',
-            'value' => '150,150', // Default
-            'disporder' => 8
-        ),
-        'socialnetwork_titlesize' => array(
-            'title' => $lang->socialnetwork_settings_titlesize_tit,
-            'description' => $lang->socialnetwork_settings_titlesize,
-            'optionscode' => 'text',
-            'value' => '600,180', // Default
-            'disporder' => 9
-        ),
-        'socialnetwork_alertpn' => array(
-            'title' => $lang->socialnetwork_settings_pn_tit,
-            'description' => $lang->socialnetwork_settings_pn,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 10
-        ),
-        'socialnetwork_alertAlert' => array(
-            'title' => $lang->socialnetwork_settings_alert_tit,
-            'description' => $lang->socialnetwork_settings_alert,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 11
-        ),
-        'socialnetwork_uploadImg' => array(
-            'title' => $lang->socialnetwork_settings_upload_tit,
-            'description' => $lang->socialnetwork_settings_upload,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 12
-        ),
-        'socialnetwork_uploadImgSize' => array(
-            'title' => $lang->socialnetwork_settings_filesize_tit,
-            'description' => $lang->socialnetwork_settings_filesize,
-            'optionscode' => 'text',
-            'value' => '2000000', // Default
-            'disporder' => 13
-        ),
-        'socialnetwork_uploadImgWidth' => array(
-            'title' => $lang->socialnetwork_settings_uploadWidth_tit,
-            'description' => $lang->socialnetwork_settings_uploadWidth,
-            'optionscode' => 'text',
-            'value' => '400', // Default
-            'disporder' => 14
-        ),
-        'socialnetwork_uploadImgHeight' => array(
-            'title' => $lang->socialnetwork_settings_uploadHeight_tit,
-            'description' => $lang->socialnetwork_settings_uploadHeight,
-            'optionscode' => 'text',
-            'value' => '200', // Default
-            'disporder' => 15
-        ),
-        'socialnetwork_orderOffFields' => array(
-            'title' => $lang->socialnetwork_settings_orderOffFields_tit,
-            'description' => $lang->socialnetwork_settings_orderOffFields,
-            'optionscode' => 'text',
-            'value' => '', // Default
-            'disporder' => 16
-        ),
-        'socialnetwork_scrolling' => array(
-            'title' => $lang->socialnetwork_settings_scrolling_tit,
-            'description' => $lang->socialnetwork_scrolling,
-            'optionscode' => 'yesno',
-            'value' => '0', // Default
-            'disporder' => 17
-        ),
-        'socialnetwork_recordsperpage' => array(
-            'title' => $lang->socialnetwork_settings_recordsperpage_tit,
-            'description' => $lang->socialnetwork_settings_recordsperpage,
-            'optionscode' => 'text',
-            'value' => '5', // Default
-            'disporder' => 18
-        ),
-        'socialnetwork_mentionsownpage' => array(
-            'title' => $lang->socialnetwork_settings_mentionsownpage_tit,
-            'description' => $lang->socialnetwork_settings_mentionsownpage,
-            'optionscode' => 'yesno',
-            'value' => '1', // Default
-            'disporder' => 18
-        ),
-    );
-
-    foreach ($setting_array as $name => $setting) {
-        $setting['name'] = $name;
-        $setting['gid'] = $gid;
-        $db->insert_query('settings', $setting);
-    }
-    rebuild_settings();
 
     //add templates and stylesheets
     // Add templategroup
@@ -298,10 +159,9 @@ function socialnetwork_install()
     );
     $db->insert_query("templategroups", $templategrouparray);
 
-    include MYBB_ROOT . "/inc/plugins/social/socialnetwork_temp_and_style.php";
-
     socialnetwork_addtemplates();
     socialnetwork_addstylesheets();
+
     $cache->update_usergroups();
 
     if (!is_writable(MYBB_ROOT . 'social/userimages/')) {
@@ -916,6 +776,11 @@ function socialnetwork_mainpage()
             $lastanswerthis['post'] = "Kein Beitrag";
             $lastanswerthis['poster'] = "";
         }
+        if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
+            $sn_thispage['sn_avatar'] = $mybb->settings['socialnetwork_images_guests_default'];
+        } else {
+            $sn_thispage['sn_avatar'] =  $sn_thispage['sn_avatar'];
+        }
         eval("\$socialnetwork_member_shortinfos = \"" . $templates->get('socialnetwork_member_shortinfos') . "\";");
     } else {
         //has no page
@@ -994,6 +859,7 @@ function socialnetwork_userdelete()
     $db->update_query("sn_answers", $updateArr, "sn_uid ='" . $todelete . "'");
     $db->delete_query("sn_friends", "sn_uid = $todelete OR sn_friendwith = $todelete");
     $db->delete_query("sn_likes", "sn_uid= $todelete");
+    $db->delete_query("sn_users", "uid= $todelete");
 }
 
 $plugins->add_hook("admin_tools_action_handler", "socialnetwork_action_handler");
@@ -1195,8 +1061,14 @@ function socialnetwork_showPosts($query, $type)
             $infinitescrolling = "";
         }
         //show the image beside the anwser form
+        //TODO if guest
+
         $sn_ansFormImg = $thisusersndata['sn_avatar'];
         if ($sn_ansFormImg == "") $sn_ansFormImg = $defaultava;
+
+        if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
+            $sn_ansFormImg = $mybb->settings['socialnetwork_images_guests_default'];
+        }
         //poster uid
         $postuser = intval($get_post['sn_uid']);
         $postuserdata = socialnetwork_getSnUserInfo($postuser);
@@ -1207,6 +1079,9 @@ function socialnetwork_showPosts($query, $type)
         //the avatar
         $sn_postimg =  $postuserdata['sn_avatar'];
 
+        if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
+            $sn_postimg = $mybb->settings['socialnetwork_images_guests_default'];
+        }
 
         if ($get_post['sn_del_name'] != "") {
             $sn_postname =  htmlspecialchars_uni($get_post['sn_del_name']);
@@ -2270,8 +2145,8 @@ function socialnetwork_newsfeed()
         $userUseSN = 1;
         $numpages = $mybb->settings['threadsperpage'];
 
-        if ($numpages == "") $numpages = 5;
-
+        if ($numpages == "") $numpages = 10;
+        // $numpages = 10;
         $userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = $thisuser"), "uid");
         if ($userUseSNQuery == "") {
             $userUseSN = 0;
@@ -2312,7 +2187,6 @@ function socialnetwork_newsfeed()
         if ($upper > $numposts) {
             $upper = $numposts;
         }
-
 
         //show all posts of erveryone
         if ($mybb->input['action'] == "sn_newsfeedAll") {
@@ -2385,6 +2259,39 @@ function socialnetwork_newsfeed()
         eval("\$outpage .= \"" . $templates->get('socialnetwork_misc_main') . "\";");
         output_page($outpage);
         die();
+    }
+}
+
+
+/**
+ * Show all Users who are using social network
+ */
+$plugins->add_hook("misc_start", "socialnetwork_userlist");
+function socialnetwork_userlist()
+{
+    global $db, $mybb, $lang, $templates, $cache, $page, $headerinclude, $header, $footer, $theme, $multipage, $sn_user;
+    $lang->load("socialnetwork");
+    $outpage = "";
+    if ($mybb->input['action'] == "sn_userlist") {
+        add_breadcrumb($lang->socialnetwork_view_userlist, "misc.php?action=sn_userlist");
+        // get all users using the network
+        $get_users = $db->simple_select("sn_users", "*");
+        //Liste Durchgehen
+        while ($sn_user = $db->fetch_array($get_users)) {
+            //gäste dürfen keine bilder sehen
+            if ($mybb->settings['socialnetwork_images_guests'] == 0 && $mybb->user['uid'] == 0) {
+                $profileimage = "<img src=\"{$mybb->settings['socialnetwork_defaultavatar']}\">";
+            } else {
+                $profileimage = "<img src=\"{$sn_user['sn_avatar']}\">";
+            }
+            $sn_userdata = get_user($sn_user['uid']);
+            $sn_profile_link = build_profile_link($sn_userdata['username'],  $sn_userdata['uid']);
+            $sn_link = "<a href=\"member.php?action=profile&uid={$sn_userdata['uid']}area=socialnetwork\">{$lang->socialnetwork_view_userlist_link}</a>";
+            
+            eval("\$socialnetwork_userlistbit .= \"" . $templates->get('socialnetwork_misc_userlist_bit') . "\";");
+        }
+        eval("\$outpage = \"" . $templates->get('socialnetwork_misc_userlist') . "\";");
+        output_page($outpage);
     }
 }
 
