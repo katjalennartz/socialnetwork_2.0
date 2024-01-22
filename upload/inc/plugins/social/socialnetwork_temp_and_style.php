@@ -1095,8 +1095,8 @@ function socialnetwork_add_settings($type = 'install')
 {
     global $db, $mybb, $lang;
     $lang->load("socialnetwork");
-    $lang->load("admin/socialnetwork");
 
+    $gid = $db->fetch_field($db->write_query("SELECT gid FROM `" . TABLE_PREFIX . "settinggroups` WHERE name like 'socialnetwork%' LIMIT 1;"), "gid");
     //setting array
     $setting_array = array(
         'socialnetwork_html' => array(
@@ -1248,7 +1248,6 @@ function socialnetwork_add_settings($type = 'install')
         ),
     );
     if ($type == "install") {
-        $gid = $db->insert_id();
         foreach ($setting_array as $name => $setting) {
             $setting['name'] = $name;
             $setting['gid'] = $gid;
