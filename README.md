@@ -3,8 +3,8 @@ von Risuena
 Kontakt: Discord: risuena
 Download: https://github.com/katjalennartz/socialnetwork_2.0  
 LICENSE: GNU General Public License v3.0  
-**Last Update: 21.01.2024**
- Update Script im update Ordner
+**Last Update: 21.01.2024**		
+ Update Script im update Ordner		
  update/update_social.php
 
 ## Wichtige Variablen.  
