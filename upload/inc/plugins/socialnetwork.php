@@ -138,7 +138,6 @@ function socialnetwork_install()
     include MYBB_ROOT . "/inc/plugins/social/socialnetwork_temp_and_style.php";
     //add settings
     $settings_group = array(
-        "gid" => "",
         "name" => "socialnetwork",
         "title" => $lang->socialnetwork_settings_title,
         "description" => $lang->socialnetwork_settings_desc,
@@ -146,9 +145,8 @@ function socialnetwork_install()
         "isdefault" => "0",
     );
 
-    socialnetwork_add_settings();
-
     $db->insert_query("settinggroups", $settings_group);
+    socialnetwork_add_settings();
 
     //add templates and stylesheets
     // Add templategroup
