@@ -35,11 +35,11 @@ LICENSE: GNU General Public License v3.0
 
 member.php?action=profile&uid=X&area=socialnetwork  (ersetze X mit uid des users)
 
-misc.php?action=sn_newsfeedAll. //feed mit allen posts
-misc.php?action=sn_newsfeedFriends //feed mit Posts von Freunden
-misc.php?action=sn_userlist //auflistung aller nutzer
+misc.php?action=sn_newsfeedAll. //feed mit allen posts  
+misc.php?action=sn_newsfeedFriends //feed mit Posts von Freunden  
+misc.php?action=sn_userlist //auflistung aller nutzer  
 
-usercp.php?action=socialnetwork  //Link zum UCP
+usercp.php?action=socialnetwork  //Link zum UCP  
 
 ## Installation
 1. Plugn installieren
