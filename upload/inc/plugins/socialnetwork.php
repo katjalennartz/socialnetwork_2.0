@@ -33,7 +33,7 @@ function socialnetwork_info()
         "version" => "2.1",
         "compatability" => "18*"
     );
-    if (socialnetwork_is_installed() && is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active']['socialnetwork']) {
+    if (socialnetwork_is_installed() && is_array($plugins_cache) && is_array($plugins_cache['active']) && !empty($plugins_cache['active']['socialnetwork'])) {
         $result = $db->simple_select('settinggroups', 'gid', "name = 'socialnetwork'");
         $set = $db->fetch_array($result);
         if (!empty($set)) {
