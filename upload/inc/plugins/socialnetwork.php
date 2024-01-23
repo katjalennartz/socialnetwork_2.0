@@ -4,7 +4,7 @@
  * social network for mybb Plugin
  *
  * @author risuena
- * @version 2.0
+ * @version 2.0.1
  * @copyright risuena 2020
  * last change: 20-03-2023
  * adding upgradescript!
@@ -30,7 +30,7 @@ function socialnetwork_info()
         "website" => "https://github.com/katjalennartz/socialnetwork_2.0",
         "author" => "risuena",
         "authorsite" => "https://github.com/katjalennartz",
-        "version" => "2.1",
+        "version" => "2.0.1",
         "compatability" => "18*"
     );
     if (socialnetwork_is_installed() && is_array($plugins_cache) && is_array($plugins_cache['active']) && !empty($plugins_cache['active']['socialnetwork'])) {
