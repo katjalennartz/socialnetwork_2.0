@@ -1,4 +1,4 @@
-# Soziales Network 2.1  
+# Soziales Network 2.0.1  
 von Risuena  
 Kontakt: Discord: risuena
 Download: https://github.com/katjalennartz/socialnetwork_2.0  
