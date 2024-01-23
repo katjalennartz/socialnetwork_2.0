@@ -51,7 +51,7 @@ $l['socialnetwork_settings_recordsperpage']='Wieviele Posts sollen zunächst ang
 $l['socialnetwork_settings_mentionsownpage_tit']='Posts mit mentions?';
 $l['socialnetwork_settings_mentionsownpage']='Sollen die Posts auf der eigenen Seite angezeigt werden, in denen man auf einer anderen Seite erwähnt wurde?';
 $l['socialnetwork_settings_images_guests_tit']='Bilder Gäste?';
-$l['socialnetwork_settings_images_guests']='Dürfen Bilder Gäste sehen?';
+$l['socialnetwork_settings_images_guests']='Dürfen Gäste Bilder sehen?';
 $l['socialnetwork_settings_images_guests_default_tit']='Default Image?';
 $l['socialnetwork_settings_images_guests_default']='Default Images für Gäste?';
 
