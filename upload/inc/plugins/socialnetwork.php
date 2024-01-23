@@ -6,8 +6,8 @@
  * @author risuena
  * @version 2.0.1
  * @copyright risuena 2020
- * last change: 20-03-2023
- * adding upgradescript!
+ * last change: januar 24
+ * update needed: upload/update_social.php
  * 
  */
 // enable for Debugging:
