@@ -1,8 +1,8 @@
 <?php
 define("IN_MYBB", 1);
 
-error_reporting(-1);
-ini_set('display_errors', true);
+//error_reporting(-1);
+//ini_set('display_errors', true);
 
 require("global.php");
 global $db, $mybb, $templates, $lang, $parser, $socialnetwork_member_postbit, $socialnetwork_member_postimg_ans, $socialnetwork_member_answerbit, $socialnetwork_member_postimg;
