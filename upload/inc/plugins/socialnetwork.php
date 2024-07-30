@@ -2617,7 +2617,7 @@ function socialnetwork_getglobals(&$forum)
 
     //letzter sn post
     $get_lastpost = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_post_id = (SELECT max(sn_post_id) FROM " . TABLE_PREFIX . "sn_posts AS max)");
-    
+
     if ($db->num_rows($get_lastpost) > 0) {
         $last_post = $db->fetch_array($get_lastpost);
         $userinfo = socialnetwork_getSnUserInfo($last_post['sn_uid']);
@@ -4032,6 +4032,34 @@ function socialnetwork_addstylesheets($type = 'install')
             color: #000; 
           }
           
+
+        .sn_forumbit {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-areas:
+                "avatar post"
+                "feedlinks feedlinks";
+            justify-items: center;
+        }
+
+        .sn_forumbit__avatar {
+            grid-area: avatar;
+            text-align:center;
+            img{
+                width: 100px;
+                border-radius: 50%;
+                object-fit: cover;
+            
+            }
+        }
+
+        .sn_forumbit__post {
+            grid-area: post;
+        }
+
+        .sn_forumbit__newsfeedlinks {
+            grid-area: feedlinks;
+        }
         ',
         'cachefile' => $db->escape_string(str_replace('/', '', 'socialnetwork.css')),
         'lastmodified' => time()
