@@ -1,8 +1,8 @@
 # Soziales Network 2.0.2  
 von Risuena  
-Kontakt: Discord: risuena
-Download: https://github.com/katjalennartz/socialnetwork_2.0  
-LICENSE: GNU General Public License v3.0  
+Kontakt: Discord: risuena  
+Download: https://github.com/katjalennartz/socialnetwork_2.0    
+LICENSE: GNU General Public License v3.0   
 **Last Update: 30.07.2024**  
  Update Script im update Ordner  
  update/update_social.php  
