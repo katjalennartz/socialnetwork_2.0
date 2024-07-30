@@ -53,52 +53,52 @@ usercp.php?action=socialnetwork  //Link zum UCP
   
 ## Inhalt
 ### Inhalt:  
-update_social.php  
-admin/modules/tools/socialnetwork.php  
-inc/languages/deutsch_du/socialnetwork.lang.php  
-inc/languages/deutsch_du/admin/socialnetwork.lang.php  
-inc/plugins/socialnetwork.php  
-social/js/jquery.inview.js  
-social/js/script.js  
-social/logo.png  
-social/profil_leer.png  
-social_saveold.php  
-social/userimages  (ACHTUNG! CHMOD RECHTE AUF 755)  
-socialpagination.php  
+- update_social.php  
+- admin/modules/tools/socialnetwork.php  
+- inc/languages/deutsch_du/socialnetwork.lang.php  
+- inc/languages/deutsch_du/admin/socialnetwork.lang.php  
+- inc/plugins/socialnetwork.php  
+- social/js/jquery.inview.js  
+- social/js/script.js  
+- social/logo.png  
+- social/profil_leer.png  
+- social_saveold.php  
+- social/userimages  (ACHTUNG! CHMOD RECHTE AUF 755)  
+- socialpagination.php  
   
   
 ### Templates:   
 Gruppe: Soziales Netzwerk  
-socialnetwork_member_answerbit  
-socialnetwork_member_answeredit  
-socialnetwork_member_friends  
-socialnetwork_member_friendsbit  
-socialnetwork_member_friendsbitAsked  
-socialnetwork_member_friendsbitToAccept  
-socialnetwork_member_infobit  
-socialnetwork_member_main  
-socialnetwork_member_postbit  
-socialnetwork_member_postedit  
-socialnetwork_misc_answerbit  
-socialnetwork_misc_main  
-socialnetwork_misc_postbit  
-socialnetwork_misc_postimg  
-socialnetwork_modcp_main  
-socialnetwork_modcp_modify  
-socialnetwork_modcp_nav  
-socialnetwork_modcp_singleuser  
-socialnetwork_ucp_main  
-socialnetwork_ucp_nav  
-socialnetwork_ucp_ownFieldsBit  
-socialnetwork_ucp_pmAlert  
+- socialnetwork_member_answerbit  
+- socialnetwork_member_answeredit  
+- socialnetwork_member_friends  
+- socialnetwork_member_friendsbit  
+- socialnetwork_member_friendsbitAsked  
+- socialnetwork_member_friendsbitToAccept  
+- socialnetwork_member_infobit  
+- socialnetwork_member_main  
+- socialnetwork_member_postbit  
+- socialnetwork_member_postedit  
+- socialnetwork_misc_answerbit  
+- socialnetwork_misc_main  
+- socialnetwork_misc_postbit  
+- socialnetwork_misc_postimg  
+- socialnetwork_modcp_main  
+- socialnetwork_modcp_modify  
+- socialnetwork_modcp_nav  
+- socialnetwork_modcp_singleuser  
+- socialnetwork_ucp_main  
+- socialnetwork_ucp_nav  
+- socialnetwork_ucp_ownFieldsBit  
+- socialnetwork_ucp_pmAlert  
 **seit märz 2023:**                
-socialnetwork_member_shortinfos         
-socialnetwork_member_shortinfos_nopage
+- socialnetwork_member_shortinfos         
+- socialnetwork_member_shortinfos_nopage
 **seit Januar2024:**  
-socialnetwork_misc_userlist
-socialnetwork_misc_userlist_bit
+- socialnetwork_misc_userlist
+- socialnetwork_misc_userlist_bit
 **seit Juli 2024:**  
-socialnetwork_forumbit_ingame
+- socialnetwork_forumbit_ingame
      
 ### CSS  
 socialnetwork.css  
