@@ -1,9 +1,9 @@
-# Soziales Network 2.0.1  
+# Soziales Network 2.0.2  
 von Risuena  
 Kontakt: Discord: risuena
 Download: https://github.com/katjalennartz/socialnetwork_2.0  
 LICENSE: GNU General Public License v3.0  
-**Last Update: 21.01.2024**  
+**Last Update: 30.07.2024**  
  Update Script im update Ordner  
  update/update_social.php  
 
@@ -12,7 +12,6 @@ LICENSE: GNU General Public License v3.0
 * Member Profil in member_profile:  
 {$sn_page_profil}  - link zur SN Seite       
 {$socialnetwork_member_shortinfos} - Shortinfos anzeigen (Freunde, letzter geschriebener Beitrag, Letzter post auf Seite etc) **muss manuell hinzugefügt werden**
-
 
 * Global verwendbar:  
 {$sn_newsfeedFriend} - link zum Newsfeed der Freunde  
@@ -54,6 +53,7 @@ usercp.php?action=socialnetwork  //Link zum UCP
   
 ## Inhalt
 ### Inhalt:  
+update_social.php  
 admin/modules/tools/socialnetwork.php  
 inc/languages/deutsch_du/socialnetwork.lang.php  
 inc/languages/deutsch_du/admin/socialnetwork.lang.php  
@@ -91,17 +91,20 @@ socialnetwork_ucp_main
 socialnetwork_ucp_nav  
 socialnetwork_ucp_ownFieldsBit  
 socialnetwork_ucp_pmAlert  
-**seit märz 2023:**              
+**seit märz 2023:**                
 socialnetwork_member_shortinfos         
 socialnetwork_member_shortinfos_nopage
-**seit Januar2024:**
+**seit Januar2024:**  
 socialnetwork_misc_userlist
 socialnetwork_misc_userlist_bit
+**seit Juli 2024:**  
+socialnetwork_forumbit_ingame
      
 ### CSS  
 socialnetwork.css  
 
-**css update zu userlist**
+#### css update zu userlist  
+```
 .sn_userlist_text {
 	margin-bottom: 20px;
 }
@@ -124,3 +127,35 @@ socialnetwork.css
     border-bottom: 1px solid #dedede;
     color: #000;
 }
+```
+
+#### css update zum forumbit  
+```
+.sn_forumbit {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas:
+          "avatar post"
+          "feedlinks feedlinks";
+      justify-items: center;
+  }
+  
+  .sn_forumbit__avatar {
+      grid-area: avatar;
+      text-align:center;
+      img{
+          width: 100px;
+          border-radius: 50%;
+          object-fit: cover;
+      
+      }
+  }
+  
+  .sn_forumbit__post {
+      grid-area: post;
+  }
+  
+  .sn_forumbit__newsfeedlinks {
+      grid-area: feedlinks;
+  }
+```
