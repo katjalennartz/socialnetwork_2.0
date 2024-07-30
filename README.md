@@ -9,23 +9,23 @@ LICENSE: GNU General Public License v3.0
 
 ## Wichtige Variablen.  
 
-* Member Profil in member_profile:  
+### Member Profil in member_profile:  
 {$sn_page_profil}  - link zur SN Seite       
 {$socialnetwork_member_shortinfos} - Shortinfos anzeigen (Freunde, letzter geschriebener Beitrag, Letzter post auf Seite etc) **muss manuell hinzugefügt werden**
 
-* Global verwendbar:  
+### Global verwendbar:  
 {$sn_newsfeedFriend} - link zum Newsfeed der Freunde  
 {$sn_newsfeedAll} - link zum Newsfeed (alle Beiträge)  
 {$sn_page} - Link zum Userprofil (vom user der online ist)   
 
-* Letzter Post(global):  
+### Letzter Post(global):  
 {$last_post['sn_social_post']} Postinhalt    
 {$userinfo['linkauthor']} Link zum Autor  
 {$last_post['linktopost']} Link zum Beitrag  
 {$last_post['sn_social_post']}  Post  
      
     
-* Mitglieder Liste - einbinden in memberlist_user:  
+### Mitglieder Liste - einbinden in memberlist_user:  
 {$user['social_link']} - link zum Profil des Nutzers  
 
 * Postbit:  
