@@ -4,11 +4,7 @@
  * social network for mybb Plugin
  *
  * @author risuena
- * @version 2.0.1
- * @copyright risuena 2020
- * last change: januar 24
- * update needed: upload/update_social.php
- * 
+ * @version 2.0.2
  */
 // enable for Debugging:
 // error_reporting(E_ERROR | E_PARSE);
