@@ -4,7 +4,7 @@
  * social network for mybb Plugin
  * FILE FOR ADDING TEMPLATES AND STYLES
  * @author risuena
- * @version 2.0
+ * @version 2.0.2
  * @copyright risuena 2020
  * 
  */
@@ -1096,7 +1096,19 @@ function socialnetwork_add_settings($type = 'install')
     global $db, $mybb, $lang;
     $lang->load("socialnetwork");
 
-    $gid = $db->fetch_field($db->write_query("SELECT gid FROM `" . TABLE_PREFIX . "settinggroups` WHERE name like 'socialnetwork%' LIMIT 1;"), "gid");
+    if ($type = "install") {
+        $settings_group = array(
+            "name" => "socialnetwork",
+            "title" => $lang->socialnetwork_settings_title,
+            "description" => $lang->socialnetwork_settings_desc,
+            "disporder" => "0",
+            "isdefault" => "0",
+        );
+
+        $gid = $db->insert_query("settinggroups", $settings_group);
+    } else {
+        $gid = $db->fetch_field($db->write_query("SELECT gid FROM `" . TABLE_PREFIX . "settinggroups` WHERE name like 'socialnetwork%' LIMIT 1;"), "gid");
+    }
     //setting array
     $setting_array = array(
         'socialnetwork_html' => array(
