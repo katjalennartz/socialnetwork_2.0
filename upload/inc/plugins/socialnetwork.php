@@ -30,7 +30,7 @@ function socialnetwork_info()
         "website" => "https://github.com/katjalennartz/socialnetwork_2.0",
         "author" => "risuena",
         "authorsite" => "https://github.com/katjalennartz",
-        "version" => "2.0.1",
+        "version" => "2.0.2",
         "compatability" => "18*"
     );
     if (socialnetwork_is_installed() && is_array($plugins_cache) && is_array($plugins_cache['active']) && !empty($plugins_cache['active']['socialnetwork'])) {
@@ -137,16 +137,7 @@ function socialnetwork_install()
 
     include MYBB_ROOT . "/inc/plugins/social/socialnetwork_temp_and_style.php";
     //add settings
-    $settings_group = array(
-        "name" => "socialnetwork",
-        "title" => $lang->socialnetwork_settings_title,
-        "description" => $lang->socialnetwork_settings_desc,
-        "disporder" => "0",
-        "isdefault" => "0",
-    );
-
-    $db->insert_query("settinggroups", $settings_group);
-    socialnetwork_add_settings();
+	socialnetwork_add_settings("install");
 
     //add templates and stylesheets
     // Add templategroup
@@ -382,7 +373,7 @@ function socialnetwork_usercp()
             error_no_permission();
         }
         //get the inputs and settings of user
-        $get_input = $db->query("SELECT * FROM " . TABLE_PREFIX . "sn_users WHERE uid = " . $thisuser . "");
+		$get_input = $db->query("SELECT * FROM " . TABLE_PREFIX . "sn_users WHERE uid = '$thisuser'");
         while ($input = $db->fetch_array($get_input)) {
             $nickname = $input['sn_nickname'];
             $profilbild = $input['sn_avatar'];
@@ -415,7 +406,7 @@ function socialnetwork_usercp()
 
         foreach ($fields as $field) {
             $sn_fieldtitle = $field;
-            $get_input  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = " . $mybb->user['uid']), "own_" . $field);
+			$get_input  = $db->fetch_field($db->simple_select("sn_users", "own_" . $field, "uid = '{$mybb->user['uid']}'"), "own_" . $field);
             eval("\$socialnetwork_ucp_ownFieldsBit .= \"" . $templates->get('socialnetwork_ucp_ownFieldsBit') . "\";");
         }
 
@@ -961,7 +952,13 @@ function socialnetwork_showPostsNormal()
         //username (escapen)
         $userdata['username'] = $db->escape_string($userdata['username']);
         //query
-        $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_pageid = $thispage OR sn_social_post LIKE '%@{$sndata['sn_nickname']}%' OR sn_social_post LIKE '%@{$userdata['username']}%' ORDER BY sn_date DESC, sn_post_id ASC");
+		$queryPosts = $db->write_query("
+			SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_pageid = '$thispage' 
+			OR sn_social_post REGEXP '(^|[^a-zA-Z0-9_])@{$userdata['username']}([^a-zA-Z0-9_]|$)' 
+			OR sn_social_post REGEXP '(^|[^a-zA-Z0-9_])@{$sndata['sn_nickname']}[^a-zA-Z0-9_]|$)' 
+			OR sn_social_post REGEXP '(^|[^a-zA-Z0-9_])@\'?{$userdata['username']}\'?([^a-zA-Z0-9_]|$)' 
+			OR sn_social_post REGEXP '(^|[^a-zA-Z0-9_])@\'?{$sndata['sn_nickname']}\'?([^a-zA-Z0-9_]|$)' 
+			ORDER BY sn_date DESC, sn_post_id ASC");
     } else {
         //nur eigene Posts
         $queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_pageid = $thispage ORDER BY sn_date DESC, sn_post_id ASC");
@@ -1015,6 +1012,30 @@ function socialnetwork_showPostsAjax()
     socialnetwork_showPosts($queryPosts, "infinite");
 }
 
+/**
+ * if a user is mentioned, replace his name with link to profile
+ * @param array of users
+ * @param string post or answer
+ * @return string parsed message
+ */
+
+function socialnetwork_replaceMentioned($user_array, $message)
+{
+	global $db, $mybb;
+	// var_dump($user_array);
+	foreach ($user_array as $uid => $username) {
+		// Benutzerprofil-URL (du musst dies an deine URL-Struktur anpassen)
+		$profile_url = "member.php?action=profile&uid={$uid}&area=socialnetwork";
+
+		// Den regulären Ausdruck an den aktuellen Benutzernamen anpassen
+		$escaped_username = preg_quote($username, '/'); // Sonderzeichen maskieren
+
+		// Regex für das Ersetzen von @'username'
+		$message = preg_replace("/@'{$escaped_username}'/", '<a href="' . $profile_url . '">@' . $username . '</a>', $message);
+	}
+	return $message;
+}
+
 /***
  * socialnetwork_showPosts()
  */
@@ -1035,6 +1056,21 @@ function socialnetwork_showPosts($query, $type)
     $defaultava = $db->escape_string($mybb->settings['socialnetwork_defaultavatar']);
     $cnt_likes_post = "";
 
+	//arrays für mentions
+	$username_array = array();
+	$get_usernames = $db->simple_select("users", "uid, username");
+	while ($data = $db->fetch_array($get_usernames)) {
+		$userid = $data['uid'];
+		$username_array[$userid] = $data['username'];
+	}
+
+	$socialname_array = array();
+	$get_socialnames = $db->simple_select("sn_users", "uid, sn_nickname");
+	while ($data = $db->fetch_array($get_socialnames)) {
+		$userid = $data['uid'];
+		$socialname_array[$userid] = $data['sn_nickname'];
+	}
+
     //Set parser options
     $options = array(
         "allow_html" => $mybb->settings['socialnetwork_html'],
@@ -1046,6 +1082,7 @@ function socialnetwork_showPosts($query, $type)
     );
     require_once MYBB_ROOT . "inc/class_parser.php";
     $parser = new postParser;
+
 
     //Daten bekommen
     while ($get_post = $db->fetch_array($query)) {
@@ -1091,7 +1128,12 @@ function socialnetwork_showPosts($query, $type)
         //the other informations of post
         $sn_date = date('d.m.y - H:i', strtotime($get_post['sn_date']));
 
-        $sn_showPost = $parser->parse_message($get_post['sn_social_post'], $options);
+		//replace message if some mentions
+		$snpost = $get_post['sn_social_post'];
+		$snpost = socialnetwork_replaceMentioned($username_array, $get_post['sn_social_post']);
+		$snpost = socialnetwork_replaceMentioned($socialname_array, $snpost);
+
+		$sn_showPost = $parser->parse_message($snpost, $options);
         $sn_postid = intval($get_post['sn_post_id']);
         if ($type == "newsfeed") {
             $pageid = socialnetwork_getPageId($sn_postid, "post");
@@ -1242,7 +1284,12 @@ function socialnetwork_showPosts($query, $type)
                 eval("\$sn_ans_ed_del = \"" . $templates->get("socialnetwork_member_answeredit") . "\";");
             }
 
-            $sn_showAnswer = $parser->parse_message($get_answer['sn_answer'], $options);
+			//replace message if some mentions
+			$sn_showAnswer = $get_answer['sn_answer'];
+			$sn_showAnswer = socialnetwork_replaceMentioned($username_array, $sn_showAnswer);
+			$sn_showAnswer = socialnetwork_replaceMentioned($socialname_array, $sn_showAnswer);
+			$sn_showAnswer = $parser->parse_message($sn_showAnswer, $options);
+			
             if ($type == "newsfeed") {
 
                 eval("\$socialnetwork_misc_answerbit .= \"" . $templates->get('socialnetwork_misc_answerbit') . "\";");
@@ -2160,7 +2207,7 @@ function socialnetwork_newsfeed()
 
         if ($numpages == "") $numpages = 10;
         // $numpages = 10;
-        $userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = $thisuser"), "uid");
+		$userUseSNQuery = $db->fetch_field($db->simple_select("sn_users", "uid", "uid = '$thisuser'"), "uid");
         if ($userUseSNQuery == "") {
             $userUseSN = 0;
         }
@@ -2178,10 +2225,10 @@ function socialnetwork_newsfeed()
                 $db->write_query(" 
             SELECT count(DISTINCT(sn_post_id)) as count FROM 
                 (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name 
-                    FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
+                FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = '$thisuser') as f 
                     JOIN " . TABLE_PREFIX . "sn_posts ON sn_uid = sn_friendwith
                 UNION
-            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab
+        SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = '$thisuser' OR sn_pageid = '$thisuser') as tab
             "),
                 "count"
             );
@@ -2213,10 +2260,10 @@ function socialnetwork_newsfeed()
             $queryPostsFriends = $db->write_query(" 
             SELECT DISTINCT(sn_post_id), sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name FROM 
                 (SELECT sn_post_id, sn_pageid, sn_uid, sn_date, sn_social_post, sn_del_name 
-                    FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = $thisuser) as f 
+                FROM (SELECT sn_friendwith FROM " . TABLE_PREFIX . "sn_friends WHERE sn_uid = '$thisuser') as f 
                     JOIN " . TABLE_PREFIX . "sn_posts ON sn_uid = sn_friendwith
                 UNION
-            SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = $thisuser OR sn_pageid = $thisuser) as tab order by sn_date DESC LIMIT $start, $numpages
+        SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_uid = '$thisuser' OR sn_pageid = '$thisuser') as tab order by sn_date DESC LIMIT $start, $numpages
             ");
 
             socialnetwork_showPosts($queryPostsFriends, "newsfeed");
