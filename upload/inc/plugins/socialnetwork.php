@@ -1534,7 +1534,8 @@ function socialnetwork_mentionUser($message, $thispage, $postid, $aid)
 	}
 
 	foreach ($users as $name => $men_uid) {
-		$searchstring = "/@" . $name . "/";
+		// $searchstring = "/@" . $name . "/";
+		$searchstring = "/@'?" . preg_quote($name) . "'?/";
 		if (preg_match($searchstring, $message)) {
 			socialnetwork_checkMentions("mention", $thispage, $men_uid, $postid, $aid);
 		}
