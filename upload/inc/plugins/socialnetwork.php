@@ -586,7 +586,7 @@ function socialnetwork_mainpage()
 			socialnetwork_checkMentions("post", $thispage, $thisuser, $postid, 0);
 
 			if ($post != '') {
-				socialnetwork_mentionUser($post, $thispage, $postid, 0);
+				socialnetwork_mentionUser($mybb->input['sn_post'], $thispage, $postid, 0);
 				socialnetwork_savingPostOrAnswer($thispage, $thisuser, $datetime, $post, "sn_posts", $thispage);
 				redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork");
 			} else {
@@ -615,7 +615,7 @@ function socialnetwork_mainpage()
 			socialnetwork_checkMentions("answer", $thispage, $thisuser, $toPostId, $answerid);
 			//wenn antwort nicht leer
 			if ($answer != '') {
-				socialnetwork_mentionUser($answer, $thispage, $toPostId, $answerid);
+				socialnetwork_mentionUser($mybb->input['sn_answer'], $thispage, $toPostId, $answerid);
 				socialnetwork_savingPostOrAnswer($toPostId, $thisuser, $datetime, $answer, "sn_answers", $thispage);
 				redirect("member.php?action=profile&uid={$thispage}&area=socialnetwork");
 			} else {
@@ -959,7 +959,6 @@ function socialnetwork_showPostsNormal()
 			OR sn_social_post REGEXP '(^|[^a-zA-Z0-9_])@\'?{$userdata['username']}\'?([^a-zA-Z0-9_]|$)' 
 			OR sn_social_post REGEXP '(^|[^a-zA-Z0-9_])@\'?{$sndata['sn_nickname']}\'?([^a-zA-Z0-9_]|$)' 
 			ORDER BY sn_date DESC, sn_post_id ASC");
-			
 	} else {
 		//nur eigene Posts
 		$queryPosts = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "sn_posts WHERE sn_pageid = $thispage ORDER BY sn_date DESC, sn_post_id ASC");
@@ -1534,8 +1533,13 @@ function socialnetwork_mentionUser($message, $thispage, $postid, $aid)
 	}
 
 	foreach ($users as $name => $men_uid) {
-		// $searchstring = "/@" . $name . "/";
-		$searchstring = "/@'?" . preg_quote($name) . "'?/";
+		// Benutzernamen für den Regex aus Sonderzeichen escapen
+		$escaped_name = preg_quote($name, '/');
+
+		// Suchstring anpassen, um @username und @'username' zu erlauben
+		$searchstring = "/@'?(" . $escaped_name . ")'?/";
+
+		// Prüfen, ob die Nachricht den Mention enthält
 		if (preg_match($searchstring, $message)) {
 			socialnetwork_checkMentions("mention", $thispage, $men_uid, $postid, $aid);
 		}
@@ -2284,7 +2288,7 @@ function socialnetwork_newsfeed()
 			}
 			socialnetwork_checkMentions("answer", $thispage, $thisuser, $toPostId, $answerid);
 			if ($answer != '') {
-				socialnetwork_mentionUser($answer, $thispage, $toPostId, $answerid);
+				socialnetwork_mentionUser($mybb->input['sn_answer'], $thispage, $toPostId, $answerid);
 				socialnetwork_savingPostOrAnswer($toPostId, $thisuser, $datetime, $answer, "sn_answers", $thispage);
 				redirect("misc.php?action=sn_newsfeedAll");
 			} else {
